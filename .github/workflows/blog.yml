@@ -75,7 +75,7 @@ jobs:
     name: Version and Release
     runs-on: ubuntu-latest
     needs: [markdownlint, spellcheck]
-    if: always()
+    if: ${{ always() && !cancelled() }}
     permissions:
       contents: write
     steps:
