@@ -52,7 +52,7 @@ jobs:
       - name: Extract misspelled words
         if: steps.changed-files.outputs.any_changed == 'true'
         run: |
-          if [ -f spellcheck-results.txt alls ]; then
+          if [ -f spellcheck-results.txt ]; then
             awk '/^-{80,}$/ {getline; if (NF > 0) print tolower($0)}' spellcheck-results.txt | sort -u > misspelled-words.txt || true
             if [ -s misspelled-words.txt ]; then
               echo "Misspelled words found:"
@@ -78,6 +78,8 @@ jobs:
     if: ${{ always() && !cancelled() }}
     permissions:
       contents: write
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -85,11 +87,14 @@ jobs:
           fetch-depth: 0
 
       - name: Generate blog version tag and release
+        id: tag
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          TODAY=$(date +%Y.%m.%d)
-          PREFIX="blog-${TODAY}"
+          YEAR=$(date +%Y)
+          MONTH=$(date +%-m)
+          DAY=$(date +%-d)
+          PREFIX="${YEAR}.${MONTH}.${DAY}-blog"
 
           git fetch --tags --force
           COUNT=$(git tag --list "${PREFIX}.*" | wc -l)
@@ -105,6 +110,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git tag "$TAG"
           git push origin "$TAG"
+          echo "tag=${TAG}" >> $GITHUB_OUTPUT
           echo "Tagged as ${TAG}"
 
           NOTES=$(git log --pretty=format:"- %s" $(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || git rev-list --max-parents=0 HEAD)..HEAD -- blog/ 2>/dev/null || echo "- Blog update")
@@ -134,13 +140,33 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Get version tag
+        id: get_tag
+        run: |
+          FULL_TAG="${{ needs.version.outputs.tag }}"
+          # 2026.2.25-blog.1 → 2026.2.25-1
+          VERSION=${FULL_TAG/-blog/}
+          MAJOR=$(echo "$VERSION" | cut -d'.' -f1)
+          MAJOR_MINOR=$(echo "$VERSION" | cut -d'.' -f1,2)
+          MAJOR_MINOR_PATCH=$(echo "$VERSION" | cut -d'-' -f1)
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "major=${MAJOR}" >> $GITHUB_OUTPUT
+          echo "major_minor=${MAJOR_MINOR}" >> $GITHUB_OUTPUT
+          echo "major_minor_patch=${MAJOR_MINOR_PATCH}" >> $GITHUB_OUTPUT
+
       - name: Extract metadata for Docker
         id: meta
         uses: docker/metadata-action@v5
         with:
           images: ghcr.io/${{ github.repository_owner }}/blog
+          flavor: |
+            latest=false
           tags: |
             type=raw,value=latest
+            type=raw,value=${{ steps.get_tag.outputs.version }}
+            type=raw,value=${{ steps.get_tag.outputs.major_minor_patch }}
+            type=raw,value=${{ steps.get_tag.outputs.major_minor }}
+            type=raw,value=${{ steps.get_tag.outputs.major }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -152,7 +178,9 @@ jobs:
           file: Dockerfile.blog
           push: true
           tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          labels: |
+            ${{ steps.meta.outputs.labels }}
+            org.opencontainers.image.version=${{ steps.get_tag.outputs.version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           secrets: |
