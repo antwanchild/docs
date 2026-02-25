@@ -27,10 +27,6 @@ RUN mkdocs build --strict --site-dir /site
 # Stage 2 — Serve with nginx
 FROM nginx:alpine
 
-#Version label
-ARG VERSION=dev
-LABEL org.opencontainers.image.version=${VERSION}
-
 # Remove default nginx page
 RUN rm -rf /usr/share/nginx/html/*
 

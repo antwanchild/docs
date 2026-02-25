@@ -186,7 +186,6 @@ jobs:
           secrets: |
             env_file=${{ secrets.ENV_FILE }}
           build-args: |
-            GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
             VERSION=${{ steps.get_tag.outputs.version }}
 
   link-check:
