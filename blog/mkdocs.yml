@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=https://squidfunk.github.io/mkdocs-material/schema.json
 site_name: Anthony's Blog
-site_url: https://docs.anthonychild.com
+site_url: https://blog.anthonychild.com
 site_description: Random Thoughts from Me...
 site_author: Anthony Child
 copyright: © <script>document.write(new Date().getFullYear())</script> Anthony Child • All rights reserved

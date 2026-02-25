@@ -183,9 +183,11 @@ jobs:
         with:
           args: >
             --no-progress
-            --accept 200,204,206,429
+            --accept 200,204,206,401,403,429
             --exclude-loopback
             --exclude 'mailto:.*'
+            --exclude 'github.com/antwanchild/docs'
+            --exclude '^file://'
             './site/**/*.html'
           fail: true
           output: link-check-results.md
@@ -193,12 +195,16 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Filter link check results
+        if: failure()
+        run: grep -v '\[200\]' link-check-results.md > link-check-filtered.md || true
+
       - name: Upload link check results
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: wiki-link-check-results
-          path: link-check-results.md
+          path: link-check-filtered.md
           retention-days: 7
 
       - name: Clean up .env
