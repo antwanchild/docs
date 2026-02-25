@@ -101,6 +101,9 @@ jobs:
           echo "tag=${TAG}" >> $GITHUB_OUTPUT
           echo "Tagged as ${TAG}"
 
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
       - name: Generate release notes with git-cliff
         id: cliff
         uses: orhun/git-cliff-action@v3
