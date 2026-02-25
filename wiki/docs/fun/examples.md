@@ -47,8 +47,8 @@ Super^script^ - `Super^script^`
 
 - Item 1
 - Item 2
-    - Nested item 2.1
-    - Nested item 2.2
+  - Nested item 2.1
+  - Nested item 2.2
 - Item 3
 
 ### Ordered List
@@ -333,7 +333,7 @@ Three or more dashes, asterisks, or underscores create a horizontal rule:
 
 **Rendered:**
 
----
+-----
 
 ```markdown
 ***
