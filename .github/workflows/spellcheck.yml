@@ -1,0 +1,64 @@
+name: Spellcheck
+
+on:
+  push:
+    branches: [ main, master ]
+    paths:
+      - 'wiki/**/*.md'
+      - 'blog/**/*.md'
+  pull_request:
+    branches: [ main, master ]
+    paths:
+      - 'wiki/**/*.md'
+      - 'blog/**/*.md'
+
+jobs:
+  spellcheck:
+    name: Spellcheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v47
+        with:
+          files: |
+            wiki/**/*.md
+            blog/**/*.md
+
+      - name: Spellcheck changed files
+        if: steps.changed-files.outputs.any_changed == 'true'
+        uses: rojopolis/spellcheck-github-actions@0.58.0
+        with:
+          source_files: ${{ steps.changed-files.outputs.all_changed_files }}
+          output_file: spellcheck-results.txt
+        continue-on-error: true
+
+      - name: Extract misspelled words
+        if: steps.changed-files.outputs.any_changed == 'true'
+        run: |
+          if [ -f spellcheck-results.txt ]; then
+            awk '/^-{80,}$/ {getline; if (NF > 0) print tolower($0)}' spellcheck-results.txt | sort -u > misspelled-words.txt || true
+            if [ -s misspelled-words.txt ]; then
+              echo "Misspelled words found:"
+              cat misspelled-words.txt
+            fi
+          fi
+
+      - name: Upload spellcheck results
+        if: steps.changed-files.outputs.any_changed == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: spellcheck-results
+          path: |
+            spellcheck-results.txt
+            misspelled-words.txt
+          retention-days: 7
+          if-no-files-found: ignore
+
+      - name: No files to check
+        if: steps.changed-files.outputs.any_changed == 'false'
+        run: echo "No markdown or text files were changed"
