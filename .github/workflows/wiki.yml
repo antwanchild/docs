@@ -193,8 +193,9 @@ jobs:
             --exclude-loopback
             --exclude 'mailto:.*'
             --exclude 'github.com/antwanchild/docs'
+            --exclude '%7B'
             --exclude '^file://'
-            --base 'https://wiki.anthonychild.com'
+            --base-url 'https://wiki.anthonychild.com'
             './site/**/*.html'
           fail: true
           output: link-check-results.md
