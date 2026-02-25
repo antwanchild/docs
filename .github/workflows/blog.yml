@@ -91,6 +91,7 @@ jobs:
           TODAY=$(date +%Y.%m.%d)
           PREFIX="blog-${TODAY}"
 
+          git fetch --tags
           COUNT=$(git tag --list "${PREFIX}.*" | wc -l)
           N=$((COUNT + 1))
           TAG="${PREFIX}.${N}"
