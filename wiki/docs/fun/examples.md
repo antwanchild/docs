@@ -485,7 +485,7 @@ docker ps
 
 Output:
 
-```
+```bash
 CONTAINER ID   IMAGE     COMMAND   STATUS
 abc123def456   nginx     ...       Up 2 hours
 ```
