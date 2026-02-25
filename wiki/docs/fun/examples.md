@@ -49,7 +49,7 @@ Super^script^ - `Super^script^`
 - Item 2
     - Nested item 2.1
     - Nested item 2.2
-- Item 3----
+- Item 3--
 
 ### Ordered List
 
