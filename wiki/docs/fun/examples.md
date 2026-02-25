@@ -47,8 +47,8 @@ Super^script^ - `Super^script^`
 
 - Item 1
 - Item 2
-    - Nested item 2.1
-    - Nested item 2.2
+  - Nested item 2.1
+  - Nested item 2.2
 - Item 3
 
 ### Ordered List
@@ -80,6 +80,7 @@ Super^script^ - `Super^script^`
 ## :material-code-tags: Code
 
 ### Inline Code
+
     Use `inline code` like this.
 
 ### Code Blocks
@@ -206,7 +207,7 @@ services:
 ## :material-format-quote-close: Blockquotes
 
 > This is a blockquote.
-> 
+>
 > It can span multiple lines.
 
 > Nested blockquotes:
@@ -553,4 +554,3 @@ abc123def456   nginx     ...       Up 2 hours
 **Now go create some beautiful documentation!** :material-pencil:
 
 </div>
-
