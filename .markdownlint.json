@@ -1,0 +1,27 @@
+{
+    "default": true,
+  
+    // Line length — MkDocs doesn't care about this
+    "MD013": false,
+  
+    // Allow inline HTML — MkDocs uses it for admonitions and other features
+    "MD033": false,
+  
+    // Allow duplicate headings — common in docs with repeated section names
+    "MD024": false,
+  
+    // Allow trailing punctuation in headings — sometimes needed
+    "MD026": false,
+  
+    // Allow bare URLs — common in docs
+    "MD034": false,
+  
+    // First line doesn't have to be a heading
+    "MD041": false,
+  
+    // Allow emphasis as heading — sometimes used in MkDocs
+    "MD036": false,
+  
+    // Allow hard tabs — some editors insert these
+    "MD010": false
+  }
