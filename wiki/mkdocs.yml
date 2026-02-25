@@ -107,13 +107,13 @@ plugins:
         minify_css: true
         htmlmin_opts:
             remove_comments: true
-    - git-revision-date-localized:
-        type: timeago
-        enable_creation_date: true
-        fallback_to_build_date: true
-    - git-committers:
-        repository: antwanchild/docs
-        branch: main
+    # - git-revision-date-localized:
+    #     type: timeago
+    #     enable_creation_date: true
+    #     fallback_to_build_date: true
+    # - git-committers:
+    #     repository: antwanchild/docs
+    #     branch: main
 
 repo_url: https://github.com/antwanchild/docs
 repo_name: antwanchild/docs
