@@ -6,7 +6,7 @@ hide:
 
 Built and maintained with ❤️ by **Anthony Child** since 2024.
 
-!!! sucdcess ":material-check-all: Current Status"
+!!! success ":material-check-all: Current Status"
     Fully operational, automated, and secured! 🚀  
     28 containers running smoothly as of December 2025.
 
