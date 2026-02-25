@@ -181,6 +181,7 @@ jobs:
         with:
           args: >
             --no-progress
+            --quiet
             --accept 200,204,206,429
             --exclude-loopback
             --exclude 'mailto:.*'
