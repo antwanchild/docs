@@ -185,6 +185,7 @@ jobs:
             --exclude-loopback
             --exclude 'mailto:.*'
             --exclude '^file://'
+            --base 'https://blog.anthonychild.com'
             './site/**/*.html'
           fail: true
           output: link-check-results.md
