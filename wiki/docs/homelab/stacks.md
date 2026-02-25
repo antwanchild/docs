@@ -262,7 +262,7 @@ Modular infrastructure with separate directories and Docker networks for clean o
 
 ## :material-file-tree: Directory Structure
 
-    ```tree
+```tree
 docker/
 ├── networking/
 │   ├── traefik/
@@ -302,7 +302,7 @@ docker/
     ├── privatebin/
     └── docs/
         └── docker-compose.yml
-    ```
+```
 
 -----
 

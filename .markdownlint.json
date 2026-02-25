@@ -23,5 +23,8 @@
     "MD036": false,
   
     // Allow hard tabs — some editors insert these
-    "MD010": false
+    "MD010": false,
+
+    // Fenced code blocks
+    "MD046": "fenced"
   }
