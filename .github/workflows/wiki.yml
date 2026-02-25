@@ -188,6 +188,7 @@ jobs:
             --exclude 'mailto:.*'
             --exclude 'github.com/antwanchild/docs'
             --exclude '^file://'
+            --base 'https://wiki.anthonychild.com'
             './site/**/*.html'
           fail: true
           output: link-check-results.md
