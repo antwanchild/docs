@@ -91,10 +91,15 @@ jobs:
           TODAY=$(date +%Y.%m.%d)
           PREFIX="blog-${TODAY}"
 
-          git fetch --tags
+          git fetch --tags --force
           COUNT=$(git tag --list "${PREFIX}.*" | wc -l)
           N=$((COUNT + 1))
           TAG="${PREFIX}.${N}"
+
+          while git tag --list | grep -q "^${TAG}$"; do
+            N=$((N + 1))
+            TAG="${PREFIX}.${N}"
+          done
 
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
