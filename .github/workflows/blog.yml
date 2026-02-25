@@ -61,7 +61,7 @@ jobs:
 
       - name: Upload spellcheck results
         if: steps.changed-files.outputs.any_changed == 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: blog-spellcheck-results
           path: |
