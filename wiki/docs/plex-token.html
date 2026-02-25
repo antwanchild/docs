@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plex Token Generator</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #1f1f1f 0%, #2d2d2d 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: rgba(40, 40, 40, 0.95);
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        h1 { color: #e5a00d; margin-bottom: 10px; font-size: 2em; }
+        h2 { color: #e5a00d; margin-bottom: 20px; font-size: 1.5em; }
+        .subtitle { color: #aaa; margin-bottom: 30px; font-size: 1.1em; }
+        .btn {
+            display: inline-block;
+            background: #e5a00d;
+            color: #1f1f1f;
+            padding: 15px 40px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        .btn:hover { background: #cc8800; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(229, 160, 13, 0.3); }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .token-box {
+            background: #1f1f1f;
+            border: 2px solid #e5a00d;
+            border-radius: 8px;
+            padding: 20px;
+            word-break: break-all;
+            font-family: 'Courier New', monospace;
+            color: #e5a00d;
+            flex: 1;
+            margin: 0;
+        }
+        .info-box { background: rgba(229, 160, 13, 0.1); border-left: 4px solid #e5a00d; padding: 15px; margin: 20px 0; border-radius: 4px; }
+        .error-box { background: rgba(220, 53, 69, 0.1); border-left: 4px solid #dc3545; padding: 15px; margin: 20px 0; border-radius: 4px; color: #ff6b7a; }
+        .warning-box { background: rgba(220, 53, 69, 0.1); border-left: 4px solid #dc3545; padding: 15px; margin: 20px 0; border-radius: 4px; }
+        .user-info { margin: 20px 0; padding: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; display: flex; align-items: center; gap: 20px; }
+        .user-info-text { flex: 1; }
+        .user-info-text p { margin: 10px 0; font-size: 1em; }
+        .user-info-text strong { color: #e5a00d; }
+        .user-avatar { width: 80px; height: 80px; border-radius: 50%; border: 3px solid #e5a00d; object-fit: cover; flex-shrink: 0; background: #1f1f1f; }
+        
+        
+        .token-row { display: flex; align-items: center; gap: 10px; margin: 10px 0 0 0; }
+        .copy-btn {
+            background: #e5a00d;
+            color: #1f1f1f;
+            border: none;
+            border-radius: 8px;
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 54px;
+            height: 54px;
+            flex-shrink: 0;
+        }
+        .copy-btn:hover { background: #cc8800; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(229, 160, 13, 0.3); }
+        .copy-status { color: #4caf50; margin-top: 10px; display: none; }
+        .form-group { margin: 20px 0; }
+        .form-group label { display: block; color: #e5a00d; font-weight: 600; margin-bottom: 8px; font-size: 1em; }
+        .form-group select, .form-group input[type="text"] {
+            width: 100%;
+            background: #1f1f1f;
+            border: 2px solid #444;
+            border-radius: 8px;
+            padding: 12px 15px;
+            color: #fff;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+        .form-group select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23e5a00d' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            padding-right: 40px;
+            cursor: pointer;
+        }
+        .form-group select:focus, .form-group input[type="text"]:focus {
+            outline: none;
+            border-color: #e5a00d;
+        }
+        .form-group select option { background: #2d2d2d; }
+        #custom-app-name { display: none; margin-top: 10px; }
+        #result-container { display: none; }
+        #pin-container { display: none; margin-top: 20px; }
+        .pin-box {
+            background: #1f1f1f;
+            border: 2px solid #e5a00d;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            text-align: center;
+        }
+        .pin-code {
+            font-family: 'Courier New', monospace;
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #e5a00d;
+            letter-spacing: 4px;
+        }
+        .pin-label {
+            color: #aaa;
+            font-size: 0.9em;
+            margin-top: 8px;
+        }
+        .authorize-link {
+            display: inline-block;
+            background: #e5a00d;
+            color: #1f1f1f;
+            padding: 15px 40px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        .authorize-link:hover { background: #cc8800; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(229, 160, 13, 0.3); }
+        #status-message { display: none; margin-top: 20px; }
+        @media (max-width: 600px) {
+            .container { padding: 30px 20px; }
+            h1 { font-size: 1.5em; }
+            h2 { font-size: 1.2em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="initial-view">
+            <h1>Plex Token Generator</h1>
+            <p class="subtitle">Authenticate with your Plex account to retrieve your access token.</p>
+
+            <div class="form-group">
+                <label for="app-select">Which app is this token for?</label>
+                <select id="app-select" onchange="handleAppSelect()">
+                    <option value="" disabled selected>Select an app...</option>
+                    <option value="Homepage">Homepage</option>
+                    <option value="Kometa">Kometa</option>
+                    <option value="Unmanic">Unmanic</option>
+                    <option value="other">Other...</option>
+                </select>
+                <input type="text" id="custom-app-name" placeholder="Enter app name..." maxlength="50" />
+            </div>
+
+            <div class="info-box">
+                <p>
+                    <strong>What happens next:</strong><br>
+                    1. Select the app you're generating a token for<br>
+                    2. Click the button below<br>
+                    3. Sign in with your Plex account in the new tab<br>
+                    4. Return here — your token will appear automatically
+                </p>
+            </div>
+
+            <div class="warning-box">
+                <p>
+                    <strong>&#x26A0;&#xFE0F; Note:</strong> The token generated is a <strong>full account token</strong> — it grants
+                    complete access to your Plex account. Treat it like a password and never share it publicly.
+                </p>
+            </div>
+
+            <button id="auth-btn" class="btn" onclick="startAuth()">Authenticate with Plex</button>
+            <div id="status-message"></div>
+
+            <div id="pin-container">
+                <div class="pin-box">
+                    <div class="pin-code" id="pin-display"></div>
+                    <div class="pin-label">Your PIN code — Plex may ask you to confirm this</div>
+                </div>
+                <p style="color: #aaa; margin-bottom: 15px;">Click the link below to authorize with Plex, then return to this page:</p>
+                <a id="authorize-link" class="authorize-link" href="#" target="_blank">Authorize with Plex →</a>
+                <p style="color: #aaa; font-size: 0.9em; margin-top: 15px;">Waiting for authorization — this page will update automatically once complete.</p>
+            </div>
+        </div>
+
+        <div id="result-container">
+            <h1>&#x2713; Authentication Successful!</h1>
+
+            <div class="user-info">
+                <img id="user-avatar" class="user-avatar" src="" alt="Profile Picture" style="display:none;" />
+                <div class="user-info-text">
+                    <p><strong>Username:</strong> <span id="username">Loading...</span></p>
+                    <p><strong>Email:</strong> <span id="email">Loading...</span></p>
+                    <p><strong>User ID:</strong> <span id="userid">Loading...</span></p>
+                    <p><strong>Plex Pass:</strong> <span id="plexpass">Loading...</span></p>
+                    <p><strong>Member Since:</strong> <span id="joinedat">Loading...</span></p>
+                    <p><strong>App:</strong> <span id="app-label"></span></p>
+                </div>
+            </div>
+
+            <h2>Your Plex Access Token</h2>
+            <p style="color: #aaa;">Copy this token and use it in your configuration:</p>
+
+            <div class="token-row">
+                <div class="token-box" id="token-box"></div>
+                <button class="copy-btn" onclick="copyToken()" title="Copy to clipboard">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <p class="copy-status" id="copy-status">&#x2713; Token copied to clipboard!</p>
+
+            <div class="info-box" style="margin-top: 20px;">
+                <p>
+                    <strong>Keep this token secure!</strong><br>
+                    This token provides full access to your Plex account. Store it safely and never share it publicly.
+                </p>
+            </div>
+
+            <button class="btn" style="margin-top: 10px;" onclick="resetPage()">Generate Another Token</button>
+        </div>
+    </div>
+
+    <script>
+        let pollInterval = null;
+        let currentAppName = 'Plex Token Generator';
+
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = Math.random() * 16 | 0;
+                var v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+
+        function handleAppSelect() {
+            const select = document.getElementById('app-select');
+            const customInput = document.getElementById('custom-app-name');
+            if (select.value === 'other') {
+                customInput.style.display = 'block';
+                customInput.focus();
+            } else {
+                customInput.style.display = 'none';
+            }
+        }
+
+        function getAppName() {
+            const select = document.getElementById('app-select');
+            const customInput = document.getElementById('custom-app-name');
+            if (select.value === 'other') {
+                return customInput.value.trim() || 'Plex Token Generator';
+            }
+            return select.value || 'Plex Token Generator';
+        }
+
+        function startAuth() {
+            const btn = document.getElementById('auth-btn');
+            const statusMsg = document.getElementById('status-message');
+            const select = document.getElementById('app-select');
+            const customInput = document.getElementById('custom-app-name');
+
+            // Validate app selection
+            if (!select.value) {
+                statusMsg.className = 'error-box';
+                statusMsg.style.display = 'block';
+                statusMsg.textContent = 'Please select an app before continuing.';
+                return;
+            }
+            if (select.value === 'other' && !customInput.value.trim()) {
+                statusMsg.className = 'error-box';
+                statusMsg.style.display = 'block';
+                statusMsg.textContent = 'Please enter an app name.';
+                return;
+            }
+
+            currentAppName = getAppName();
+
+            const HEADERS = {
+                'Accept': 'application/json',
+                'X-Plex-Client-Identifier': generateUUID(),
+                'X-Plex-Product': currentAppName,
+                'X-Plex-Version': '1.2.0',
+                'X-Plex-Platform': 'Web',
+                'X-Plex-Platform-Version': '1.0',
+                'X-Plex-Device': 'Browser',
+                'X-Plex-Device-Name': 'Plex Token Generator'
+            };
+
+            btn.disabled = true;
+            btn.textContent = 'Requesting PIN...';
+            statusMsg.style.display = 'none';
+
+            fetch('https://plex.tv/api/v2/pins?strong=true', { method: 'POST', headers: HEADERS })
+            .then(function(res) { return res.json(); })
+            .then(function(pin) {
+                window._plexHeaders = HEADERS;
+
+                const authUrl = 'https://app.plex.tv/auth#?' +
+                    'clientID=' + encodeURIComponent(HEADERS['X-Plex-Client-Identifier']) +
+                    '&code=' + encodeURIComponent(pin.code) +
+                    '&context%5Bdevice%5D%5Bproduct%5D=' + encodeURIComponent(currentAppName) +
+                    '&context%5Bdevice%5D%5Bplatform%5D=Web' +
+                    '&context%5Bdevice%5D%5BplatformVersion%5D=1.0' +
+                    '&context%5Bdevice%5D%5Bdevice%5D=Browser';
+
+                // Show PIN and authorize link instead of auto-opening popup
+                document.getElementById('pin-display').textContent = pin.code;
+                document.getElementById('authorize-link').href = authUrl;
+                document.getElementById('pin-container').style.display = 'block';
+                btn.style.display = 'none';
+
+                pollInterval = setInterval(function() { pollForToken(pin.id); }, 2000);
+
+                setTimeout(function() {
+                    if (pollInterval) {
+                        clearInterval(pollInterval);
+                        pollInterval = null;
+                        document.getElementById('pin-container').style.display = 'none';
+                        statusMsg.className = 'error-box';
+                        statusMsg.style.display = 'block';
+                        statusMsg.textContent = 'Authentication timed out. Please try again.';
+                        btn.disabled = false;
+                        btn.style.display = 'inline-block';
+                        btn.textContent = 'Authenticate with Plex';
+                    }
+                }, 300000);
+            })
+            .catch(function() {
+                statusMsg.className = 'error-box';
+                statusMsg.style.display = 'block';
+                statusMsg.textContent = 'Failed to contact Plex. Please check your connection and try again.';
+                btn.disabled = false;
+                btn.textContent = 'Authenticate with Plex';
+            });
+        }
+
+        function pollForToken(pinId) {
+            fetch('https://plex.tv/api/v2/pins/' + pinId, { headers: window._plexHeaders })
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                if (data.authToken) {
+                    clearInterval(pollInterval);
+                    pollInterval = null;
+                    showResult(data.authToken);
+                }
+            })
+            .catch(function(err) { console.error('Polling error:', err); });
+        }
+
+        function showResult(token) {
+            document.getElementById('initial-view').style.display = 'none';
+            document.getElementById('result-container').style.display = 'block';
+            document.getElementById('token-box').textContent = token;
+            document.getElementById('app-label').textContent = currentAppName;
+
+            fetch('https://plex.tv/api/v2/user', {
+                headers: Object.assign({}, window._plexHeaders, { 'X-Plex-Token': token })
+            })
+            .then(function(res) { return res.json(); })
+            .then(function(user) {
+                document.getElementById('username').textContent = user.username || 'N/A';
+                document.getElementById('email').textContent = user.email || 'N/A';
+                document.getElementById('userid').textContent = user.id || 'N/A';
+
+                var sub = user.subscription || {};
+                var plexPass = sub.active ? (user.subscriptionDescription || (sub.plan ? sub.plan.charAt(0).toUpperCase() + sub.plan.slice(1) : 'Active')) + ' ✓' : 'No';
+                document.getElementById('plexpass').textContent = plexPass;
+                if (sub.active) {
+                    document.getElementById('plexpass').style.color = '#4caf50';
+                }
+
+                if (user.joinedAt) {
+                    var date = new Date(user.joinedAt * 1000);
+                    document.getElementById('joinedat').textContent = date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+                } else {
+                    document.getElementById('joinedat').textContent = 'N/A';
+                }
+
+                if (user.thumb) {
+                    var avatar = document.getElementById('user-avatar');
+                    avatar.src = user.thumb;
+                    avatar.style.display = 'block';
+                }
+            })
+            .catch(function() {
+                document.getElementById('username').textContent = 'Authenticated';
+                document.getElementById('email').textContent = 'N/A';
+                document.getElementById('userid').textContent = 'N/A';
+                document.getElementById('plexpass').textContent = 'N/A';
+                document.getElementById('joinedat').textContent = 'N/A';
+            });
+        }
+
+        function copyToken() {
+            const token = document.getElementById('token-box').textContent;
+            const copyStatus = document.getElementById('copy-status');
+            const copyBtn = document.querySelector('.copy-btn');
+
+            navigator.clipboard.writeText(token).then(function() {
+                copyStatus.style.display = 'block';
+                copyBtn.style.background = '#28a745';
+                setTimeout(function() {
+                    copyStatus.style.display = 'none';
+                    copyBtn.style.background = '#e5a00d';
+                }, 3000);
+            }).catch(function() {
+                const textarea = document.createElement('textarea');
+                textarea.value = token;
+                textarea.style.position = 'fixed';
+                textarea.style.opacity = '0';
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                copyStatus.style.display = 'block';
+                setTimeout(function() { copyStatus.style.display = 'none'; }, 3000);
+            });
+        }
+
+        function resetPage() {
+            document.getElementById('initial-view').style.display = 'block';
+            document.getElementById('result-container').style.display = 'none';
+            document.getElementById('pin-container').style.display = 'none';
+            document.getElementById('auth-btn').disabled = false;
+            document.getElementById('auth-btn').style.display = 'inline-block';
+            document.getElementById('auth-btn').textContent = 'Authenticate with Plex';
+            document.getElementById('status-message').style.display = 'none';
+            document.getElementById('app-select').value = '';
+            document.getElementById('custom-app-name').style.display = 'none';
+            document.getElementById('custom-app-name').value = '';
+        }
+    </script>
+</body>
+</html>

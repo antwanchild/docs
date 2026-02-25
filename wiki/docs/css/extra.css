@@ -1,0 +1,33 @@
+/* Hide TOC on mobile */
+@media screen and (max-width: 768px) {
+  .md-sidebar–secondary {
+  display: none;
+  }
+  }
+  
+  /* Change TOC title */
+  .md-sidebar–secondary > .md-sidebar__scrollwrap > .md-sidebar__inner > .md-nav__title {
+  font-weight: bold;
+  color: #ff6b6b;
+  }
+  
+  /* ===== Theme-Aware Classes ===== */
+  
+  /* Custom block that adapts to theme */
+  .custom-block {
+  padding: 10px;
+  border-radius: 5px;
+  }
+  
+  [data-md-color-scheme=“default”] .custom-block {
+  background-color: #f0f0f0;
+  color: #263238;
+  border: 1px solid #e0e0e0;
+  }
+  
+  [data-md-color-scheme=“slate”] .custom-block {
+  background-color: #3b4252;
+  color: #d8dee9;
+  border: 1px solid #4c566a;
+  }
+  
