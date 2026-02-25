@@ -41,7 +41,7 @@ jobs:
           fi
 
       - name: Upload spellcheck results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: spellcheck-results-full
           path: |
