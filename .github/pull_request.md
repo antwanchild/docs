@@ -22,7 +22,7 @@
 - [ ] Feature/Tweak (non-breaking change which adds new functionality or enhances existing functionality)
 - [ ] Breaking Change (fix or feature that would break any existing functionality for users)
 - [ ] Documentation Update
-- [ ] Other 
+- [ ] Other
 
 ## Description
 
