@@ -78,6 +78,8 @@ jobs:
     if: ${{ always() && !cancelled() }}
     permissions:
       contents: write
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -85,11 +87,14 @@ jobs:
           fetch-depth: 0
 
       - name: Generate wiki version tag and release
+        id: tag
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          TODAY=$(date +%Y.%m.%d)
-          PREFIX="wiki-${TODAY}"
+          YEAR=$(date +%Y)
+          MONTH=$(date +%-m)
+          DAY=$(date +%-d)
+          PREFIX="${YEAR}.${MONTH}.${DAY}-wiki"
 
           git fetch --tags --force
           COUNT=$(git tag --list "${PREFIX}.*" | wc -l)
@@ -105,6 +110,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git tag "$TAG"
           git push origin "$TAG"
+          echo "tag=${TAG}" >> $GITHUB_OUTPUT
           echo "Tagged as ${TAG}"
 
           NOTES=$(git log --pretty=format:"- %s" $(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || git rev-list --max-parents=0 HEAD)..HEAD -- wiki/ 2>/dev/null || echo "- Wiki update")
@@ -134,6 +140,20 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Get version tag
+        id: get_tag
+        run: |
+          FULL_TAG="${{ needs.version.outputs.tag }}"
+          # 2026.2.25-wiki.1 → 2026.2.25-1
+          VERSION=${FULL_TAG/-wiki/}
+          MAJOR=$(echo "$VERSION" | cut -d'.' -f1)
+          MAJOR_MINOR=$(echo "$VERSION" | cut -d'.' -f1,2)
+          MAJOR_MINOR_PATCH=$(echo "$VERSION" | cut -d'-' -f1)
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "major=${MAJOR}" >> $GITHUB_OUTPUT
+          echo "major_minor=${MAJOR_MINOR}" >> $GITHUB_OUTPUT
+          echo "major_minor_patch=${MAJOR_MINOR_PATCH}" >> $GITHUB_OUTPUT
+
       - name: Extract metadata for Docker
         id: meta
         uses: docker/metadata-action@v5
@@ -141,6 +161,10 @@ jobs:
           images: ghcr.io/${{ github.repository_owner }}/wiki
           tags: |
             type=raw,value=latest
+            type=raw,value=${{ steps.get_tag.outputs.version }}
+            type=raw,value=${{ steps.get_tag.outputs.major_minor_patch }}
+            type=raw,value=${{ steps.get_tag.outputs.major_minor }}
+            type=raw,value=${{ steps.get_tag.outputs.major }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -159,6 +183,7 @@ jobs:
             env_file=${{ secrets.ENV_FILE }}
           build-args: |
             GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
+            VERSION=${{ steps.get_tag.outputs.version }}
 
   link-check:
     name: Link Checker
