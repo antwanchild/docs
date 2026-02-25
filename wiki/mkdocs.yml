@@ -4,7 +4,7 @@ site_url: https://wiki.anthonychild.com
 site_description: Documentation for my self-hosted homelab
 site_author: Anthony Child
 copyright: © <script>document.write(new Date().getFullYear())</script> Anthony Child • All rights reserved
-site_dir: /site
+# site_dir: /site
 
 theme:
     name: material
