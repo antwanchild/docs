@@ -5,6 +5,8 @@ WORKDIR /build
 
 # Install blog plugins
 RUN pip install --no-cache-dir \
+    mkdocs-macros-plugin \
+    python-dotenv \
     mkdocs-rss-plugin \
     mkdocs-glightbox \
     mkdocs-minify-plugin \
