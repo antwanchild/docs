@@ -14,6 +14,7 @@ RUN pip install --no-cache-dir \
 # Copy blog content and MkDocs config
 COPY blog/docs docs/
 COPY blog/mkdocs.yml mkdocs.yml
+COPY blog/main.py main.py
 
 # Build the static site
 RUN mkdocs build --strict --site-dir /site

@@ -16,6 +16,7 @@ RUN pip install --no-cache-dir \
 # Copy wiki content and MkDocs config
 COPY wiki/docs docs/
 COPY wiki/mkdocs.yml mkdocs.yml
+COPY wiki/main.py main.py
 
 # Build the static site
 # Note: git-committers requires GITHUB_TOKEN at build time
