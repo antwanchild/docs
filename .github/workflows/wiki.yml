@@ -104,7 +104,7 @@ jobs:
           NOTES=$(git log --pretty=format:"- %s" $(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || git rev-list --max-parents=0 HEAD)..HEAD -- wiki/ 2>/dev/null || echo "- Wiki update")
 
           gh release create "$TAG" \
-            --title "Wiki ${TAG}" \
+            --title "${TAG}" \
             --notes "${NOTES}" \
             --latest
 
