@@ -174,7 +174,9 @@ jobs:
         run: echo "${{ secrets.ENV_FILE }}" > .env
 
       - name: Build MkDocs site
-        run: mkdocs build --config-file wiki/mkdocs.yml --site-dir site
+        run: |
+          cd wiki 
+          mkdocs build --site-dir ../site
 
       - name: Check links
         uses: lycheeverse/lychee-action@v2
