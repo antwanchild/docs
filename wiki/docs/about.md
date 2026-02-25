@@ -2,7 +2,7 @@
 hide:
   - navigation
 ---
-# :material-home-heart: About This Homelab
+# :material-home-heart: About This Homelab-
 
 Built and maintained with ❤️ by **Anthony Child** since 2024.
 
