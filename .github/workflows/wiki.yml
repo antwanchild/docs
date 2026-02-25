@@ -186,10 +186,10 @@ jobs:
             --accept 200,204,206,429
             --exclude-loopback
             --exclude 'mailto:.*'
-            --output link-check-results.md
-            --format markdown
             './site/**/*.html'
           fail: true
+          output: link-check-results.md
+          format: markdown
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
