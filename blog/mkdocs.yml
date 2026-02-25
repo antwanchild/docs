@@ -4,7 +4,7 @@ site_url: https://docs.anthonychild.com
 site_description: Random Thoughts from Me...
 site_author: Anthony Child
 copyright: © <script>document.write(new Date().getFullYear())</script> Anthony Child • All rights reserved
-site_dir: /site
+# site_dir: /site
 
 theme:
     name: material
