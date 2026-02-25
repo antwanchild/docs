@@ -14,7 +14,7 @@ RUN pip install --no-cache-dir \
     mkdocs-minify-plugin
 
 # Copy wiki content and MkDocs config
-COPY wiki/ wiki/
+COPY wiki/docs docs/
 COPY wiki/mkdocs.yml mkdocs.yml
 
 # Build the static site

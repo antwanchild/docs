@@ -12,7 +12,7 @@ RUN pip install --no-cache-dir \
     mkdocs-git-revision-date-localized-plugin
 
 # Copy blog content and MkDocs config
-COPY blog/ blog/
+COPY blog/docs docs/
 COPY blog/mkdocs.yml mkdocs.yml
 
 # Build the static site
