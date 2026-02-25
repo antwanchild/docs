@@ -2,7 +2,7 @@
 title: Blog
 ---
 
-# My Blog
+# My Bl--og
 
 Welcome to my blog where I share recipes, thoughts, and projects.
 
