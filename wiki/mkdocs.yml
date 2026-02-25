@@ -53,13 +53,6 @@ theme:
         - search.highlight
         - search.share
 
-
-        # - navigation.sections     #if on, prevents `>` from showing
-        # - navigation.expand
-        # - navigation.indexes
-        # - content.tooltips
-
-
 markdown_extensions:
     # Python Markdown
     - abbr

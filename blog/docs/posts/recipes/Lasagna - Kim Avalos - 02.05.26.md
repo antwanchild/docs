@@ -26,21 +26,21 @@ It's non-traditional and it's the best!
 
 **Ingredients**
 
-- 1 lb ground beef          
-- 1 lb italian sausage      
-- 2 tbsp Worcestershire Sauce (approximate) 
+- 1 lb ground beef
+- 1 lb italian sausage
+- 2 tbsp Worcestershire Sauce (approximate)
 - 1/2 diced onion (optional)
-- 1 box lasagna noodles 
+- 1 box lasagna noodles
 - 1 package frozen spinach  
-- 2 lbs Mozzerella or Monterey Jack Cheese (Shredded)   
-- 2 cans cream of mushroom soup 
-- 3/4 can milk              
+- 2 lbs Mozzerella or Monterey Jack Cheese (Shredded)
+- 2 cans cream of mushroom soup
+- 3/4 can milk
 - 1 small can tomato sauce  
-- Oregano - to taste        
-- Salt - to taste           
-- Parmesan cheese - to taste   
-- Garlic Salt - to taste    
-- Dried Parsley - taste     
+- Oregano - to taste
+- Salt - to taste
+- Parmesan cheese - to taste
+- Garlic Salt - to taste
+- Dried Parsley - taste
 
 **Step-by-Step Instructions**
 

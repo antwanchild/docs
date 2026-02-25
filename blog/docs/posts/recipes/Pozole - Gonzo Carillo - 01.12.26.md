@@ -26,7 +26,7 @@ categories:
 
 ## Ingredients You’ll Need
 
-| For the soup base         | For the chile (sauce)             | 
+| For the soup base         | For the chile (sauce)             |
 |---------------------------|-----------------------------------|
 | 2 lbs pork shoulder (or a mix of shoulder and ribs) | 4 dried guajillo chiles, stemmed and seeded|
 | 1 onion, halved            | 2 dried ancho chiles             |
@@ -36,30 +36,32 @@ categories:
 | 8 cups chicken broth      | 1 cup water (for blending)        |
 
 ### Other essentials:
+
 - 2 (25 oz) cans of hominy, rinsed and drained
-- Toppings (Suggested): 
-    - shredded cabbage
-    - radish slices
-    - lime wedges
-    - dried oregano
-    - chopped onion
-    - tostadas
+- Toppings (Suggested):
+  - shredded cabbage
+  - radish slices
+  - lime wedges
+  - dried oregano
+  - chopped onion
+  - tostadas
 
 ## Step-by-Step Instructions
+
 - Cook the Pork
-    * In a large pot, brown the pork. 
-    * Once brown, add onion, garlic, salt and pepper. 
-    * Add stock to cover. Add bay leaves and bring it to a boil. 
-    * Then lower the heat and simmer for about 1.5 to 2 hours until the meat is tender.
+  - In a large pot, brown the pork.
+  - Once brown, add onion, garlic, salt and pepper.
+  - Add stock to cover. Add bay leaves and bring it to a boil.
+  - Then lower the heat and simmer for about 1.5 to 2 hours until the meat is tender.
 - Make the Chile Sauce
-    * While the pork simmers, toast (or boil) the dried chiles in a hot skillet for a few seconds on each side until fragrant (not burnt). 
-    * Then soak them in hot water for 15–20 minutes to soften. Blend the chiles with garlic, cumin, clove, and water until smooth.
-    * Strain the sauce through a fine sieve for a velvety texture (optional).
+  - While the pork simmers, toast (or boil) the dried chiles in a hot skillet for a few seconds on each side until fragrant (not burnt).
+  - Then soak them in hot water for 15–20 minutes to soften. Blend the chiles with garlic, cumin, clove, and water until smooth.
+  - Strain the sauce through a fine sieve for a velvety texture (optional).
 - Combine and Simmer
-    * Drain the hominy and it to the pot along with chile (sauce). For a thicker broth blend a cup
+  - Drain the hominy and it to the pot along with chile (sauce). For a thicker broth blend a cup
 of the hominy with the chile (sauce) and add to pot.
-    * Simmer everything together for another 30-45 minutes until the hominy is soft.
-    * Taste and adjust seasoning as needed.
+  - Simmer everything together for another 30-45 minutes until the hominy is soft.
+  - Taste and adjust seasoning as needed.
 
 ???+ tip "^^Don’t Skip the Toppings!!^^"
     What makes pozole extra special? The toppings/garnishes!

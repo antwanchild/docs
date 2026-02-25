@@ -26,15 +26,15 @@ This Chile Verde is off the Hook!!!
 **Ingredients**
 
 - 5 lbs Thick, Boneless, pork chops *(Cut into Chunks)*
-- Vegetable Oil                                     
-- 1 tbsp Ground Cumin                               
-- 1 tbsp Salt                                       
-- 2 tbsp Flour                                      
-- 1 cup water *(estimate)*                            
-- 6 can roasted, diced green chilies                
-- 1 can roasted, diced jalapeños                    
-- Salt                                              
-- Ground Garlic                                     
+- Vegetable Oil
+- 1 tbsp Ground Cumin
+- 1 tbsp Salt
+- 2 tbsp Flour
+- 1 cup water *(estimate)*
+- 6 can roasted, diced green chilies
+- 1 can roasted, diced jalapeños
+- Salt
+- Ground Garlic
 
 ***Step-by-Step Instructions***
 
@@ -44,7 +44,7 @@ This Chile Verde is off the Hook!!!
 - Cook for a couple minutes, turning frequently and scraping up the bottom of the pan
 - Add about a cup of water. Keep water simmering.
 - Add 6 cans of roasted, diced green chilies
-- Add 1 can of roasted, diced jalapeño 
+- Add 1 can of roasted, diced jalapeño
 - Season to taste with salt and ground garlic
 - Let simmer about 15 minutes, and enjoy.
 
