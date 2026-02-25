@@ -1,0 +1,74 @@
+[project]
+name = "Anthony's Homelab Docs"
+url = "https://docs.anthonychild.com"
+description = "My self-hosted homelab documentation"
+author = "Anthony Child"
+site_dir = "/site"
+
+#[theme]
+#name = "material"   # Use "classic" for exact old look, omit for new modern theme
+
+[features]
+navigation.tabs = true
+navigation.sections = true
+navigation.expand = true
+navigation.indexes = true
+toc.follow = true
+search.suggest = true
+search.highlight = true
+content.code.copy = true
+
+[palette.primary]
+light = "indigo"
+dark = "deep purple"
+
+[palette.accent]
+light = "deep orange"
+dark = "amber"
+
+[navigation]
+  - "Home" = "index.md"
+  - "Dashboard" = "dashboard/index.md"
+  - "Homelab"
+      - "Overview" = "homelab/overview.md"
+      - "Stacks" = "homelab/stacks.md"
+      - "Services" = "homelab/services.md"
+      - "Network" = "homelab/network.md"
+  - "Reference"
+      - "Cheatsheet" = "reference/cheatsheet.md"
+      - "Troubleshooting" = "reference/troubleshooting.md"
+  - "Planning"
+      - "Wishlist" = "planning/wishlist.md"
+  - "About" = "about.md"
+  - "Fun" = "fun/ascii.md"
+  - "Notes"
+      - "General" = "notes/general.md"
+      - "Tech Tips" = "notes/tech-tips.md"
+      - "Recipes" = "notes/recipes.md"
+  - "Projects" = "projects/index.md"
+  - "Bookmarks" = "bookmarks.md"
+
+[markdown]
+extensions = [
+  "admonition",
+  "pymdownx.superfences",
+  "pymdownx.tabbed",
+  "pymdownx.tasklist",
+  "pymdownx.emoji",
+  "toc"
+]
+
+[markdown.pymdownx.tasklist]
+custom_checkbox = true
+
+[markdown.pymdownx.emoji]
+emoji_index = "twemoji"
+emoji_generator = "to_svg"
+
+[markdown.toc]
+permalink = true
+
+[plugins]
+search = true
+macros.include_dir = "include"   # Your extra.py still works!
+
