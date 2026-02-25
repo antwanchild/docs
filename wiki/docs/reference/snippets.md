@@ -193,10 +193,13 @@ labels:
 **In Authentik UI:**
 
 1. **Applications → Create**
+
 - Name: `My Service`
 - Slug: `myservice`
 - Provider: Create new OAuth2/OIDC Provider
+
 1. **Provider Settings:**
+
 - Client ID: `generated-by-authentik`
 - Client Secret: `generated-by-authentik`
 - Redirect URIs: `https://myservice.anthonychild.com/oauth/callback`
@@ -429,7 +432,7 @@ docker network inspect proxy --format '{{range .Containers}}{{.Name}}'
 
 ### Standard Stack Layout
 
-```
+```tree
 docker/
 └── stack-name/
     ├── docker-compose.yml
@@ -449,19 +452,19 @@ docker/
 
 !!! tip "Use .env files"
     Keep secrets in `.env` files (and add to `.gitignore`):
-    `yaml environment: - API_KEY=${API_KEY}  # From .env `
+    `yaml environment: - API_KEY=${API_KEY}  # From .env`
 
 !!! tip "Version pinning"
     Use specific versions in production:
-    `yaml image: postgres:16  # Not :latest `
+    `yaml image: postgres:16  # Not :latest`
 
 !!! tip "Resource limits"
     Set limits to prevent resource hogging:
-    `yaml deploy: resources: limits: cpus: '0.5' memory: 512M `
+    `yaml deploy: resources: limits: cpus: '0.5' memory: 512M`
 
 !!! tip "Health checks"
     Add health checks for critical services:
-    `yaml healthcheck: test: ["CMD", "curl", "-f", "http://localhost:8080/health"] interval: 30s timeout: 10s retries: 3 `
+    `yaml healthcheck: test: ["CMD", "curl", "-f", "http://localhost:8080/health"] interval: 30s timeout: 10s retries: 3`
 
 -----
 

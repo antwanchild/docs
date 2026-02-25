@@ -27,6 +27,7 @@ When a container stops, it returns an exit code that tells you why:
 {% raw %}
 Check with: `docker inspect <container> --format '{{.State.ExitCode}}'`
 {% endraw %}
+
 ### Container Networking Explained
 
 Containers on the same Docker network can communicate using **container names as hostnames**:
@@ -79,6 +80,7 @@ services:
 ## :material-router: Traefik Architecture
 
 ### How Traefik Routing Works
+
   1. **Entrypoints** - Listen on ports (80, 443)
   1. **Routers** - Match requests by hostname/path
   1. **Services** - Forward to container
@@ -295,13 +297,17 @@ This automatically:
 **Solutions:**
 
 1. **Find the hog:**
+
     ```bash
     docker stats --no-stream | sort -k4 -rh
     ```
+
 1. **Set limits:**
+
     ```yaml
     mem_limit: 2g
     ```
+
 1. **Optimize the app:**
     - Check for memory leaks in logs
     - Reduce cache sizes

@@ -45,7 +45,6 @@ Modular infrastructure with separate directories and Docker networks for clean o
 
 **Status:** ✅ Active
 
-
 ??? example "Stack Management Commands"
     ```bash
     # Navigate to stack directory
@@ -65,7 +64,6 @@ Modular infrastructure with separate directories and Docker networks for clean o
     # Pull latest images
     docker compose pull
     ```
-
 
 -----
 
@@ -264,7 +262,7 @@ Modular infrastructure with separate directories and Docker networks for clean o
 
 ## :material-file-tree: Directory Structure
 
-```
+    ```tree
 docker/
 ├── networking/
 │   ├── traefik/
@@ -304,7 +302,7 @@ docker/
     ├── privatebin/
     └── docs/
         └── docker-compose.yml
-```
+    ```
 
 -----
 
@@ -378,7 +376,7 @@ Each stack’s data should be backed up regularly:
 |**networking**    |🔵 Medium       |Traefik config              |
 
 !!! tip ":material-backup-restore: Backup Command"
-    `bash # Example: Backup entire docker directory tar -czf homelab-backup-$(date +%Y%m%d).tar.gz docker/ `
+    `bash # Example: Backup entire docker directory tar -czf homelab-backup-$(date +%Y%m%d).tar.gz docker/`
 
 -----
 
@@ -427,6 +425,7 @@ Understanding stack dependencies helps with maintenance:
 ## :material-frequently-asked-questions: Common Tasks
 
 ### Update All Stacks
+
 ```bash
 #!/bin/bash
 for stack in networking security monitoring media-download media-server utilities; do
@@ -479,10 +478,3 @@ done
 **Happy stacking!** :material-docker:
 
 </div>
-
-
-
-
-
-
-

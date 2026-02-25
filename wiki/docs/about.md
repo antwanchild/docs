@@ -242,7 +242,6 @@ The docs are automatically rebuilt and deployed whenever changes are made.
     - Monitoring and alerts
     - Remote access via Tailscale for emergency fixes
 
-
 ??? question "Can I copy your setup?"
     Absolutely! That’s partly why this documentation exists. Everything here is reproducible. Check out the [Services](homelab/services.md), [Networking](homelab/networking.md), and [Stacks](homelab/stacks.md) pages for details.
 
@@ -272,12 +271,11 @@ This homelab started as a simple Plex server and evolved into a comprehensive se
 ## :material-email: Get in Touch
 
 !!! tip ":material-chat: Contact"
-    - Have questions about the setup? 
+    - Have questions about the setup?
     - Want to share your own homelab?
     - Found an issue in the docs?
 
     {{ email_link("Feel free to reach out!") }}
-
 
 -----
 

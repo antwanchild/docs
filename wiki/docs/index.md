@@ -18,6 +18,7 @@ Your personal knowledge base for homelab infrastructure, configurations, and tec
 -----
 
 ## :material-rocket-launch: Getting Started
+
 !!! tip ":material-file-document-edit: Editing Documentation"
     1. Edit any `.md` file in the `docs/` folder
     2. Run `docker compose -f app.mkdocs-builder.yml up` to rebuild

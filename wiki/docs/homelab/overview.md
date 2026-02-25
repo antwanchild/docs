@@ -229,10 +229,10 @@ Single-server self-hosted infrastructure running on Docker with modular stacks f
 
 See the **[Wishlist](../planning/wishlist.md)** for:
 
-  - Planned upgrades
-  - New services to try
-  - Infrastructure improvements
-  - Automation enhancements
+- Planned upgrades
+- New services to try
+- Infrastructure improvements
+- Automation enhancements
 
 -----
 
@@ -251,20 +251,3 @@ See the **[Wishlist](../planning/wishlist.md)** for:
 **Happy homelabbing!** :material-server-network:
 
 </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -54,10 +54,10 @@ Complete inventory of all running containers with access information and purpose
 - **Authentication:** Master login (protects all other services)
 - **Purpose:** Single Sign-On for the entire homelab
 - **Features:**
-    - LDAP/OAuth2/SAML support    
-    - Multi-factor authentication
-    - User & group management
-    - Application proxy
+  - LDAP/OAuth2/SAML support
+  - Multi-factor authentication
+  - User & group management
+  - Application proxy
 
 !!! danger ":material-shield-alert: Master Auth System"
     This is your primary authentication - secure it with a strong password and enable MFA!
@@ -82,9 +82,9 @@ Complete inventory of all running containers with access information and purpose
 - **Purpose:** Secure tunnel to Cloudflare without open ports
 - **Authentication:** Cloudflare Zero Trust
 - **Features:**
-    - No inbound firewall rules needed
-    - Automatic HTTPS
-    - DDoS protection via Cloudflare
+  - No inbound firewall rules needed
+  - Automatic HTTPS
+  - DDoS protection via Cloudflare
 
 -----
 
@@ -95,10 +95,10 @@ Complete inventory of all running containers with access information and purpose
 - **Access:** Internal (no web UI)
 - **Purpose:** Analyzes logs and blocks malicious IPs
 - **Features:**
-    - Community-driven threat intelligence
-    - Real-time ban decisions
-    - Integration with Cloudflare
-    - Traefik log parsing
+  - Community-driven threat intelligence
+  - Real-time ban decisions
+  - Integration with Cloudflare
+  - Traefik log parsing
 
 !!! info ":material-information: How It Works"
     CrowdSec reads Traefik logs, detects attacks, and automatically blocks threats at the edge via Cloudflare.
@@ -113,10 +113,10 @@ Complete inventory of all running containers with access information and purpose
 - **Authentication:** Authentik SSO
 - **Purpose:** Routes all web traffic and manages SSL certificates
 - **Features:**
-    - Automatic Let’s Encrypt certificates
-    - Dynamic Docker label configuration
-    - Dashboard for monitoring routes
-    - Middleware for auth & rate limiting
+  - Automatic Let’s Encrypt certificates
+  - Dynamic Docker label configuration
+  - Dashboard for monitoring routes
+  - Middleware for auth & rate limiting
 
 !!! warning ":material-alert: Never Expose Unprotected"
     Always keep the Traefik dashboard behind authentication!
@@ -131,10 +131,10 @@ Complete inventory of all running containers with access information and purpose
 - **Authentication:** Tailscale account
 - **Purpose:** Secure remote access without exposing services
 - **Features:**
-    - Zero-config VPN
-    - Device-to-device encryption
-    - ACLs for access control
-    - Exit nodes
+  - Zero-config VPN
+  - Device-to-device encryption
+  - ACLs for access control
+  - Exit nodes
 
 -----
 
@@ -148,10 +148,10 @@ Complete inventory of all running containers with access information and purpose
 - **Authentication:** Authentik SSO
 - **Purpose:** Central hub for all services with status monitoring
 - **Features:**
-    - Service status widgets
-    - System resource monitoring
-    - Quick links to all apps
-    - Custom integrations
+  - Service status widgets
+  - System resource monitoring
+  - Quick links to all apps
+  - Custom integrations
 
 -----
 
@@ -163,10 +163,10 @@ Complete inventory of all running containers with access information and purpose
 - **Authentication:** Authentik SSO
 - **Purpose:** View live logs from all containers
 - **Features:**
-    - Multi-container view
-    - Search & filter
-    - Log streaming
-    - No database required
+  - Multi-container view
+  - Search & filter
+  - Log streaming
+  - No database required
 
 !!! tip ":material-lightbulb: Troubleshooting First Stop"
     Check Dozzle logs first when debugging any container issues!
@@ -181,11 +181,11 @@ Complete inventory of all running containers with access information and purpose
 - **Authentication:** Authentik SSO
 - **Purpose:** Monitor Plex usage and generate reports
 - **Features:**
-    - Watch history
-    - User statistics
-    - Play state monitoring
-    - Newsletter generation
-    - Discord/Slack notifications
+  - Watch history
+  - User statistics
+  - Play state monitoring
+  - Newsletter generation
+  - Discord/Slack notifications
 
 -----
 
@@ -197,10 +197,10 @@ Complete inventory of all running containers with access information and purpose
 - **Authentication:** Authentik SSO
 - **Purpose:** Centralized notifications for *arr apps and Plex
 - **Features:**
-    - Discord integration
-    - Webhook support
-    - Custom triggers
-    - Health monitoring
+  - Discord integration
+  - Webhook support
+  - Custom triggers
+  - Health monitoring
 
 -----
 
@@ -214,11 +214,11 @@ Complete inventory of all running containers with access information and purpose
 - **Authentication:** Plex account
 - **Purpose:** Stream movies and TV shows
 - **Features:**
-    - Transcoding
-    - Remote access
-    - Mobile apps
-    - User management
-    - Live TV & DVR
+  - Transcoding
+  - Remote access
+  - Mobile apps
+  - User management
+  - Live TV & DVR
 
 -----
 
@@ -229,10 +229,10 @@ Complete inventory of all running containers with access information and purpose
 - **Access:** Scheduled runs (no web UI)
 - **Purpose:** Automated Plex library management
 - **Features:**
-    - Smart collections
-    - Metadata overlays
-    - Poster management
-    - Scheduled automation
+  - Smart collections
+  - Metadata overlays
+  - Poster management
+  - Scheduled automation
 
 -----
 
@@ -243,9 +243,9 @@ Complete inventory of all running containers with access information and purpose
 - **Access:** Scheduled runs (no web UI)
 - **Purpose:** Clean up and optimize Plex library images
 - **Features:**
-    - Remove duplicate images
-    - Optimize file sizes
-    - Clean metadata cache
+  - Remove duplicate images
+  - Optimize file sizes
+  - Clean metadata cache
 
 -----
 
@@ -257,9 +257,9 @@ Complete inventory of all running containers with access information and purpose
 - **Authentication:** Authentik SSO
 - **Purpose:** Generate custom title cards for TV episodes
 - **Features:**
-    - Template management
-    - Automated generation
-    - Integration with Plex
+  - Template management
+  - Automated generation
+  - Integration with Plex
 
 -----
 
@@ -271,9 +271,9 @@ Complete inventory of all running containers with access information and purpose
 - **Authentication:** Authentik SSO
 - **Purpose:** Manage and sync posters across Sonarr/Radarr
 - **Features:**
-    - Bulk poster updates
-    - Custom poster sources
-    - Automated syncing
+  - Bulk poster updates
+  - Custom poster sources
+  - Automated syncing
 
 -----
 
@@ -287,10 +287,10 @@ Complete inventory of all running containers with access information and purpose
 - **Authentication:** Authentik SSO
 - **Purpose:** User-facing media request interface
 - **Features:**
-    - Browse & request movies/TV
-    - Approval workflow
-    - Integration with Radarr/Sonarr
-    - Discord notifications
+  - Browse & request movies/TV
+  - Approval workflow
+  - Integration with Radarr/Sonarr
+  - Discord notifications
 
 -----
 
@@ -302,10 +302,10 @@ Complete inventory of all running containers with access information and purpose
 - **Authentication:** Authentik SSO
 - **Purpose:** Automated TV episode management
 - **Features:**
-    - Episode monitoring
-    - Quality profiles
-    - Calendar view
-    - Automatic upgrades
+  - Episode monitoring
+  - Quality profiles
+  - Calendar view
+  - Automatic upgrades
 
 -----
 
@@ -317,10 +317,10 @@ Complete inventory of all running containers with access information and purpose
 - **Authentication:** Authentik SSO
 - **Purpose:** Automated movie management
 - **Features:**
-    - Movie monitoring
-    - Quality profiles
-    - Collection management
-    - Import lists
+  - Movie monitoring
+  - Quality profiles
+  - Collection management
+  - Import lists
 
 -----
 
@@ -332,10 +332,10 @@ Complete inventory of all running containers with access information and purpose
 - **Authentication:** Authentik SSO
 - **Purpose:** Centralized indexer configuration for *arr apps
 - **Features:**
-    - Sync to Sonarr/Radarr
-    - Indexer testing
-    - Statistics tracking
-    - Category mapping
+  - Sync to Sonarr/Radarr
+  - Indexer testing
+  - Statistics tracking
+  - Category mapping
 
 -----
 
@@ -347,10 +347,10 @@ Complete inventory of all running containers with access information and purpose
 - **Authentication:** Authentik SSO
 - **Purpose:** Download and process Usenet content
 - **Features:**
-    - NZB queue management
-    - Automatic unpacking
-    - Category-based organization
-    - Speed limiting
+  - NZB queue management
+  - Automatic unpacking
+  - Category-based organization
+  - Speed limiting
 
 -----
 
@@ -361,9 +361,9 @@ Complete inventory of all running containers with access information and purpose
 - **Access:** Internal (no web UI)
 - **Purpose:** Secure proxy for *arr application API calls
 - **Features:**
-    - API request filtering
-    - Load balancing
-    - Security layer
+  - API request filtering
+  - Load balancing
+  - Security layer
 
 -----
 
@@ -377,11 +377,11 @@ Complete inventory of all running containers with access information and purpose
 - **Authentication:** Immich account
 - **Purpose:** Photo backup and management
 - **Features:**
-    - Mobile auto-backup
-    - Facial recognition
-    - Album management
-    - Machine learning tagging
-    - Sharing
+  - Mobile auto-backup
+  - Facial recognition
+  - Album management
+  - Machine learning tagging
+  - Sharing
 
 !!! tip ":material-cellphone: Mobile App Available"
     Install the Immich mobile app for automatic photo backup from your phone!
@@ -396,10 +396,10 @@ Complete inventory of all running containers with access information and purpose
 - **Authentication:** None (public)
 - **Purpose:** Secure, temporary text/file sharing
 - **Features:**
-    - End-to-end encryption
-    - Burn after reading
-    - Password protection
-    - Expiration times
+  - End-to-end encryption
+  - Burn after reading
+  - Password protection
+  - Expiration times
 
 !!! info ":material-information: Use Cases"
     Perfect for sharing passwords, config snippets, or sensitive information securely.
@@ -414,10 +414,10 @@ Complete inventory of all running containers with access information and purpose
 - **Authentication:** Authentik SSO
 - **Purpose:** Automated media library transcoding
 - **Features:**
-    - Library optimization
-    - Format conversion
-    - Plugin system
-    - Queue management
+  - Library optimization
+  - Format conversion
+  - Plugin system
+  - Queue management
 
 -----
 
@@ -429,10 +429,10 @@ Complete inventory of all running containers with access information and purpose
 - **Authentication:** Authentik SSO
 - **Purpose:** This wiki you’re reading!
 - **Features:**
-    - Markdown-based
-    - Material theme
-    - Full-text search
-    - Version controlled
+  - Markdown-based
+  - Material theme
+  - Full-text search
+  - Version controlled
 
 -----
 
@@ -442,19 +442,19 @@ Complete inventory of all running containers with access information and purpose
 
 These services run in the background without a web interface:
 
-  - **Authentik PostgreSQL** - Database
-  - **Cloudflared** - Tunnel daemon
-  - **CrowdSec** - Security monitor
-  - **ImageMaid** - Scheduled cleanup
-  - **Kometa** - Scheduled metadata
-  - **Starrproxy** - API proxy
-  - **Tailscale** - VPN daemon
+- **Authentik PostgreSQL** - Database
+- **Cloudflared** - Tunnel daemon
+- **CrowdSec** - Security monitor
+- **ImageMaid** - Scheduled cleanup
+- **Kometa** - Scheduled metadata
+- **Starrproxy** - API proxy
+- **Tailscale** - VPN daemon
 
 ### Public Access (No Auth Required)
 
 These services are accessible without authentication:
 
-  - **Privatebin** - Encrypted paste sharing
+- **Privatebin** - Encrypted paste sharing
 
 !!! warning ":material-alert: Public Services"
     Only Privatebin is intentionally public. All other services require authentication.

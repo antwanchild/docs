@@ -41,13 +41,13 @@ docker ps | grep <service>
 **Solutions:**
 
 === "Container Not Running"
-    `bash docker logs <container>  # Check why it stopped docker restart <container> `
+    `bash docker logs <container>  # Check why it stopped docker restart <container>`
 
 === "Not on Proxy Network"
-    `bash docker network connect proxy <container> `
+    `bash docker network connect proxy <container>`
 
 === "Traefik Labels Wrong"
-    `bash docker inspect <container> | grep traefik # Fix in docker-compose.yml, then: docker compose up -d --force-recreate `
+    `bash docker inspect <container> | grep traefik # Fix in docker-compose.yml, then: docker compose up -d --force-recreate`
 
 === "Certificate Issue"
     See [Certificate Problems](#certificate-problems) below
@@ -86,7 +86,9 @@ docker logs --tail=50 <container>
     docker stats
     ```
     ```
-    # Add limit to docker-compose.yml
+
+# Add limit to docker-compose.yml
+
     mem_limit: 2g
     ```
 
@@ -105,7 +107,7 @@ docker logs --tail=50 <container>
     ```
 
 === "Permission Error"
-    `bash # Fix permissions (most services use 1000:1000) sudo chown -R 1000:1000 /path/to/config `
+    `bash # Fix permissions (most services use 1000:1000) sudo chown -R 1000:1000 /path/to/config`
 
 -----
 
@@ -129,7 +131,7 @@ docker exec <container1> nslookup <container2>
 **Solutions:**
 
 === "Not on Same Network"
-    `bash docker network connect <network> <container> `
+    `bash docker network connect <network> <container>`
 
 === "DNS Not Working"
     ```bash
@@ -178,7 +180,7 @@ docker exec traefik ls -la /letsencrypt/
     ```bash
     cd docker/1-networking
     docker compose stop traefik
-    
+
     # Backup
     cp acme.json acme.json.backup
 
@@ -323,11 +325,11 @@ du -h /var/lib/docker | sort -rh | head -20
 
 === "Configure Log Rotation"
     Add to docker-compose.yml:
-    ```yaml 
-    logging: 
-        driver: "json-file" 
-        options: max-size: "10m" 
-        max-file: "3" 
+    ```yaml
+    logging:
+        driver: "json-file"
+        options: max-size: "10m"
+        max-file: "3"
     ```
 
 -----
@@ -371,7 +373,9 @@ docker exec authentik-db pg_isready -U authentik
     docker network inspect security-net
     ```
     ```
-    # Check environment variables
+
+# Check environment variables
+
     docker inspect authentik | grep -i db
     ```
 
@@ -400,15 +404,17 @@ docker logs cloudflared
     docker compose restart cloudflared
     ```
     ```
-    # Check logs
+
+# Check logs
+
     docker logs -f cloudflared
     ```
 
 === "Credentials Invalid"
-    ```bash 
-    # Re-authenticate tunnel 
-    # Follow Cloudflare docs to get new credentials 
-    # Update docker-compose.yml 
+    ```bash
+    # Re-authenticate tunnel
+    # Follow Cloudflare docs to get new credentials
+    # Update docker-compose.yml
     docker compose up -d cloudflared
     ```
 
@@ -464,7 +470,9 @@ sudo nethogs
     iostat -x 1
     ```
     ```
-    # May need:
+
+# May need:
+
     # - Move to SSD
     # - Reduce log sizes
     # - Optimize database

@@ -115,7 +115,7 @@ graph TB
     This is your only network exposed to the internet. Only add services that NEED web access!
 
 ??? example "Creating the proxy network"
-    `bash docker network create \ --driver bridge \ --subnet 172.20.0.0/16 \ --gateway 172.20.0.1 \ proxy `
+    `bash docker network create \ --driver bridge \ --subnet 172.20.0.0/16 \ --gateway 172.20.0.1 \ proxy`
 
 -----
 
@@ -154,7 +154,7 @@ graph TB
     This network keeps media-related traffic isolated from monitoring and security services.
 
 ??? example "Creating the media-backend network"
-    `bash docker network create \ --driver bridge \ --subnet 172.21.0.0/16 \ --gateway 172.21.0.1 \ media-backend `
+    `bash docker network create \ --driver bridge \ --subnet 172.21.0.0/16 \ --gateway 172.21.0.1 \ media-backend`
 
 -----
 
@@ -184,7 +184,7 @@ graph TB
     Keep monitoring separate so issues in production don’t affect your ability to troubleshoot.
 
 ??? example "Creating the monitoring-net network"
-    `bash docker network create \ --driver bridge \ --subnet 172.22.0.0/16 \ --gateway 172.22.0.1 \ monitoring-net `
+    `bash docker network create \ --driver bridge \ --subnet 172.22.0.0/16 \ --gateway 172.22.0.1 \ monitoring-net`
 
 -----
 
@@ -215,7 +215,7 @@ graph TB
     Never expose this network publicly. Contains master authentication and security systems!
 
 ??? example "Creating the security-net network"
-    `bash docker network create \ --driver bridge \ --subnet 172.23.0.0/16 \ --gateway 172.23.0.1 \ security-net `
+    `bash docker network create \ --driver bridge \ --subnet 172.23.0.0/16 \ --gateway 172.23.0.1 \ security-net`
 
 -----
 
@@ -239,7 +239,7 @@ graph TB
     Keeps utility services separate from critical infrastructure.
 
 ??? example "Creating the utils-net network"
-    `bash docker network create \ --driver bridge \ --subnet 172.24.0.0/16 \ --gateway 172.24.0.1 \ utils-net `
+    `bash docker network create \ --driver bridge \ --subnet 172.24.0.0/16 \ --gateway 172.24.0.1 \ utils-net`
 
 -----
 
@@ -297,17 +297,16 @@ Some containers connect to multiple networks for different purposes:
 - **Purpose:** Secure remote access from anywhere
 - **Authentication:** Tailscale account + MagicDNS
 - **Features:**
-    - Zero-config VPN
-    - Encrypted tunnels
-    - No port forwarding
-    - Works alongside Cloudflare Tunnel
+  - Zero-config VPN
+  - Encrypted tunnels
+  - No port forwarding
+  - Works alongside Cloudflare Tunnel
 
 !!! tip ":material-cellphone-link: Access Methods"
     You have TWO ways to access your homelab remotely:
 
     1. **Cloudflare Tunnel** - Public web access via HTTPS
     2. **Tailscale** - Private VPN access to your entire network
-
 
 -----
 
@@ -365,7 +364,6 @@ When deploying a new service:
     2. Connects to media-backend for internal media stack communication
     3. `external: true` means the network already exists (created manually)
 
-
 -----
 
 ## :material-information: Network Commands
@@ -406,6 +404,5 @@ When deploying a new service:
     - Request rates  
     - HTTP status codes
     - Connected services
-
 
 Your network architecture is secure, segmented, and optimized for a single-server homelab! 🛡️
