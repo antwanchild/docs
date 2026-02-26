@@ -18,7 +18,7 @@ hide:
 |Update + sync env |`./update-all.sh --sync-env`                        |
 |Full update + docs|`./update-all.sh --sync-env --docs`                 |
 |Full update + blog|`./update-all.sh --sync-env --blog`                 |
-|Full update + both|`./update-all.sh --sync-env --all`
+|Full update + both|`./update-all.sh --sync-env --all`                  |
 |Rebuild docs      |`cd docker/6-utilities && docker compose restart docs`|
 
 !!! info "Sync Docs without .env"

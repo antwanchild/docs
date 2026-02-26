@@ -152,7 +152,7 @@ Single-server self-hosted infrastructure running on Docker with modular stacks f
 
 ## :material-file-tree: Directory Structure
 
-```
+```text
 /opt/homelab/
 ├── networking/
 │   ├── traefik/

@@ -432,7 +432,7 @@ docker network inspect proxy --format '{{range .Containers}}{{.Name}}'
 
 ### Standard Stack Layout
 
-```tree
+```text
 docker/
 └── stack-name/
     ├── docker-compose.yml

@@ -344,7 +344,7 @@ Three or more dashes, asterisks, or underscores create a horizontal rule:
 ***
 
 ```markdown
-___
+---
 ```
 
 **Rendered:**

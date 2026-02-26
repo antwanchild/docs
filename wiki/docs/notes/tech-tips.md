@@ -24,6 +24,7 @@ When a container stops, it returns an exit code that tells you why:
 |137      |OOMKilled         |Out of memory             |
 |139      |Segmentation fault|Corrupted binary          |
 |143      |SIGTERM           |Manual stop               |
+
 {% raw %}
 Check with: `docker inspect <container> --format '{{.State.ExitCode}}'`
 {% endraw %}
@@ -88,7 +89,7 @@ services:
 
 Example flow:
 
-```
+```text
 Request to plex.anthonychild.com
   → Entrypoint (443)
   → Router (matches Host rule)
@@ -432,7 +433,7 @@ environment:
 
 Use `.env` file (add to `.gitignore`):
 
-```
+```text
 API_KEY=abc123secret
 ```
 
