@@ -167,6 +167,14 @@ jobs:
             type=raw,value=${{ steps.get_tag.outputs.major_minor_patch }}
             type=raw,value=${{ steps.get_tag.outputs.major_minor }}
             type=raw,value=${{ steps.get_tag.outputs.major }}
+          labels: |
+            org.opencontainers.image.authors=Anthony Child
+            org.opencontainers.image.source=https://github.com/antwanchild/docs
+            org.opencontainers.image.url=https://blog.anthonychild.com
+            org.opencontainers.image.documentation=https://blog.anthonychild.com
+            org.opencontainers.image.vendor=Anthony Child
+            org.opencontainers.image.title=Blog
+            org.opencontainers.image.description=Personal blog built with MkDocs Material
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
