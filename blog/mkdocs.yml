@@ -102,8 +102,7 @@ plugins:
         blog_dir: .     #blog
         authors_file: ".authors.yml"
         authors_profiles: true
-        post_url_format: "{date}/{slug}"
-        post_url_date_format: "%Y/%m/%d"
+
     - macros:
     - tags
         # enabled: true
