@@ -1,5 +1,6 @@
 # Stage 1 — Build the blog site
-FROM squidfunk/mkdocs-material:latest AS builder
+FROM squidfunk/mkdocs-material:9.5.49 AS builder
+
 
 WORKDIR /build
 
