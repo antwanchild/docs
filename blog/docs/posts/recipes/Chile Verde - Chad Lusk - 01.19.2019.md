@@ -2,7 +2,7 @@
 title: Chili Verde
 prep_time: 
 cook_time:
-servings :       #how many people it feeds
+servings:       #how many people it feeds
 yield:          #how much or how many items it makes
 difficulty: Medium
 contributor: Chad Lusk
