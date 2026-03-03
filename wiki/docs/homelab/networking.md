@@ -7,7 +7,7 @@ hide:
 Custom Docker bridge networks for isolation, security, and clean service communication.
 
 !!! success ":material-shield-check: Network Design Philosophy"
-    Minimal public exposure — only necessary services on the `proxy` network. Everything else stays internal and secure!
+    Minimal  public exposure — only necessary services on the `proxy` network. Everything else stays internal and secure!
 
 -----
 
