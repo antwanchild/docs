@@ -1,5 +1,5 @@
 # Stage 1 — Build the wiki site
-FROM squidfunk/mkdocs-material:9.5.49 AS builder
+FROM squidfunk/mkdocs-material:9.7.3 AS builder
 
 
 WORKDIR /build
