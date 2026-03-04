@@ -25,6 +25,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VALIDATE_ALL_CODEBASE: false
           DEFAULT_BRANCH: main
+          # Add these to help Super-Linter identify the diff range
+          GITHUB_BEFORE_SHA: ${{ github.event.before }}
+          GITHUB_SHA: ${{ github.sha }}
+          # Your existing filters
           VALIDATE_PYTHON_PYLINT: true
           VALIDATE_BASH: true
           VALIDATE_YAML: true
