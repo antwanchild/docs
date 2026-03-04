@@ -95,6 +95,7 @@ jobs:
       - name: Determine version tag
         id: version
         run: |
+          export TZ="America/Denver"
           git fetch --tags --force
 
           # Check if any new .md files were added
@@ -117,6 +118,7 @@ jobs:
           echo "year_month=${YEAR_MONTH}" >> $GITHUB_OUTPUT
           echo "year=${YEAR}" >> $GITHUB_OUTPUT
           echo "Using version: ${VERSION}"
+
 
       - name: Extract metadata for Docker
         id: meta
@@ -170,6 +172,7 @@ jobs:
       - name: Check for new files and determine release
         id: release-check
         run: |
+          export TZ="America/Denver"
           git fetch --tags --force
 
           # Check if any new .md files were added
@@ -200,6 +203,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          export TZ="America/Denver"
           TAG="${{ steps.release-check.outputs.tag }}"
           YEAR_TAG="wiki-$(date +%Y)"
 
