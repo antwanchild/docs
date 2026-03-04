@@ -28,5 +28,4 @@ jobs:
           VALIDATE_PYTHON_PYLINT: true
           VALIDATE_BASH: true
           VALIDATE_YAML: true
-          # VALIDATE_MARKDOWN: false
           FILTER_REGEX_EXCLUDE: .*\.git.*

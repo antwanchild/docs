@@ -111,8 +111,8 @@ jobs:
             fi
           fi
 
-          YEAR_MONTH=$(echo $VERSION | cut -d. -f1-2)
-          YEAR=$(echo $VERSION | cut -d. -f1)
+          YEAR_MONTH=$(echo "$VERSION" | cut -d. -f1-2)
+          YEAR=$(echo "$VERSION" | cut -d. -f1)
 
           echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
           echo "year_month=${YEAR_MONTH}" >> "$GITHUB_OUTPUT"
