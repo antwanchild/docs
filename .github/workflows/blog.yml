@@ -95,6 +95,7 @@ jobs:
       - name: Determine version tag
         id: version
         run: |
+          export TZ="America/Denver"
           git fetch --tags --force
 
           # Check if any new .md files were added to posts
@@ -168,6 +169,7 @@ jobs:
       - name: Check for new files and determine release
         id: release-check
         run: |
+          export TZ="America/Denver"
           git fetch --tags --force
 
           # Check if any new .md files were added to posts
@@ -198,6 +200,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          export TZ="America/Denver"
           TAG="${{ steps.release-check.outputs.tag }}"
           YEAR_TAG="blog-$(date +%Y)"
 
