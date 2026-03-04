@@ -1,0 +1,32 @@
+name: Super Linter
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  superlinter:
+    name: Super Linter
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      statuses: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Super Linter
+        uses: super-linter/super-linter@v7
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VALIDATE_ALL_CODEBASE: false
+          DEFAULT_BRANCH: main
+          VALIDATE_PYTHON_PYLINT: true
+          VALIDATE_BASH: true
+          VALIDATE_YAML: true
+          VALIDATE_MARKDOWN: false
+          FILTER_REGEX_EXCLUDE: .*\.git.*
