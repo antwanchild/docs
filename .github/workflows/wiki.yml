@@ -211,6 +211,8 @@ jobs:
 
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Use quotes for tagging and pushing
           git tag "$TAG"
           git push origin "$TAG"
 
@@ -218,7 +220,8 @@ jobs:
           git tag -f "$YEAR_TAG"
           git push origin "$YEAR_TAG" --force
 
-          NOTES=$(git log --pretty=format:"- %s" $(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || git rev-list --max-parents=0 HEAD)..HEAD -- wiki/ 2>/dev/null || echo "- Wiki update")
+          # THE FIX: Added quotes around the nested $(git describe ...) subshell
+          NOTES="$(git log --pretty=format:"- %s" "$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || git rev-list --max-parents=0 HEAD)"..HEAD -- wiki/ 2>/dev/null || echo "- Wiki update")"
 
           gh release create "$TAG" \
             --title "${TAG}" \

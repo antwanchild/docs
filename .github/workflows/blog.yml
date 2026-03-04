@@ -209,6 +209,7 @@ jobs:
 
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          
           git tag "$TAG"
           git push origin "$TAG"
 
@@ -216,7 +217,8 @@ jobs:
           git tag -f "$YEAR_TAG"
           git push origin "$YEAR_TAG" --force
 
-          NOTES=$(git log --pretty=format:"- %s" $(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || git rev-list --max-parents=0 HEAD)..HEAD -- blog/ 2>/dev/null || echo "- Blog update")
+          # FIX: Quoted both the outer assignment AND the inner subshell $(git describe ...)
+          NOTES="$(git log --pretty=format:"- %s" "$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || git rev-list --max-parents=0 HEAD)"..HEAD -- blog/ 2>/dev/null || echo "- Blog update")"
 
           gh release create "$TAG" \
             --title "${TAG}" \
