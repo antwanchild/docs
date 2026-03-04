@@ -99,24 +99,26 @@ jobs:
           git fetch --tags --force
 
           # Check if any new .md files were added
-          NEW_FILES=$(git diff --name-status HEAD~1 HEAD -- 'wiki/docs/' | grep '^A' | grep '\.md$' || true)
+          NEW_FILES="$(git diff --name-status HEAD~1 HEAD -- 'wiki/docs/' | grep '^A' | grep '\.md$' || true)"
 
           if [ -n "$NEW_FILES" ]; then
-            VERSION=$(date +%Y.%m.%d)
+            VERSION="$(date +%Y.%m.%d)"
           else
             # Reuse last version tag
-            VERSION=$(git tag --list | grep -E '^[0-9]{4}\.[0-9]{2}\.[0-9]{2}$' | sort -V | tail -1)
+            VERSION="$(git tag --list | grep -E '^[0-9]{4}\.[0-9]{2}\.[0-9]{2}$' | sort -V | tail -1)"
             if [ -z "$VERSION" ]; then
-              VERSION=$(date +%Y.%m.%d)
+              VERSION="$(date +%Y.%m.%d)"
             fi
           fi
 
-          YEAR_MONTH=$(echo "$VERSION" | cut -d. -f1-2)
-          YEAR=$(echo "$VERSION" | cut -d. -f1)
+          YEAR_MONTH="$(echo "$VERSION" | cut -d. -f1-2)"
+          YEAR="$(echo "$VERSION" | cut -d. -f1)"
 
-          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
-          echo "year_month=${YEAR_MONTH}" >> "$GITHUB_OUTPUT"
-          echo "year=${YEAR}" >> "$GITHUB_OUTPUT"
+          {
+            echo "version=${VERSION}"
+            echo "year_month=${YEAR_MONTH}"
+            echo "year=${YEAR}"
+          } >> "$GITHUB_OUTPUT"          
           echo "Using version: ${VERSION}"
 
 
