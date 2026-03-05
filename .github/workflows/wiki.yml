@@ -79,6 +79,8 @@ jobs:
     permissions:
       contents: read
       packages: write
+    outputs:
+      version: ${{ steps.version.outputs.version }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -286,3 +288,62 @@ jobs:
       - name: Clean up .env
         if: always()
         run: rm -f wiki/.env
+
+  notify:
+    name: Discord Notification
+    runs-on: ubuntu-latest
+    needs: [markdownlint, spellcheck, docker, version, link-check]
+    if: always()
+    steps:
+      - name: Send Discord notification
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          if [[ "${{ contains(needs.*.result, 'failure') }}" == "true" ]]; then
+            STATUS="❌ Failed"
+            COLOR=15158332
+          else
+            STATUS="✅ Success"
+            COLOR=3066993
+          fi
+
+          curl -H "Content-Type: application/json" \
+            -d '{
+              "embeds": [{
+                "title": "'"${STATUS}"' — Wiki Build",
+                "color": '"${COLOR}"',
+                "fields": [
+                  {
+                    "name": "Triggered by",
+                    "value": "'"${{ github.actor }}"'",
+                    "inline": true
+                  },
+                  {
+                    "name": "Branch",
+                    "value": "'"${{ github.ref_name }}"'",
+                    "inline": true
+                  },
+                  {
+                    "name": "Version",
+                    "value": "'"${{ needs.docker.outputs.version }}"'",
+                    "inline": true
+                  },
+                  {
+                    "name": "Commit",
+                    "value": "['"${GITHUB_SHA::7}"']('"${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}"') — '"${{ github.event.head_commit.message }}"'",
+                    "inline": false
+                  },
+                  {
+                    "name": "Actions",
+                    "value": "[View Run]('"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"')",
+                    "inline": false
+                  }
+                ],
+                "footer": {
+                  "text": "Wiki • '"$(date +'%B %-d, %Y')"'"
+                }
+              }]
+            }' \
+            "$DISCORD_WEBHOOK_URL"
+
+

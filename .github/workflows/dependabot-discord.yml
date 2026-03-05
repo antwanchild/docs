@@ -1,0 +1,106 @@
+name: Dependabot Discord Notification
+
+on:
+  pull_request:
+    types: [opened]
+  push:
+    branches:
+      - main
+
+jobs:
+  notify-major:
+    name: Major Update Opened
+    runs-on: ubuntu-latest
+    if: github.actor == 'dependabot[bot]' && github.event_name == 'pull_request'
+    steps:
+      - name: Fetch Dependabot metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Send Discord notification
+        if: steps.metadata.outputs.update-type == 'version-update:semver-major'
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          curl -H "Content-Type: application/json" \
+            -d '{
+              "embeds": [{
+                "title": "⚠️ Dependabot Major Update — Review Required",
+                "color": 16744272,
+                "fields": [
+                  {
+                    "name": "Update",
+                    "value": "'"${{ github.event.pull_request.title }}"'",
+                    "inline": false
+                  },
+                  {
+                    "name": "PR",
+                    "value": "[#${{ github.event.pull_request.number }}](${{ github.event.pull_request.html_url }})",
+                    "inline": true
+                  }
+                ],
+                "footer": {
+                  "text": "antwanchild/docs • '"$(date +'%B %-d, %Y')"'"
+                }
+              }]
+            }' \
+            "$DISCORD_WEBHOOK_URL"
+
+  notify-merged:
+    name: PR Auto-Merged
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: Check if push was a Dependabot merge
+        id: check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR=$(gh pr list --state merged --base main --json author,title,number,mergedAt,url \
+            --jq '[.[] | select(.author.login == "dependabot[bot]")] | sort_by(.mergedAt) | last')
+
+          if [ -z "$PR" ] || [ "$PR" == "null" ]; then
+            echo "no_pr=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "title=$(echo $PR | jq -r '.title')" >> "$GITHUB_OUTPUT"
+          echo "number=$(echo $PR | jq -r '.number')" >> "$GITHUB_OUTPUT"
+          echo "url=$(echo $PR | jq -r '.url')" >> "$GITHUB_OUTPUT"
+          echo "no_pr=false" >> "$GITHUB_OUTPUT"
+
+      - name: Send Discord notification
+        if: steps.check.outputs.no_pr == 'false'
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          curl -H "Content-Type: application/json" \
+            -d '{
+              "embeds": [{
+                "title": "✅ Dependabot PR Auto-Merged",
+                "color": 3066993,
+                "fields": [
+                  {
+                    "name": "Update",
+                    "value": "'"${{ steps.check.outputs.title }}"'",
+                    "inline": false
+                  },
+                  {
+                    "name": "PR",
+                    "value": "[#${{ steps.check.outputs.number }}]('"${{ steps.check.outputs.url }}"')",
+                    "inline": true
+                  },
+                  {
+                    "name": "Merged to",
+                    "value": "'"${{ github.ref_name }}"'",
+                    "inline": true
+                  }
+                ],
+                "footer": {
+                  "text": "antwanchild/docs • '"$(date +'%B %-d, %Y')"'"
+                }
+              }]
+            }' \
+            "$DISCORD_WEBHOOK_URL"
