@@ -55,6 +55,9 @@ jobs:
     name: PR Auto-Merged
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      pull-requests: read
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -115,3 +118,4 @@ jobs:
               }]
             }' \
             "$DISCORD_WEBHOOK_URL"
+

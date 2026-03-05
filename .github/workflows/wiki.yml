@@ -300,18 +300,48 @@ jobs:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
         run: |
+          # Overall status
           if [[ "${{ contains(needs.*.result, 'failure') }}" == "true" ]]; then
-            STATUS="❌ Failed"
+            TITLE="❌ Wiki Build — Failed"
             COLOR=15158332
           else
-            STATUS="✅ Success"
+            TITLE="✅ Wiki Build — Success"
             COLOR=3066993
+          fi
+
+          # Job statuses
+          job_emoji() {
+            case "$1" in
+              success) echo "✅ Passed" ;;
+              failure) echo "❌ Failed" ;;
+              skipped) echo "⚠️ Skipped" ;;
+              *) echo "❓ Unknown" ;;
+            esac
+          }
+
+          LINT_STATUS=$(job_emoji "${{ needs.markdownlint.result }}")
+          SPELL_STATUS=$(job_emoji "${{ needs.spellcheck.result }}")
+          DOCKER_STATUS=$(job_emoji "${{ needs.docker.result }}")
+          LINK_STATUS=$(job_emoji "${{ needs.link-check.result }}")
+
+          # Description
+          FAIL_COUNT=0
+          [[ "${{ needs.markdownlint.result }}" == "failure" ]] && FAIL_COUNT=$((FAIL_COUNT+1))
+          [[ "${{ needs.spellcheck.result }}" == "failure" ]] && FAIL_COUNT=$((FAIL_COUNT+1))
+          [[ "${{ needs.docker.result }}" == "failure" ]] && FAIL_COUNT=$((FAIL_COUNT+1))
+          [[ "${{ needs.link-check.result }}" == "failure" ]] && FAIL_COUNT=$((FAIL_COUNT+1))
+
+          if [[ $FAIL_COUNT -eq 0 ]]; then
+            DESCRIPTION="All jobs passed"
+          else
+            DESCRIPTION="${FAIL_COUNT} job(s) failed"
           fi
 
           curl -H "Content-Type: application/json" \
             -d '{
               "embeds": [{
-                "title": "'"${STATUS}"' — Wiki Build",
+                "title": "'"${TITLE}"'",
+                "description": "'"${DESCRIPTION}"'",
                 "color": '"${COLOR}"',
                 "fields": [
                   {
@@ -327,6 +357,26 @@ jobs:
                   {
                     "name": "Version",
                     "value": "'"${{ needs.docker.outputs.version }}"'",
+                    "inline": true
+                  },
+                  {
+                    "name": "Markdown Lint",
+                    "value": "'"${LINT_STATUS}"'",
+                    "inline": true
+                  },
+                  {
+                    "name": "Spellcheck",
+                    "value": "'"${SPELL_STATUS}"'",
+                    "inline": true
+                  },
+                  {
+                    "name": "Docker Build",
+                    "value": "'"${DOCKER_STATUS}"'",
+                    "inline": true
+                  },
+                  {
+                    "name": "Link Checker",
+                    "value": "'"${LINK_STATUS}"'",
                     "inline": true
                   },
                   {
@@ -346,5 +396,6 @@ jobs:
               }]
             }' \
             "$DISCORD_WEBHOOK_URL"
+
 
 
