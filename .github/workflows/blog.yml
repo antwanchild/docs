@@ -296,6 +296,7 @@ jobs:
       - name: Send Discord notification
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
         run: |
           if [[ "${{ contains(needs.*.result, 'failure') }}" == "true" ]]; then
             STATUS="❌ Failed"
@@ -328,7 +329,7 @@ jobs:
                   },
                   {
                     "name": "Commit",
-                    "value": "['"${GITHUB_SHA::7}"']('"${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}"') — '"${{ github.event.head_commit.message }}"'",
+                    "value": "['"${GITHUB_SHA::7}"']('"${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}"') — '"${COMMIT_MESSAGE}"'",
                     "inline": false
                   },
                   {
@@ -343,3 +344,4 @@ jobs:
               }]
             }' \
             "$DISCORD_WEBHOOK_URL"
+

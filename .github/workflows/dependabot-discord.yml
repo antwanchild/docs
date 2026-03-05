@@ -23,6 +23,9 @@ jobs:
         if: steps.metadata.outputs.update-type == 'version-update:semver-major'
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           curl -H "Content-Type: application/json" \
             -d '{
@@ -32,12 +35,12 @@ jobs:
                 "fields": [
                   {
                     "name": "Update",
-                    "value": "'"${{ github.event.pull_request.title }}"'",
+                    "value": "'"${PR_TITLE}"'",
                     "inline": false
                   },
                   {
                     "name": "PR",
-                    "value": "[#${{ github.event.pull_request.number }}](${{ github.event.pull_request.html_url }})",
+                    "value": "[#'"${PR_NUMBER}"']('"${PR_URL}"')",
                     "inline": true
                   }
                 ],
@@ -54,7 +57,7 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Check if push was a Dependabot merge
         id: check
@@ -69,15 +72,20 @@ jobs:
             exit 0
           fi
 
-          echo "title=$(echo $PR | jq -r '.title')" >> "$GITHUB_OUTPUT"
-          echo "number=$(echo $PR | jq -r '.number')" >> "$GITHUB_OUTPUT"
-          echo "url=$(echo $PR | jq -r '.url')" >> "$GITHUB_OUTPUT"
-          echo "no_pr=false" >> "$GITHUB_OUTPUT"
+          {
+            echo "title=$(echo "$PR" | jq -r '.title')"
+            echo "number=$(echo "$PR" | jq -r '.number')"
+            echo "url=$(echo "$PR" | jq -r '.url')"
+            echo "no_pr=false"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Send Discord notification
         if: steps.check.outputs.no_pr == 'false'
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          PR_TITLE: ${{ steps.check.outputs.title }}
+          PR_NUMBER: ${{ steps.check.outputs.number }}
+          PR_URL: ${{ steps.check.outputs.url }}
         run: |
           curl -H "Content-Type: application/json" \
             -d '{
@@ -87,12 +95,12 @@ jobs:
                 "fields": [
                   {
                     "name": "Update",
-                    "value": "'"${{ steps.check.outputs.title }}"'",
+                    "value": "'"${PR_TITLE}"'",
                     "inline": false
                   },
                   {
                     "name": "PR",
-                    "value": "[#${{ steps.check.outputs.number }}]('"${{ steps.check.outputs.url }}"')",
+                    "value": "[#'"${PR_NUMBER}"']('"${PR_URL}"')",
                     "inline": true
                   },
                   {
