@@ -53,6 +53,9 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
       - name: Check if push was a Dependabot merge
         id: check
         env:
