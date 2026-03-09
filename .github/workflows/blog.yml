@@ -159,6 +159,15 @@ jobs:
           secrets: |
             env_file=${{ secrets.ENV_FILE }}
 
+      - name: Scan Docker image with Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ghcr.io/${{ github.repository_owner }}/blog:latest
+          format: table
+          exit-code: 0
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+
   version:
     name: Version and Release
     runs-on: ubuntu-latest
