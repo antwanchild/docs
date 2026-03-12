@@ -8,18 +8,24 @@ on:
       - main
 
 jobs:
-  notify-major:
+
+  # ---------------------------------------------------------------
+  # Notify Discord when Dependabot opens a major version update PR.
+  # Major updates require manual review and are never auto-merged.
+  # Minor and patch updates are handled silently by auto-merge.
+  # ---------------------------------------------------------------
+  notify-major-update:
     name: Major Update Opened
     runs-on: ubuntu-latest
     if: github.actor == 'dependabot[bot]' && github.event_name == 'pull_request'
     steps:
-      - name: Fetch Dependabot metadata
+      - name: Fetch Dependabot PR metadata
         id: metadata
         uses: dependabot/fetch-metadata@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Send Discord notification
+      - name: Notify Discord of major update requiring review
         if: steps.metadata.outputs.update-type == 'version-update:semver-major'
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
@@ -51,7 +57,12 @@ jobs:
             }' \
             "$DISCORD_WEBHOOK_URL"
 
-  notify-merged:
+  # ---------------------------------------------------------------
+  # Notify Discord when a Dependabot PR is auto-merged into main.
+  # Checks the most recently merged Dependabot PR to get details.
+  # Skips silently if the push was not from a Dependabot merge.
+  # ---------------------------------------------------------------
+  notify-auto-merged:
     name: PR Auto-Merged
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -59,36 +70,39 @@ jobs:
       contents: read
       pull-requests: read
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Check if push was a Dependabot merge
-        id: check
+      - name: Find most recently merged Dependabot PR
+        id: merged-pr
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          PR=$(gh pr list --state merged --base main --json author,title,number,mergedAt,url \
+          # Query the most recently merged Dependabot PR
+          MERGED_PR=$(gh pr list --state merged --base main \
+            --json author,title,number,mergedAt,url \
             --jq '[.[] | select(.author.login == "dependabot[bot]")] | sort_by(.mergedAt) | last')
 
-          if [ -z "$PR" ] || [ "$PR" == "null" ]; then
-            echo "no_pr=true" >> "$GITHUB_OUTPUT"
+          if [ -z "$MERGED_PR" ] || [ "$MERGED_PR" == "null" ]; then
+            echo "No merged Dependabot PR found — skipping notification"
+            echo "found=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
           {
-            echo "title=$(echo "$PR" | jq -r '.title')"
-            echo "number=$(echo "$PR" | jq -r '.number')"
-            echo "url=$(echo "$PR" | jq -r '.url')"
-            echo "no_pr=false"
+            echo "title=$(echo "$MERGED_PR" | jq -r '.title')"
+            echo "number=$(echo "$MERGED_PR" | jq -r '.number')"
+            echo "url=$(echo "$MERGED_PR" | jq -r '.url')"
+            echo "found=true"
           } >> "$GITHUB_OUTPUT"
 
-      - name: Send Discord notification
-        if: steps.check.outputs.no_pr == 'false'
+      - name: Notify Discord of auto-merged Dependabot PR
+        if: steps.merged-pr.outputs.found == 'true'
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          PR_TITLE: ${{ steps.check.outputs.title }}
-          PR_NUMBER: ${{ steps.check.outputs.number }}
-          PR_URL: ${{ steps.check.outputs.url }}
+          PR_TITLE: ${{ steps.merged-pr.outputs.title }}
+          PR_NUMBER: ${{ steps.merged-pr.outputs.number }}
+          PR_URL: ${{ steps.merged-pr.outputs.url }}
         run: |
           curl -H "Content-Type: application/json" \
             -d '{
@@ -118,4 +132,3 @@ jobs:
               }]
             }' \
             "$DISCORD_WEBHOOK_URL"
-
