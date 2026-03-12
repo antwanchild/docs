@@ -301,7 +301,7 @@ jobs:
             --exclude '%7B'
             --exclude 'blog.anthonychild.com/[0-9]'
             --exclude "anthonychild.com/category/" ./site
-            --base_url 'https://blog.anthonychild.com'
+            --base-url 'https://blog.anthonychild.com'
             './site/**/*.html'
           fail: true
           output: link-check-results.md
