@@ -296,10 +296,12 @@ jobs:
             --exclude-loopback
             --exclude 'mailto:.*'
             --exclude 'github.com/antwanchild/ubuntu_Desktop'
+            --exclude 'github.com/antwanchild/'
             --exclude '^file://'
             --exclude '%7B'
             --exclude 'blog.anthonychild.com/[0-9]'
-            --base 'https://blog.anthonychild.com'
+            --exclude "anthonychild.com/category/" ./site
+            --base_url 'https://blog.anthonychild.com'
             './site/**/*.html'
           fail: true
           output: link-check-results.md
