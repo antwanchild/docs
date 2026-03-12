@@ -140,6 +140,7 @@ nav:
     - Tech Tips: notes/tech-tips.md
 - Projects & Planning:
     - Projects: projects/index.md
+    - Discord Cleanup Bot: projects/discord_cleanup_bot.md
     - Wishlist: planning/wishlist.md
 - Resources:
     - Bookmarks: bookmarks.md
