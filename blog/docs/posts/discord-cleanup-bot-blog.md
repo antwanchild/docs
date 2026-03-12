@@ -3,10 +3,15 @@ date: 2026-03-12
 authors:
   - antwanchild
 categories:
-  - Technology
+  - Homelab
+  - Projects
+  - Discord
 tags:
+  - discord
   - python
-  - coding
+  - docker
+  - github-actions
+  - self-hosted
 readtime: 8
 draft: false
 ---
@@ -107,7 +112,7 @@ A few things stick out from this project:
 
 The bot runs in Docker. Config persists in a mounted volume. A healthcheck monitors a timestamped file the bot updates every minute — if it goes stale, Docker knows something's wrong.
 
-Source is at [github.com/antwanchild/discord_cleanup](https://github.com/antwanchild/discord_cleanup) and there's fuller documentation over in the [wiki](../projects/discord_cleanup_bot.md).
+Source is at [github.com/antwanchild/discord_cleanup](https://github.com/antwanchild/discord_cleanup) and there's fuller documentation over at [wiki.anthonychild.com](https://wiki.anthonychild.com).
 
 ---
 
