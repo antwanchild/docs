@@ -11,7 +11,6 @@ theme:
   name: material
   icon:
     logo: fontawesome/brands/discord
-  favicon: fontawesome/brands/discord
   palette:
     - media: "(prefers-color-scheme)"
       toggle:
