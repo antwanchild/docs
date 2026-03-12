@@ -4,6 +4,19 @@ on:
   push:
     branches:
       - main
+    paths:
+      # Only scan when non-content files change — secrets won't appear in .md files
+      - '**/*.py'
+      - '**/*.sh'
+      - '**/*.yml'
+      - '**/*.yaml'
+      - '**/*.env*'
+      - '**/*.json'
+      - '**/*.toml'
+      - '**/*.cfg'
+      - '**/*.ini'
+      - 'Dockerfile*'
+      - '.github/workflows/**'
   workflow_dispatch:
 
 jobs:
@@ -11,12 +24,12 @@ jobs:
     name: Secrets Scan
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
-      - name: Run Gitleaks
+      - name: Scan for secrets with Gitleaks
         uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

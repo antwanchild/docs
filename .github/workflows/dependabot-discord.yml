@@ -59,7 +59,8 @@ jobs:
 
   # ---------------------------------------------------------------
   # Notify Discord when a Dependabot PR is auto-merged into main.
-  # Checks the most recently merged Dependabot PR to get details.
+  # Only fires if a Dependabot PR was merged within the last 5 minutes,
+  # which tightly correlates this notification with the triggering push.
   # Skips silently if the push was not from a Dependabot merge.
   # ---------------------------------------------------------------
   notify-auto-merged:
@@ -73,18 +74,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Find most recently merged Dependabot PR
+      - name: Find Dependabot PR merged in the last 5 minutes
         id: merged-pr
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Query the most recently merged Dependabot PR
+          # Calculate a cutoff timestamp 5 minutes ago
+          CUTOFF=$(date -u -d '5 minutes ago' +%Y-%m-%dT%H:%M:%SZ 2>/dev/null \
+            || date -u -v-5M +%Y-%m-%dT%H:%M:%SZ)
+
+          # Find the most recently merged Dependabot PR and check if it falls within the window
           MERGED_PR=$(gh pr list --state merged --base main \
             --json author,title,number,mergedAt,url \
-            --jq '[.[] | select(.author.login == "dependabot[bot]")] | sort_by(.mergedAt) | last')
+            --jq '[.[] | select(.author.login == "dependabot[bot]") | select(.mergedAt >= "'"$CUTOFF"'")] | sort_by(.mergedAt) | last')
 
           if [ -z "$MERGED_PR" ] || [ "$MERGED_PR" == "null" ]; then
-            echo "No merged Dependabot PR found — skipping notification"
+            echo "No Dependabot PR merged in the last 5 minutes — skipping notification"
             echo "found=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi

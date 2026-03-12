@@ -4,6 +4,13 @@ on:
   push:
     branches:
       - main
+    paths:
+      # Only run when code files change — not on content pushes
+      - '**/*.py'
+      - '**/*.sh'
+      - '**/*.yaml'
+      - '**/*.yml'
+      - '.github/workflows/**'
   workflow_dispatch:
 
 jobs:
@@ -14,7 +21,7 @@ jobs:
       contents: read
       statuses: write
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
@@ -25,11 +32,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VALIDATE_ALL_CODEBASE: false
           DEFAULT_BRANCH: main
-          # Add these to help Super-Linter identify the diff range
           GITHUB_BEFORE_SHA: ${{ github.event.before }}
           GITHUB_SHA: ${{ github.sha }}
-          # Your existing filters
           VALIDATE_PYTHON_PYLINT: true
           VALIDATE_BASH: true
           VALIDATE_YAML: true
+          # Markdown linting is handled by markdownlint in wiki.yml and blog.yml
+          VALIDATE_MARKDOWN: false
           FILTER_REGEX_EXCLUDE: .*\.git.*
