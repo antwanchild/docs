@@ -1,159 +1,152 @@
 # yaml-language-server: $schema=https://squidfunk.github.io/mkdocs-material/schema.json
+
 site_name: Anthony's Homelab Docs
 site_url: https://wiki.anthonychild.com
 site_description: Documentation for my self-hosted homelab
 site_author: Anthony Child
 copyright: © <script>document.write(new Date().getFullYear())</script> Anthony Child • All rights reserved
-# site_dir: /site
-
-theme:
-    name: material
-    icon:
-        logo: fontawesome/brands/discord
-    favicon:
-        logo: fontawesome/brands/discord
-    palette:
-    # Palette toggle for automatic mode
-        # - media: "(prefers-color-scheme)"
-        #   toggle:
-        #     icon: material/brightness-auto
-        #     name: Switch to light mode
-        # Palette toggle for dark mode
-        - media: "(prefers-color-scheme: dark)"
-          scheme: slate
-          primary: deep purple
-          accent: amber
-          toggle:
-            icon: material/brightness-4
-            name: Switch to system preference
-        # Palette toggle for light mode
-        - media: "(prefers-color-scheme: light)"
-          scheme: default
-          primary: indigo
-          accent: deep orange
-          toggle:
-            icon: material/brightness-7
-            name: Switch to dark mode
-
-    features:
-        # - content.action.edit
-        - content.code.annotate
-        - content.tabs.link
-        - content.code.copy
-        - header.autohide
-        - announce.dismiss
-        # - navigation.footer
-        - navigation.tabs
-        - navigation.tabs.sticky
-        # - navigation.sections
-        - navigation.top
-        - navigation.tracking
-        - toc.follow
-        - search.suggest
-        - search.highlight
-        - search.share
-
-markdown_extensions:
-    # Python Markdown
-    - abbr
-    - admonition
-    - attr_list
-    - def_list
-    - footnotes
-    - md_in_html
-    - tables
-    - toc:
-        permalink: true
-        toc_depth: 3
-
-    # Python Markdown Extentions
-    - pymdownx.arithmatex:      #look what this does
-        generic: 
-    - pymdownx.betterem:        #look what this does
-        smart_enable: all
-    - pymdownx.caret            #look what this does
-    - pymdownx.details
-    - pymdownx.emoji:
-        emoji_index: !!python/name:material.extensions.emoji.twemoji
-        emoji_generator: !!python/name:material.extensions.emoji.to_svg
-    - pymdownx.highlight:
-        anchor_linenums: true
-    - pymdownx.inlinehilite
-    - pymdownx.keys
-    - pymdownx.mark
-    - pymdownx.smartsymbols
-    - pymdownx.snippets
-    - pymdownx.superfences:
-        custom_fences:
-        - name: mermaid
-          class: mermaid
-          format: !!python/name:pymdownx.superfences.fence_code_format
-    - pymdownx.tabbed:
-        alternate_style: true
-    - pymdownx.tasklist:
-        custom_checkbox: true
-    - pymdownx.tilde
-
-plugins:
-    - search:
-        lang: en
-        separator: '[\s\-,:!=\[\]()"/]+|(?!\b)(?=[A-Z][a-z])|\.(?!\d)|&[lg]t;'
-    - open-in-new-tab
-    - macros:
-    - glightbox
-    - minify:
-        minify_html: true
-        minify_js: true
-        minify_css: true
-        htmlmin_opts:
-            remove_comments: true
-    # - git-revision-date-localized:
-    #     type: timeago
-    #     enable_creation_date: true
-    #     fallback_to_build_date: true
-    # - git-committers:
-    #     repository: antwanchild/docs
-    #     branch: main
 
 repo_url: https://github.com/antwanchild/docs
 repo_name: antwanchild/docs
 edit_uri: edit/main/wiki/docs/
 
-nav:
+# ── Theme ────────────────────────────────────────────────────────────────────
+theme:
+  name: material
+  icon:
+    logo: fontawesome/brands/discord
+  favicon: fontawesome/brands/discord
+  palette:
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: deep purple
+      accent: amber
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: deep orange
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+  features:
+    - content.code.annotate
+    - content.code.copy
+    - content.tabs.link
+    - header.autohide
+    - announce.dismiss
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.top
+    - navigation.tracking
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - search.share
 
-- Home: index.md
-- Dashboard: dashboard/index.md
-- Homelab:
-    - Overview: homelab/overview.md
-    - Services: homelab/services.md
-    - Stacks: homelab/stacks.md
-    - Networking: homelab/networking.md
-    - Plex Token Generator: plex-token.html
-- Quick Reference:
-    # - Troubleshooting:
-    - Quick Commands: reference/quick-commands.md
-    - Cheatsheet: reference/cheatsheet.md
-    - Snippets: reference/snippets.md
-    - Troubleshooting: reference/troubleshooting.md
-- Notes & Tips:
-    - General Notes: notes/general.md
-    - Tech Tips: notes/tech-tips.md
-- Projects & Planning:
-    - Projects: projects/index.md
-    - Discord Cleanup Bot: projects/discord_cleanup_bot.md
-    - Wishlist: planning/wishlist.md
-- Resources:
-    - Bookmarks: bookmarks.md
-    - Examples: fun/examples.md
-- About: about.md
+# ── Markdown Extensions ───────────────────────────────────────────────────────
+markdown_extensions:
+  # Standard
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+      toc_depth: 3
+
+  # PyMdown
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+# ── Plugins ───────────────────────────────────────────────────────────────────
+plugins:
+  - search:
+      lang: en
+      separator: '[\s\-,:!=\[\]()"/]+|(?!\b)(?=[A-Z][a-z])|\.(?!\d)|&[lg]t;'
+  - open-in-new-tab
+  - macros:
+  - glightbox
+  - minify:
+      minify_html: true
+      minify_js: true
+      minify_css: true
+      htmlmin_opts:
+        remove_comments: true
+  # - git-revision-date-localized:
+  #     type: timeago
+  #     enable_creation_date: true
+  #     fallback_to_build_date: true
+  # - git-committers:
+  #     repository: antwanchild/docs
+  #     branch: main
+
+# ── Navigation ────────────────────────────────────────────────────────────────
+nav:
+  - Home: index.md
+  - Dashboard: dashboard/index.md
+  - Homelab:
+      - Overview: homelab/overview.md
+      - Services: homelab/services.md
+      - Stacks: homelab/stacks.md
+      - Networking: homelab/networking.md
+      - Plex Token Generator: plex-token.html
+  - Quick Reference:
+      - Quick Commands: reference/quick-commands.md
+      - Cheatsheet: reference/cheatsheet.md
+      - Snippets: reference/snippets.md
+      - Troubleshooting: reference/troubleshooting.md
+  - Notes & Tips:
+      - General Notes: notes/general.md
+      - Tech Tips: notes/tech-tips.md
+  - Projects & Planning:
+      - Projects: projects/index.md
+      - Discord Cleanup Bot: projects/discord_cleanup_bot.md
+      - Wishlist: planning/wishlist.md
+  - Resources:
+      - Bookmarks: bookmarks.md
+      - Examples: fun/examples.md
+  - About: about.md
+
+# ── Extras ────────────────────────────────────────────────────────────────────
 extra_css:
-    - css/extra.css
+  - css/extra.css
+
 extra_javascript:
-    # - javascripts/collapsible-toc.js  #used to collapse toc
-    - javascripts/mathjax.js
-    - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+  - javascripts/mathjax.js
+  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+
 extra:
-    social:
+  social:
     - icon: fontawesome/brands/github
       link: https://github.com/antwanchild
       name: GitHub Repository
