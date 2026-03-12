@@ -18,7 +18,6 @@ Every cleanup run is logged to a date-stamped file and summarised in a Discord e
 ## Features
 
 ### Channel Management
-
 - Clean entire Discord **categories** or individual channels
 - Per-channel **retention overrides** — different rules for different channels
 - **Exclusions** — mark channels to skip entirely
@@ -26,7 +25,6 @@ Every cleanup run is logged to a date-stamped file and summarised in a Discord e
 - **Purge** command for on-demand channel wipes
 
 ### Scheduling
-
 - Multiple run times per day, fully configurable
 - Timezone-aware scheduling via `TZ` environment variable
 - Missed run detection — alerts if a scheduled run fires more than 15 minutes late
@@ -34,7 +32,6 @@ Every cleanup run is logged to a date-stamped file and summarised in a Discord e
 - Discord notification on any schedule change
 
 ### Statistics
-
 - Three stat buckets tracked independently: **all-time**, **rolling 30-day**, and **this month**
 - Per-channel breakdown with channel names
 - Monthly diff reports showing change vs previous month
@@ -43,7 +40,6 @@ Every cleanup run is logged to a date-stamped file and summarised in a Discord e
 - Stats reset per bucket with confirmation prompt
 
 ### Configuration
-
 - All settings managed via `/cleanup config` slash commands
   - Default retention, log level, warn unconfigured, report frequency
 - Schedule changes apply immediately in memory and persist to `.env`
@@ -52,7 +48,6 @@ Every cleanup run is logged to a date-stamped file and summarised in a Discord e
 - **Status** — `/cleanup status` shows full config snapshot, uptime, next run time, and channel list
 
 ### Notifications
-
 - Deploy notifications on startup showing what changed since the last version the container was running
 - Changelog filtering per-user — only shows commits newer than your last pull
 - Startup notifications for first run after a fresh deploy
@@ -117,7 +112,7 @@ Commit message tags control the bump type:
 
 ## Deployment
 
-The bot runs in Docker on Unraid. A `discord_cleanup.xml` Unraid community application template is included in the repo for easy setup through the Unraid UI. Required volumes are `/config` for persistent config and data, and the `TZ` environment variable for correct scheduling.
+The bot runs in Docker. A `discord_cleanup.xml` Unraid community application template is included in the repo for those running Unraid. Required volumes are `/config` for persistent config and data, and the `TZ` environment variable for correct scheduling.
 
 A `HEALTHCHECK` in the Dockerfile monitors a `/tmp/health` file that the bot updates every minute — if it goes stale, Docker marks the container unhealthy.
 
@@ -135,4 +130,4 @@ This project was built iteratively over many sessions, with each version adding 
 
 ---
 
-_Part of the antwanchild homelab. Built with discord.py, Docker, and GitHub Actions._
+*Part of the antwanchild homelab. Built with discord.py, Docker, and GitHub Actions.*
