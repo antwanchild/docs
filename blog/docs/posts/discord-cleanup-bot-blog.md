@@ -3,15 +3,10 @@ date: 2026-03-12
 authors:
   - antwanchild
 categories:
-  - Homelab
-  - Projects
-  - Discord
+  - homelab
 tags:
-  - discord
-  - python
-  - docker
-  - github-actions
-  - self-hosted
+  - technology
+  - coding
 readtime: 8
 draft: false
 ---

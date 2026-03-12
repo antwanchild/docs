@@ -102,6 +102,7 @@ plugins:
         blog_dir: .     #blog
         authors_file: ".authors.yml"
         authors_profiles: true
+        categories: true
 
     - macros:
     - tags
