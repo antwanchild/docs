@@ -2,10 +2,7 @@ name: Dependabot Discord Notification
 
 on:
   pull_request:
-    types: [opened]
-  push:
-    branches:
-      - main
+    types: [opened, closed]
 
 jobs:
 
@@ -59,55 +56,23 @@ jobs:
 
   # ---------------------------------------------------------------
   # Notify Discord when a Dependabot PR is auto-merged into main.
-  # Only fires if a Dependabot PR was merged within the last 5 minutes,
-  # which tightly correlates this notification with the triggering push.
-  # Skips silently if the push was not from a Dependabot merge.
+  # Triggers on PR close events from Dependabot where the PR was merged.
   # ---------------------------------------------------------------
   notify-auto-merged:
     name: PR Auto-Merged
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    permissions:
-      contents: read
-      pull-requests: read
+    if: >
+      github.actor == 'dependabot[bot]' &&
+      github.event_name == 'pull_request' &&
+      github.event.action == 'closed' &&
+      github.event.pull_request.merged == true
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-
-      - name: Find Dependabot PR merged in the last 5 minutes
-        id: merged-pr
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          # Calculate a cutoff timestamp 5 minutes ago
-          CUTOFF=$(date -u -d '5 minutes ago' +%Y-%m-%dT%H:%M:%SZ 2>/dev/null \
-            || date -u -v-5M +%Y-%m-%dT%H:%M:%SZ)
-
-          # Find the most recently merged Dependabot PR and check if it falls within the window
-          MERGED_PR=$(gh pr list --state merged --base main \
-            --json author,title,number,mergedAt,url \
-            --jq '[.[] | select(.author.login == "dependabot[bot]") | select(.mergedAt >= "'"$CUTOFF"'")] | sort_by(.mergedAt) | last')
-
-          if [ -z "$MERGED_PR" ] || [ "$MERGED_PR" == "null" ]; then
-            echo "No Dependabot PR merged in the last 5 minutes — skipping notification"
-            echo "found=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          {
-            echo "title=$(echo "$MERGED_PR" | jq -r '.title')"
-            echo "number=$(echo "$MERGED_PR" | jq -r '.number')"
-            echo "url=$(echo "$MERGED_PR" | jq -r '.url')"
-            echo "found=true"
-          } >> "$GITHUB_OUTPUT"
-
       - name: Notify Discord of auto-merged Dependabot PR
-        if: steps.merged-pr.outputs.found == 'true'
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          PR_TITLE: ${{ steps.merged-pr.outputs.title }}
-          PR_NUMBER: ${{ steps.merged-pr.outputs.number }}
-          PR_URL: ${{ steps.merged-pr.outputs.url }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
         run: |
           curl -H "Content-Type: application/json" \
             -d '{
@@ -127,7 +92,7 @@ jobs:
                   },
                   {
                     "name": "Merged to",
-                    "value": "'"${{ github.ref_name }}"'",
+                    "value": "'"${{ github.base_ref }}"'",
                     "inline": true
                   }
                 ],
