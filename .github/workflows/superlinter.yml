@@ -34,9 +34,8 @@ jobs:
           DEFAULT_BRANCH: main
           GITHUB_BEFORE_SHA: ${{ github.event.before }}
           GITHUB_SHA: ${{ github.sha }}
+          SAVE_SUPER_LINTER_SUMMARY: true
           VALIDATE_PYTHON_PYLINT: true
           VALIDATE_BASH: true
           VALIDATE_YAML: true
-          # Markdown linting is handled by markdownlint in wiki.yml and blog.yml
-          VALIDATE_MARKDOWN: false
           FILTER_REGEX_EXCLUDE: .*\.git.*
