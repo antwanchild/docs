@@ -8,6 +8,9 @@ on:
       - 'blog/**'
   workflow_dispatch:
 
+env:
+  TZ: American/Denver  
+
 jobs:
 
   # ---------------------------------------------------------------
@@ -265,7 +268,6 @@ jobs:
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
 
-          echo "release_notes=${RELEASE_NOTES}" >> "$GITHUB_OUTPUT"  
           gh release create "$RELEASE_TAG" \
             --title "${RELEASE_TAG}" \
             --notes "${RELEASE_NOTES}" \
