@@ -258,6 +258,10 @@ jobs:
             "$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || git rev-list --max-parents=0 HEAD)"..HEAD \
             -- blog/ 2>/dev/null || echo "- Blog update")"
 
+          # Encode newlines so the value can be written to GITHUB_OUTPUT
+          RELEASE_NOTES_ENCODED="${RELEASE_NOTES//$'\n'/'\\n'}"
+          echo "release_notes=${RELEASE_NOTES_ENCODED}" >> "$GITHUB_OUTPUT"
+
           echo "release_notes=${RELEASE_NOTES}" >> "$GITHUB_OUTPUT"  
           gh release create "$RELEASE_TAG" \
             --title "${RELEASE_TAG}" \
