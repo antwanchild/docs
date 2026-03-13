@@ -220,7 +220,7 @@ jobs:
 
           RELEASE_MONTH=$(date +%m)
           RELEASE_YEAR=$(date +%Y)
-          RELEASE_TAG="wiki-${RELEASE_YEAR}.${RELEASE_MONTH}"
+          RELEASE_TAG="blog-${RELEASE_YEAR}.${RELEASE_MONTH}"
 
           # Allow manual trigger to force a release
           if [[ "${{ github.event.inputs.force_release }}" == "true" ]]; then
@@ -231,7 +231,7 @@ jobs:
           fi
 
           # Only create a release if new .md files were added this push
-          NEW_PAGES=$(git diff --name-status HEAD~1 HEAD -- 'wiki/docs/' | grep '^A' | grep '\.md$' || true)
+          NEW_PAGES=$(git diff --name-status HEAD~1 HEAD -- 'blog/docs/' | grep '^A' | grep '\.md$' || true)
 
           if [ -z "$NEW_PAGES" ]; then
             echo "No new pages added — skipping release"
@@ -269,7 +269,7 @@ jobs:
           git tag -f "$YEARLY_TAG"
           git push origin "$YEARLY_TAG" --force
 
-          # Use recent wiki commit messages as release notes
+          # Use recent blog commit messages as release notes
           RELEASE_NOTES="$(git log --pretty=format:"- %s" HEAD~10..HEAD -- blog/)"
           if [ -z "$RELEASE_NOTES" ]; then
             RELEASE_NOTES="- Blog update"
@@ -374,7 +374,7 @@ jobs:
           curl -H "Content-Type: application/json" \
             -d '{
               "embeds": [{
-                "title": "📖 Wiki Release — '"${RELEASE_TAG}"'",
+                "title": "✏️ Blog Release — '"${RELEASE_TAG}"'",
                 "url": "'"${RELEASE_URL}"'",
                 "color": 3066993,
                 "fields": [
@@ -419,10 +419,10 @@ jobs:
 
           # Set overall build title and embed color
           if [[ "${{ contains(needs.*.result, 'failure') }}" == "true" ]]; then
-            EMBED_TITLE="❌ Wiki Build — Failed"
+            EMBED_TITLE="❌ Blog Build — Failed"
             EMBED_COLOR=15158332
           else
-            EMBED_TITLE="✅ Wiki Build — Success"
+            EMBED_TITLE="✅ Blog Build — Success"
             EMBED_COLOR=3066993
           fi
 
