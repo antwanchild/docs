@@ -7,6 +7,11 @@ on:
     paths:
       - 'blog/**'
   workflow_dispatch:
+    inputs:
+      force_release:
+        description: 'Force a release even if no new pages were added'
+        type: boolean
+        default: false    
 
 env:
   TZ: America/Denver  
@@ -213,19 +218,26 @@ jobs:
           export TZ="America/Denver"
           git fetch --tags --force
 
-          # Only create a release if new .md files were added to posts this push
-          NEW_POSTS=$(git diff --name-status HEAD~1 HEAD -- 'blog/docs/posts/' | grep '^A' | grep '\.md$' || true)
+          RELEASE_MONTH=$(date +%m)
+          RELEASE_YEAR=$(date +%Y)
+          RELEASE_TAG="wiki-${RELEASE_YEAR}.${RELEASE_MONTH}"
 
-          if [ -z "$NEW_POSTS" ]; then
-            echo "No new posts added — skipping release"
-            echo "should_release=false" >> "$GITHUB_OUTPUT"
+          # Allow manual trigger to force a release
+          if [[ "${{ github.event.inputs.force_release }}" == "true" ]]; then
+            echo "Force release triggered manually"
+            echo "should_release=true" >> "$GITHUB_OUTPUT"
+            echo "tag=${RELEASE_TAG}" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          # Build the monthly release tag
-          RELEASE_MONTH=$(date +%m)
-          RELEASE_YEAR=$(date +%Y)
-          RELEASE_TAG="blog-${RELEASE_YEAR}.${RELEASE_MONTH}"
+          # Only create a release if new .md files were added this push
+          NEW_PAGES=$(git diff --name-status HEAD~1 HEAD -- 'wiki/docs/' | grep '^A' | grep '\.md$' || true)
+
+          if [ -z "$NEW_PAGES" ]; then
+            echo "No new pages added — skipping release"
+            echo "should_release=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
 
           # Skip if this month's release tag already exists
           if git tag --list | grep -q "^${RELEASE_TAG}$"; then
