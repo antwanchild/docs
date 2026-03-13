@@ -196,6 +196,10 @@ jobs:
     needs: [docker]
     permissions:
       contents: write
+    outputs:
+      should_release: ${{ steps.release-check.outputs.should_release }}
+      tag: ${{ steps.release-check.outputs.tag }}
+      release_notes: ${{ steps.release-check.outputs.release_notes }}  
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -256,7 +260,8 @@ jobs:
             "$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || git rev-list --max-parents=0 HEAD)"..HEAD \
             -- wiki/ 2>/dev/null || echo "- Wiki update")"
 
-          gh release create "$RELEASE_TAG" \
+            echo "release_notes=${RELEASE_NOTES}" >> "$GITHUB_OUTPUT"
+            gh release create "$RELEASE_TAG" \
             --title "${RELEASE_TAG}" \
             --notes "${RELEASE_NOTES}" \
             --latest
@@ -324,11 +329,49 @@ jobs:
         if: always()
         run: rm -f wiki/.env
 
+  notify-release:
+    name: Discord Release Notification
+    runs-on: ubuntu-latest
+    needs: [version]
+    if: needs.version.outputs.should_release == 'true'
+    steps:
+      - name: Send release notification to Discord
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          RELEASE_TAG: ${{ needs.version.outputs.tag }}
+          RELEASE_NOTES: ${{ needs.version.outputs.release_notes }}
+          RELEASE_URL: ${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ needs.version.outputs.tag }}
+        run: |
+          curl -H "Content-Type: application/json" \
+            -d '{
+              "embeds": [{
+                "title": "📖 Wiki Release — '"${RELEASE_TAG}"'",
+                "url": "'"${RELEASE_URL}"'",
+                "color": 3066993,
+                "fields": [
+                  {
+                    "name": "Changes",
+                    "value": "'"${RELEASE_NOTES:-No release notes provided.}"'",
+                    "inline": false
+                  },
+                  {
+                    "name": "Release",
+                    "value": "[View on GitHub]('"${RELEASE_URL}"')",
+                    "inline": true
+                  }
+                ],
+                "footer": {
+                  "text": "antwanchild/docs • '"$(date +'%B %-d, %Y')"'"
+                }
+              }]
+            }' \
+            "$DISCORD_WEBHOOK_URL"
+
   # ---------------------------------------------------------------
   # Send a Discord embed notification with the overall build result
   # and individual job statuses for each stage of the pipeline.
   # Always runs regardless of upstream job results.
-  # ---------------------------------------------------------------
+  # ---------------------------------------------------------------  
   notify:
     name: Discord Notification
     runs-on: ubuntu-latest
