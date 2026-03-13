@@ -353,6 +353,7 @@ jobs:
           RELEASE_URL: ${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ needs.version.outputs.tag }}
         run: |
           export TZ="America/Denver"
+          # shellcheck disable=SC2034
           FORMATTED_DATE="$(date +'%B %-d, %Y')"
 
           curl -H "Content-Type: application/json" \
@@ -398,6 +399,7 @@ jobs:
           COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
         run: |
           export TZ="America/Denver"
+          # shellcheck disable=SC2034
           FORMATTED_DATE="$(date +'%B %-d, %Y')"
 
           # Set overall build title and embed color
