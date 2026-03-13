@@ -225,8 +225,13 @@ jobs:
           # Allow manual trigger to force a release
           if [[ "${{ github.event.inputs.force_release }}" == "true" ]]; then
             echo "Force release triggered manually"
-            echo "should_release=true" >> "$GITHUB_OUTPUT"
-            echo "tag=${RELEASE_TAG}" >> "$GITHUB_OUTPUT"
+            if git tag --list | grep -q "^${RELEASE_TAG}$"; then
+              echo "Release tag ${RELEASE_TAG} already exists — skipping release"
+              echo "should_release=false" >> "$GITHUB_OUTPUT"
+            else
+              echo "should_release=true" >> "$GITHUB_OUTPUT"
+              echo "tag=${RELEASE_TAG}" >> "$GITHUB_OUTPUT"
+            fi
             exit 0
           fi
 
@@ -328,7 +333,7 @@ jobs:
             --exclude '^file://'
             --exclude '%7B'
             --exclude 'blog.anthonychild.com/[0-9]'
-            --exclude "anthonychild.com/category/" ./site
+            --exclude "anthonychild.com/category/"
             --base-url 'https://blog.anthonychild.com'
             './site/**/*.html'
           fail: true
