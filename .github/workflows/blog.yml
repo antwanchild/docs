@@ -329,11 +329,11 @@ jobs:
             --exclude-loopback
             --exclude 'mailto:.*'
             --exclude 'github.com/antwanchild/ubuntu_Desktop'
-            --exclude 'github.com/antwanchild/'
+            --exclude 'github.com/antwanchild/discord_cleanup'
             --exclude '^file://'
             --exclude '%7B'
             --exclude 'blog.anthonychild.com/[0-9]'
-            --exclude "anthonychild.com/category/"
+            --exclude 'blog.anthonychild.com'
             --base-url 'https://blog.anthonychild.com'
             './site/**/*.html'
           fail: true
