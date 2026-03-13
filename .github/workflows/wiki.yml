@@ -202,7 +202,7 @@ jobs:
     outputs:
       should_release: ${{ steps.release-check.outputs.should_release }}
       tag: ${{ steps.release-check.outputs.tag }}
-      release_notes: ${{ steps.release-check.outputs.release_notes }}  
+      release_notes: ${{ steps.create-release.outputs.release_notes }}    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -239,6 +239,7 @@ jobs:
           fi
 
       - name: Create monthly and yearly release tags
+        id: create-release
         if: steps.release-check.outputs.should_release == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
