@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 env:
-  TZ: American/Denver  
+  TZ: America/Denver  
 
 jobs:
 
@@ -259,9 +259,10 @@ jobs:
           git push origin "$YEARLY_TAG" --force
 
           # Generate release notes from commits since the last release
-          RELEASE_NOTES="$(git log --pretty=format:"- %s" \
-            "$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || git rev-list --max-parents=0 HEAD)"..HEAD \
-            -- wiki/ 2>/dev/null || echo "- Wiki update")"
+          RELEASE_NOTES="$(git log --pretty=format:"- %s" HEAD~10..HEAD -- wiki/ 2>/dev/null)"
+          if [ -z "$RELEASE_NOTES" ]; then
+            RELEASE_NOTES="- Wiki update"
+          fi
 
           # Use heredoc syntax to safely write multiline/special char values
           {
@@ -351,6 +352,9 @@ jobs:
           RELEASE_NOTES: ${{ needs.version.outputs.release_notes }}
           RELEASE_URL: ${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ needs.version.outputs.tag }}
         run: |
+          export TZ="America/Denver"
+          FORMATTED_DATE="$(date +'%B %-d, %Y')"
+
           curl -H "Content-Type: application/json" \
             -d '{
               "embeds": [{
@@ -370,11 +374,12 @@ jobs:
                   }
                 ],
                 "footer": {
-                  "text": "antwanchild/docs • '"$(date +'%B %-d, %Y')"'"
+                  "text": "antwanchild/docs • '"${FORMATTED_DATE}"'"
                 }
               }]
             }' \
             "$DISCORD_WEBHOOK_URL"
+
 
   # ---------------------------------------------------------------
   # Send a Discord embed notification with the overall build result
@@ -392,6 +397,9 @@ jobs:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
         run: |
+          export TZ="America/Denver"
+          FORMATTED_DATE="$(date +'%B %-d, %Y')"
+
           # Set overall build title and embed color
           if [[ "${{ contains(needs.*.result, 'failure') }}" == "true" ]]; then
             EMBED_TITLE="❌ Wiki Build — Failed"
@@ -483,8 +491,9 @@ jobs:
                   }
                 ],
                 "footer": {
-                  "text": "Wiki • '"$(date +'%B %-d, %Y')"'"
+                  "text": "Wiki • '"${FORMATTED_DATE}"'"
                 }
               }]
             }' \
             "$DISCORD_WEBHOOK_URL"
+
