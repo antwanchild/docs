@@ -258,8 +258,8 @@ jobs:
           git tag -f "$YEARLY_TAG"
           git push origin "$YEARLY_TAG" --force
 
-          # Generate release notes from commits since the last release
-          RELEASE_NOTES="$(git log --pretty=format:"- %s" HEAD~10..HEAD -- wiki/ 2>/dev/null)"
+          # Use recent wiki commit messages as release notes
+          RELEASE_NOTES="$(git log --pretty=format:"- %s" HEAD~10..HEAD -- wiki/)"
           if [ -z "$RELEASE_NOTES" ]; then
             RELEASE_NOTES="- Wiki update"
           fi
