@@ -4,6 +4,7 @@ Your personal knowledge base for homelab infrastructure, configurations, and tec
 
 -----
 
+
 ## :material-compass: Quick Navigation
 
 |Section                                                                           |Description                                                                             |
