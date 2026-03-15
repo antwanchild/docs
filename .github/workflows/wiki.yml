@@ -334,6 +334,7 @@ jobs:
             --exclude 'github.com/antwanchild/discord_cleanup'
             --exclude '^file://'
             --exclude '%7B'
+            --exclude 'wiki.anthonychild.com'
             --base 'https://wiki.anthonychild.com'
             './site/**/*.html'
           fail: true
