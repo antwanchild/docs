@@ -4,6 +4,7 @@ hide:
 #   - navigation
 ---
 
+
 # :material-format-text: Markdown Examples
 
 A showcase of Material for MkDocs features and markdown syntax you can use throughout this wiki.
