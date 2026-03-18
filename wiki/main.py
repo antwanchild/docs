@@ -15,7 +15,7 @@ def define_env(env):
     author = os.getenv("AUTHOR", "Anthony Child")
     env.variables["author"] = author
 
-    current_year = os.getenv("CURRENT_YEAR", "2025")
+    current_year = os.getenv("CURRENT_YEAR", "2026")
     env.variables["current_year"] = current_year
 
     @env.macro

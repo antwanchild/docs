@@ -9,11 +9,9 @@ WORKDIR /build
 RUN pip install --no-cache-dir \
     mkdocs-macros-plugin \
     python-dotenv \
-    mkdocs-rss-plugin \
     mkdocs-glightbox \
     mkdocs-minify-plugin \
-    mkdocs-open-in-new-tab \
-    mkdocs-git-revision-date-localized-plugin
+    mkdocs-open-in-new-tab
 
 # Copy blog content and MkDocs config
 COPY blog/docs docs/

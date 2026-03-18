@@ -101,6 +101,10 @@ plugins:
       minify_css: true
       htmlmin_opts:
         remove_comments: true
+  # Disabled: git-revision-date-localized and git-committers require a full git
+  # history at build time. The Docker build context does not include .git/, so
+  # these plugins fail unless a shallow/full clone is passed in — not worth the
+  # added CI complexity for now. Re-enable if build context is changed.
   # - git-revision-date-localized:
   #     type: timeago
   #     enable_creation_date: true
