@@ -13,6 +13,7 @@ edit_uri: edit/main/wiki/docs/
 # ── Theme ────────────────────────────────────────────────────────────────────
 theme:
   name: material
+  custom_dir: docs/overrides
   icon:
     logo: fontawesome/brands/discord
   palette:
