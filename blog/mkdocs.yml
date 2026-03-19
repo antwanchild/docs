@@ -9,6 +9,7 @@ copyright: © <script>document.write(new Date().getFullYear())</script> Anthony 
 # ── Theme ────────────────────────────────────────────────────────────────────
 theme:
   name: material
+  custom_dir: docs/overrides
   icon:
     logo: fontawesome/brands/discord
   palette:
