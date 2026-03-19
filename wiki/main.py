@@ -35,7 +35,7 @@ def define_env(env):
             "prowlarr": "manager",
             "radarr": "movies",
             "sabnzbd": "sabnzb",
-            "seerr": "flix",
+            "seerr": "requests",
             "sonarr": "series",
             "starr": "starr",
             "tautulli": "tautulli",
