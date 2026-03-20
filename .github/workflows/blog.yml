@@ -121,7 +121,6 @@ jobs:
       - name: Determine image version tag
         id: version
         run: |
-          export TZ="America/Denver"
           git fetch --tags --force
 
           # Use today's date if new posts were added, otherwise reuse the last version tag
@@ -183,7 +182,7 @@ jobs:
             env_file=${{ secrets.ENV_FILE }}
 
       - name: Scan image for CVEs with Trivy
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@v0.35.0
         with:
           image-ref: ghcr.io/${{ github.repository_owner }}/blog:latest
           format: table
@@ -215,7 +214,6 @@ jobs:
       - name: Check for new posts and determine release eligibility
         id: release-check
         run: |
-          export TZ="America/Denver"
           git fetch --tags --force
 
           RELEASE_MONTH=$(date +%m)
@@ -259,7 +257,6 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          export TZ="America/Denver"
           RELEASE_TAG="${{ steps.release-check.outputs.tag }}"
           YEARLY_TAG="blog-$(date +%Y)"
 
@@ -372,7 +369,6 @@ jobs:
           RELEASE_NOTES: ${{ needs.version.outputs.release_notes }}
           RELEASE_URL: ${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ needs.version.outputs.tag }}
         run: |
-          export TZ="America/Denver"
           # shellcheck disable=SC2034
           FORMATTED_DATE="$(date +'%B %-d, %Y')"
 
@@ -395,7 +391,7 @@ jobs:
                   }
                 ],
                 "footer": {
-                  "title": "✏️ Blog Release — '"${RELEASE_TAG}"'",
+                  "text": "✏️ Blog Release — '"${RELEASE_TAG}"'"
                 }
               }]
             }' \
@@ -418,7 +414,6 @@ jobs:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
         run: |
-          export TZ="America/Denver"
           # shellcheck disable=SC2034
           FORMATTED_DATE="$(date +'%B %-d, %Y')"
 
