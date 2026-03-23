@@ -1,5 +1,5 @@
 # Stage 1 — Build the blog site
-FROM squidfunk/mkdocs-material:9.7.5 AS builder
+FROM squidfunk/mkdocs-material:9.7.6 AS builder
 ENV NO_MKDOCS_2_WARNING=1
 
 
