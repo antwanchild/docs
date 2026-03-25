@@ -100,6 +100,7 @@ plugins:
       authors_profiles: true
       categories: true
       categories_url_format: "category/{slug}"
+  - open-in-new-tab
   - glightbox
   - minify:
       minify_html: true
