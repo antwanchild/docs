@@ -54,8 +54,6 @@ on:
         required: false
         default: false
     secrets:
-      GITHUB_TOKEN:
-        required: true
       ENV_FILE:
         required: true
       DISCORD_WEBHOOK_URL:
@@ -313,6 +311,32 @@ jobs:
             echo "tag=${RELEASE_TAG}" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Compute release note range
+        id: range
+        if: steps.release-check.outputs.should_release == 'true'
+        run: |
+          PREV_TAG=$(git tag --list "${{ inputs.tag_prefix }}*" | sort -V | tail -1)
+          if [ -n "$PREV_TAG" ]; then
+            echo "value=${PREV_TAG}..HEAD" >> "$GITHUB_OUTPUT"
+          else
+            echo "value=HEAD~20..HEAD" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Generate release notes with git-cliff
+        id: cliff
+        if: steps.release-check.outputs.should_release == 'true'
+        uses: orhun/git-cliff-action@v4
+        with:
+          config: cliff.toml
+          args: >-
+            --tag ${{ steps.release-check.outputs.tag }}
+            --include-path ${{ inputs.mkdocs_dir }}/**
+            ${{ steps.range.outputs.value }}
+        env:
+          OUTPUT: release-notes.md
+          GITHUB_REPO: ${{ github.repository }}
+        continue-on-error: true
+
       - name: Create monthly and yearly release tags
         id: create-release
         if: steps.release-check.outputs.should_release == 'true'
@@ -321,34 +345,12 @@ jobs:
         run: |
           RELEASE_TAG="${{ steps.release-check.outputs.tag }}"
           YEARLY_TAG="${{ inputs.tag_prefix }}$(date +%Y)"
+          RANGE="${{ steps.range.outputs.value }}"
 
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Find the previous site-specific tag to scope release notes correctly
-          PREV_TAG=$(git tag --list "${{ inputs.tag_prefix }}*" | sort -V | tail -1)
-          if [ -n "$PREV_TAG" ]; then
-            RANGE="${PREV_TAG}..HEAD"
-          else
-            RANGE="HEAD~20..HEAD"
-          fi
-
-          # Install git-cliff for structured release note generation
-          CLIFF_VERSION="2.6.1"
-          curl -sL "https://github.com/orhun/git-cliff/releases/download/v${CLIFF_VERSION}/git-cliff-${CLIFF_VERSION}-x86_64-unknown-linux-musl.tar.gz" \
-            -o /tmp/git-cliff.tar.gz
-          tar -xzf /tmp/git-cliff.tar.gz -C /tmp
-          find /tmp -name 'git-cliff' -type f | head -1 | xargs -I{} install -m755 {} /usr/local/bin/git-cliff
-
-          # Generate release notes scoped to this site's directory
-          git-cliff \
-            --config cliff.toml \
-            --tag "$RELEASE_TAG" \
-            --include-path "${{ inputs.mkdocs_dir }}/**" \
-            --output release-notes.md \
-            "$RANGE" || true
-
-          # Fallback to git log if cliff produces nothing
+          # Fallback to git log if cliff produced nothing
           if [ ! -s release-notes.md ]; then
             git log --pretty=format:"- %s" "$RANGE" -- "${{ inputs.mkdocs_dir }}/" > release-notes.md || true
           fi
