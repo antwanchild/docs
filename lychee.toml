@@ -1,0 +1,12 @@
+accept = [200, 204, 206, 401, 403, 429]
+no_progress = true
+exclude_loopback = true
+exclude = [
+  "mailto:.*",
+  "github.com/antwanchild/ubuntu_Desktop",
+  "github.com/antwanchild/discord_cleanup",
+  "^file://",
+  "%7B",
+  "wiki.anthonychild.com",
+  "blog.anthonychild.com"
+]
