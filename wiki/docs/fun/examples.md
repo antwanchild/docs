@@ -210,6 +210,7 @@ services:
 >
 > It can span multiple lines.
 
+<!-- markdownlint-disable-next-line MD028 -->
 > Nested blockquotes:
 > > This is nested.
 
