@@ -13,6 +13,10 @@ on:
         type: boolean
         default: false
 
+permissions:
+  contents: write
+  packages: write
+
 jobs:
   build:
     uses: ./.github/workflows/build-site.yml
