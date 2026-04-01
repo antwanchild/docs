@@ -12,6 +12,7 @@ updates:
     labels:
       - "dependencies"
       - "python"
+    rebase-strategy: "auto"
     commit-message:
       prefix: "chore(deps)"
 
@@ -26,6 +27,7 @@ updates:
     labels:
       - "dependencies"
       - "github-actions"
+    rebase-strategy: "auto"
     commit-message:
       prefix: "chore(actions)"
 
@@ -40,5 +42,6 @@ updates:
     labels:
       - "dependencies"
       - "docker"
+    rebase-strategy: "auto"
     commit-message:
       prefix: "chore(docker)"
