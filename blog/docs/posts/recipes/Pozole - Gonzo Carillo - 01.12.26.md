@@ -26,14 +26,14 @@ categories:
 
 ## Ingredients You’ll Need
 
-| For the soup base         | For the chile (sauce)             |
-|---------------------------|-----------------------------------|
-| 2 lbs pork shoulder (or a mix of shoulder and ribs) | 4 dried guajillo chiles, stemmed and seeded|
-| 1 onion, halved            | 2 dried ancho chiles             |
-| 5 garlic cloves            | 3 garlic cloves                  |
-| 2 bay leaves              | 1 tsp cumin                       |
-| Salt and pepper to taste  | 1/4 tsp ground clove (optional)   |
-| 8 cups chicken broth      | 1 cup water (for blending)        |
+| For the soup base                                   | For the chile (sauce)                       |
+|-----------------------------------------------------|---------------------------------------------|
+| 2 lbs pork shoulder (or a mix of shoulder and ribs) | 4 dried guajillo chiles, stemmed and seeded |
+| 1 onion, halved                                     | 2 dried ancho chiles                        |
+| 5 garlic cloves                                     | 3 garlic cloves                             |
+| 2 bay leaves                                        | 1 tsp cumin                                 |
+| Salt and pepper to taste                            | 1/4 tsp ground clove (optional)             |
+| 8 cups chicken broth                                | 1 cup water (for blending)                  |
 
 ### Other essentials:
 
