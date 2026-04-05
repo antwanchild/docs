@@ -58,3 +58,9 @@ Both sites default to `http://localhost:8000`.
 Open an [issue](https://github.com/antwanchild/docs/issues) to suggest content or report a bug.
 
 To report a security vulnerability, see [SECURITY.md](SECURITY.md).
+
+## License
+
+- **Code** (Dockerfiles, workflows, configs) — [MIT](LICENSE)
+- **Wiki content** (`wiki/docs/`) — [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
+- **Blog content** (`blog/docs/`) — © Anthony Child, all rights reserved
