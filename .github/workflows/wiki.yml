@@ -29,7 +29,6 @@ jobs:
       image_name: wiki
       dockerfile: Dockerfile.wiki
       docker_description: Personal wiki built with MkDocs Material
-      needs_github_token_build_arg: true
       tag_prefix: wiki-
       base_url: https://wiki.anthonychild.com
       force_release: ${{ inputs.force_release || false }}

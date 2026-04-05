@@ -35,11 +35,6 @@ on:
         description: 'OCI image description label'
         type: string
         required: true
-      needs_github_token_build_arg:
-        description: 'Pass GITHUB_TOKEN as a Docker build-arg (required for wiki git plugins)'
-        type: boolean
-        required: false
-        default: false
       tag_prefix:
         description: 'Git release tag prefix (wiki- or blog-)'
         type: string
@@ -213,24 +208,7 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
 
-      - name: Build and push image (wiki — includes GITHUB_TOKEN build-arg)
-        if: inputs.needs_github_token_build_arg == true
-        uses: docker/build-push-action@v7
-        with:
-          context: .
-          file: ${{ inputs.dockerfile }}
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          secrets: |
-            env_file=${{ secrets.ENV_FILE }}
-          build-args: |
-            GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
-
       - name: Build and push image
-        if: inputs.needs_github_token_build_arg == false
         uses: docker/build-push-action@v7
         with:
           context: .
