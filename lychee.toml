@@ -3,6 +3,7 @@ no_progress = true
 exclude_loopback = true
 exclude = [
   "mailto:.*",
+  "^https://github.com/antwanchild$",
   "github.com/antwanchild/ubuntu_Desktop",
   "github.com/antwanchild/discord_cleanup",
   "^file://",
