@@ -44,9 +44,13 @@ misspelled-words.txt
 .*DS_Store
 
 # Repo docs — not needed in build context
+LICENSE
 README.md
 SECURITY.md
-lychee.toml
 cliff.toml
+lychee.toml
+requirements.txt
 .markdownlint.json
 .markdownlint.yaml
+.spellcheck.yml
+.wordlist.txt
