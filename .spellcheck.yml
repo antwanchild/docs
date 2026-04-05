@@ -5,6 +5,8 @@ matrix:
     ignore-case: true
   dictionary:
     encoding: utf-8
+    wordlists:
+    - .wordlist.txt
   pipeline:
   - pyspelling.filters.markdown:
       {}
