@@ -29,7 +29,6 @@ jobs:
       image_name: blog
       dockerfile: Dockerfile.blog
       docker_description: Personal blog built with MkDocs Material
-      needs_github_token_build_arg: false
       tag_prefix: blog-
       base_url: https://blog.anthonychild.com
       force_release: ${{ inputs.force_release || false }}
