@@ -1,0 +1,52 @@
+# Git
+.git/
+.gitignore
+
+# MkDocs build output
+site/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+
+# Docker
+.dockerignore
+Dockerfile.wiki
+Dockerfile.blog
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+._*
+Thumbs.db
+desktop.ini
+
+# CI
+.github/
+
+# Spellcheck output
+spellcheck-results.txt
+misspelled-words.txt
+
+# Env files — never copy secrets into image
+.env
+
+.*DS_Store
+
+# Repo docs — not needed in build context
+README.md
+SECURITY.md
+lychee.toml
+cliff.toml
+.markdownlint.json
+.markdownlint.yaml
