@@ -6,7 +6,8 @@ ENV NO_MKDOCS_2_WARNING=1
 WORKDIR /build
 
 # Install wiki plugins
-RUN pip install --no-cache-dir \
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir \
     mkdocs-macros-plugin \
     python-dotenv \
     mkdocs-open-in-new-tab \
