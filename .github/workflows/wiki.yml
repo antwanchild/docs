@@ -26,6 +26,7 @@ jobs:
       content_dir: wiki/docs/
       mkdocs_dir: wiki
       env_file_path: wiki/.env
+      requirements_file: requirements.wiki.txt
       image_name: wiki
       dockerfile: Dockerfile.wiki
       docker_description: Personal wiki built with MkDocs Material
