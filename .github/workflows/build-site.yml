@@ -431,14 +431,15 @@ jobs:
           RELEASE_NOTES: ${{ needs.version.outputs.release_notes }}
           RELEASE_URL: ${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ needs.version.outputs.tag }}
           REPOSITORY: ${{ github.repository }}
+          SITE_NAME: ${{ inputs.site_name }}
+          SITE_EMOJI: ${{ inputs.site_emoji }}
         run: |
-          # shellcheck disable=SC2034,SC2016
           FORMATTED_DATE="$(date +'%B %-d, %Y')"
 
           curl -H "Content-Type: application/json" \
             -d '{
               "embeds": [{
-                "title": "${{ inputs.site_emoji }} ${{ inputs.site_name }} — Release Published",
+                "title": "'"${SITE_EMOJI} ${SITE_NAME}"' — Release Published",
                 "url": "'"${RELEASE_URL}"'",
                 "color": 3066993,
                 "fields": [
@@ -459,7 +460,7 @@ jobs:
                   }
                 ],
                 "footer": {
-                  "text": "${{ inputs.site_name }} ${RELEASE_TAG} • github.com/'"${REPOSITORY}"' • '"${FORMATTED_DATE}"'"
+                  "text": "'"${SITE_NAME}"' '"${RELEASE_TAG}"' • github.com/'"${REPOSITORY}"' • '"${FORMATTED_DATE}"'"
                 }
               }]
             }' \
@@ -481,15 +482,25 @@ jobs:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
           REPOSITORY: ${{ github.repository }}
+          SITE_NAME: ${{ inputs.site_name }}
+          GITHUB_ACTOR_NAME: ${{ github.actor }}
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+          DOCKER_VERSION: ${{ needs.docker.outputs.version }}
+          GITHUB_COMMIT_URL: ${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}
+          GITHUB_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          MARKDOWNLINT_RESULT: ${{ needs.markdownlint.result }}
+          SPELLCHECK_RESULT: ${{ needs.spellcheck.result }}
+          DOCKER_RESULT: ${{ needs.docker.result }}
+          LINKCHECK_RESULT: ${{ needs.link-check.result }}
+          HAS_FAILURES: ${{ contains(needs.*.result, 'failure') }}
         run: |
-          # shellcheck disable=SC2034,SC2016
           FORMATTED_DATE="$(date +'%B %-d, %Y')"
 
-          if [[ "${{ contains(needs.*.result, 'failure') }}" == "true" ]]; then
-            EMBED_TITLE="❌ ${{ inputs.site_name }} — Build Failed"
+          if [[ "${HAS_FAILURES}" == "true" ]]; then
+            EMBED_TITLE="❌ ${SITE_NAME} — Build Failed"
             EMBED_COLOR=15158332
           else
-            EMBED_TITLE="✅ ${{ inputs.site_name }} — Build Succeeded"
+            EMBED_TITLE="✅ ${SITE_NAME} — Build Succeeded"
             EMBED_COLOR=3066993
           fi
 
@@ -502,16 +513,16 @@ jobs:
             esac
           }
 
-          LINT_STATUS=$(job_status_label "${{ needs.markdownlint.result }}")
-          SPELL_STATUS=$(job_status_label "${{ needs.spellcheck.result }}")
-          DOCKER_STATUS=$(job_status_label "${{ needs.docker.result }}")
-          LINK_STATUS=$(job_status_label "${{ needs.link-check.result }}")
+          LINT_STATUS=$(job_status_label "${MARKDOWNLINT_RESULT}")
+          SPELL_STATUS=$(job_status_label "${SPELLCHECK_RESULT}")
+          DOCKER_STATUS=$(job_status_label "${DOCKER_RESULT}")
+          LINK_STATUS=$(job_status_label "${LINKCHECK_RESULT}")
 
           FAILED_JOB_COUNT=0
-          [[ "${{ needs.markdownlint.result }}" == "failure" ]] && FAILED_JOB_COUNT=$((FAILED_JOB_COUNT+1))
-          [[ "${{ needs.spellcheck.result }}"   == "failure" ]] && FAILED_JOB_COUNT=$((FAILED_JOB_COUNT+1))
-          [[ "${{ needs.docker.result }}"        == "failure" ]] && FAILED_JOB_COUNT=$((FAILED_JOB_COUNT+1))
-          [[ "${{ needs.link-check.result }}"   == "failure" ]] && FAILED_JOB_COUNT=$((FAILED_JOB_COUNT+1))
+          [[ "${MARKDOWNLINT_RESULT}" == "failure" ]] && FAILED_JOB_COUNT=$((FAILED_JOB_COUNT+1))
+          [[ "${SPELLCHECK_RESULT}" == "failure" ]] && FAILED_JOB_COUNT=$((FAILED_JOB_COUNT+1))
+          [[ "${DOCKER_RESULT}" == "failure" ]] && FAILED_JOB_COUNT=$((FAILED_JOB_COUNT+1))
+          [[ "${LINKCHECK_RESULT}" == "failure" ]] && FAILED_JOB_COUNT=$((FAILED_JOB_COUNT+1))
 
           if [[ $FAILED_JOB_COUNT -eq 0 ]]; then
             EMBED_DESCRIPTION="All jobs passed"
@@ -528,17 +539,17 @@ jobs:
                 "fields": [
                   {
                     "name": "Triggered by",
-                    "value": "'"${{ github.actor }}"'",
+                    "value": "'"${GITHUB_ACTOR_NAME}"'",
                     "inline": true
                   },
                   {
                     "name": "Branch",
-                    "value": "'"${{ github.ref_name }}"'",
+                    "value": "'"${GITHUB_REF_NAME}"'",
                     "inline": true
                   },
                   {
                     "name": "Version",
-                    "value": "'"${{ needs.docker.outputs.version }}"'",
+                    "value": "'"${DOCKER_VERSION}"'",
                     "inline": true
                   },
                   {
@@ -563,17 +574,17 @@ jobs:
                   },
                   {
                     "name": "Commit",
-                    "value": "['"${GITHUB_SHA::7}"']('"${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}"') — '"${COMMIT_MESSAGE}"'",
+                    "value": "['"${GITHUB_SHA::7}"']('"${GITHUB_COMMIT_URL}"') — '"${COMMIT_MESSAGE}"'",
                     "inline": false
                   },
                   {
                     "name": "Actions",
-                    "value": "[View Run]('"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"')",
+                    "value": "[View Run]('"${GITHUB_RUN_URL}"')",
                     "inline": false
                   }
                 ],
                 "footer": {
-                  "text": "${{ inputs.site_name }} v'"${{ needs.docker.outputs.version }}"' • github.com/'"${REPOSITORY}"' • '"${FORMATTED_DATE}"'"
+                  "text": "'"${SITE_NAME}"' v'"${DOCKER_VERSION}"' • github.com/'"${REPOSITORY}"' • '"${FORMATTED_DATE}"'"
                 }
               }]
             }' \
