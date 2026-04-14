@@ -432,7 +432,7 @@ jobs:
           RELEASE_URL: ${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ needs.version.outputs.tag }}
           REPOSITORY: ${{ github.repository }}
         run: |
-          # shellcheck disable=SC2034
+          # shellcheck disable=SC2034,SC2016
           FORMATTED_DATE="$(date +'%B %-d, %Y')"
 
           curl -H "Content-Type: application/json" \
@@ -482,7 +482,7 @@ jobs:
           COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
           REPOSITORY: ${{ github.repository }}
         run: |
-          # shellcheck disable=SC2034
+          # shellcheck disable=SC2034,SC2016
           FORMATTED_DATE="$(date +'%B %-d, %Y')"
 
           if [[ "${{ contains(needs.*.result, 'failure') }}" == "true" ]]; then
