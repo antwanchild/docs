@@ -19,7 +19,7 @@ jobs:
   auto-merge:
     name: Auto-Merge
     runs-on: ubuntu-latest
-    if: github.actor == 'dependabot[bot]' && github.event.action != 'closed'
+    if: github.event.pull_request.user.login == 'dependabot[bot]' && github.event.action != 'closed'
     steps:
       - name: Fetch Dependabot PR metadata
         id: metadata
@@ -61,7 +61,7 @@ jobs:
   notify-major-update:
     name: Notify Major Update
     runs-on: ubuntu-latest
-    if: github.actor == 'dependabot[bot]' && github.event.action == 'opened'
+    if: github.event.pull_request.user.login == 'dependabot[bot]' && github.event.action == 'opened'
     steps:
       - name: Collect PR context
         id: pr_context
@@ -184,7 +184,7 @@ jobs:
     name: Notify Merged
     runs-on: ubuntu-latest
     if: >
-      github.actor == 'dependabot[bot]' &&
+      github.event.pull_request.user.login == 'dependabot[bot]' &&
       github.event.action == 'closed' &&
       github.event.pull_request.merged == true
     steps:
