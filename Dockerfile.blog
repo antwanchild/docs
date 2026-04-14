@@ -5,14 +5,11 @@ ENV NO_MKDOCS_2_WARNING=1
 
 WORKDIR /build
 
-# Install blog plugins
+# Install blog dependencies
+COPY requirements.shared.txt requirements.blog.txt ./
+
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir \
-    mkdocs-macros-plugin \
-    python-dotenv \
-    mkdocs-glightbox \
-    mkdocs-minify-plugin \
-    mkdocs-open-in-new-tab
+    pip install --no-cache-dir -r requirements.blog.txt
 
 # Copy blog content and MkDocs config
 COPY blog/docs docs/

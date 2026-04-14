@@ -5,16 +5,11 @@ ENV NO_MKDOCS_2_WARNING=1
 
 WORKDIR /build
 
-# Install wiki plugins
+# Install wiki dependencies
+COPY requirements.shared.txt requirements.wiki.txt ./
+
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir \
-    mkdocs-macros-plugin \
-    python-dotenv \
-    mkdocs-open-in-new-tab \
-    mkdocs-git-revision-date-localized-plugin \
-    mkdocs-git-committers-plugin-2 \
-    mkdocs-glightbox \
-    mkdocs-minify-plugin
+    pip install --no-cache-dir -r requirements.wiki.txt
 
 # Copy wiki content and MkDocs config
 COPY wiki/docs docs/
