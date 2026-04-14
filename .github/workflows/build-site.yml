@@ -434,7 +434,7 @@ jobs:
           SITE_NAME: ${{ inputs.site_name }}
           SITE_EMOJI: ${{ inputs.site_emoji }}
         run: |
-          FORMATTED_DATE="$(date +'%B %-d, %Y')"
+          FORMATTED_DATE="$(date +'%B %-d, %Y at %-I:%M %p %Z')"
 
           curl -H "Content-Type: application/json" \
             -d '{
@@ -494,7 +494,7 @@ jobs:
           LINKCHECK_RESULT: ${{ needs.link-check.result }}
           HAS_FAILURES: ${{ contains(needs.*.result, 'failure') }}
         run: |
-          FORMATTED_DATE="$(date +'%B %-d, %Y')"
+          FORMATTED_DATE="$(date +'%B %-d, %Y at %-I:%M %p %Z')"
 
           if [[ "${HAS_FAILURES}" == "true" ]]; then
             EMBED_TITLE="❌ ${SITE_NAME} — Build Failed"

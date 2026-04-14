@@ -124,7 +124,7 @@ jobs:
           CHANGELOG_URL: ${{ steps.pr_context.outputs.changelog_url }}
           COMMITS_URL: ${{ steps.pr_context.outputs.commits_url }}
         run: |
-          FORMATTED_DATE="$(date +'%B %-d, %Y')"
+          FORMATTED_DATE="$(date +'%B %-d, %Y at %-I:%M %p %Z')"
           CHANGE_SUMMARY="${DEPENDENCY_NAMES}"
 
           if [[ -n "${PREVIOUS_VERSION}" && -n "${NEW_VERSION}" ]]; then
@@ -247,7 +247,7 @@ jobs:
           CHANGELOG_URL: ${{ steps.pr_context.outputs.changelog_url }}
           COMMITS_URL: ${{ steps.pr_context.outputs.commits_url }}
         run: |
-          FORMATTED_DATE="$(date +'%B %-d, %Y')"
+          FORMATTED_DATE="$(date +'%B %-d, %Y at %-I:%M %p %Z')"
           CHANGE_SUMMARY="${DEPENDENCY_NAMES}"
 
           if [[ -n "${PREVIOUS_VERSION}" && -n "${NEW_VERSION}" ]]; then
