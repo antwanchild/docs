@@ -444,17 +444,17 @@ jobs:
                 "color": 3066993,
                 "fields": [
                   {
-                    "name": "Release",
+                    "name": "🏷️ Release",
                     "value": "'"${RELEASE_TAG}"'",
                     "inline": true
                   },
                   {
-                    "name": "Changes",
+                    "name": "📝 Changes",
                     "value": "'"${RELEASE_NOTES:-No release notes provided.}"'",
                     "inline": false
                   },
                   {
-                    "name": "Link",
+                    "name": "🔗 Link",
                     "value": "[View on GitHub]('"${RELEASE_URL}"')",
                     "inline": true
                   }
@@ -538,47 +538,47 @@ jobs:
                 "color": '"${EMBED_COLOR}"',
                 "fields": [
                   {
-                    "name": "Triggered by",
+                    "name": "👤 Triggered by",
                     "value": "'"${GITHUB_ACTOR_NAME}"'",
                     "inline": true
                   },
                   {
-                    "name": "Branch",
+                    "name": "🌿 Branch",
                     "value": "'"${GITHUB_REF_NAME}"'",
                     "inline": true
                   },
                   {
-                    "name": "Version",
+                    "name": "🏷️ Version",
                     "value": "'"${DOCKER_VERSION}"'",
                     "inline": true
                   },
                   {
-                    "name": "Markdown Lint",
+                    "name": "📝 Markdown Lint",
                     "value": "'"${LINT_STATUS}"'",
                     "inline": true
                   },
                   {
-                    "name": "Spellcheck",
+                    "name": "🔤 Spellcheck",
                     "value": "'"${SPELL_STATUS}"'",
                     "inline": true
                   },
                   {
-                    "name": "Docker Build",
+                    "name": "🐳 Docker Build",
                     "value": "'"${DOCKER_STATUS}"'",
                     "inline": true
                   },
                   {
-                    "name": "Link Checker",
+                    "name": "🔗 Link Checker",
                     "value": "'"${LINK_STATUS}"'",
                     "inline": true
                   },
                   {
-                    "name": "Commit",
+                    "name": "💬 Commit",
                     "value": "['"${GITHUB_SHA::7}"']('"${GITHUB_COMMIT_URL}"') — '"${COMMIT_MESSAGE}"'",
                     "inline": false
                   },
                   {
-                    "name": "Actions",
+                    "name": "🔗 Actions",
                     "value": "[View Run]('"${GITHUB_RUN_URL}"')",
                     "inline": false
                   }

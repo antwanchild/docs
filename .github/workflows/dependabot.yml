@@ -149,22 +149,22 @@ jobs:
                 "color": 16744272,
                 "fields": [
                   {
-                    "name": "Update",
+                    "name": "📦 Update",
                     "value": "'"${CHANGE_DETAILS}"'",
                     "inline": false
                   },
                   {
-                    "name": "Scope",
+                    "name": "🧭 Scope",
                     "value": "'"${PR_SCOPE}"'",
                     "inline": true
                   },
                   {
-                    "name": "Type",
+                    "name": "🧪 Type",
                     "value": "'"${UPDATE_TYPE#version-update:}"' / '"${DEPENDENCY_TYPE}"'",
                     "inline": true
                   },
                   {
-                    "name": "PR",
+                    "name": "🔀 PR",
                     "value": "[#'"${PR_NUMBER}"']('"${PR_URL}"')",
                     "inline": true
                   }
@@ -272,27 +272,27 @@ jobs:
                 "color": 3066993,
                 "fields": [
                   {
-                    "name": "Update",
+                    "name": "📦 Update",
                     "value": "'"${CHANGE_DETAILS}"'",
                     "inline": false
                   },
                   {
-                    "name": "Scope",
+                    "name": "🧭 Scope",
                     "value": "'"${PR_SCOPE}"'",
                     "inline": true
                   },
                   {
-                    "name": "Type",
+                    "name": "🧪 Type",
                     "value": "'"${UPDATE_TYPE#version-update:}"' / '"${DEPENDENCY_TYPE}"'",
                     "inline": true
                   },
                   {
-                    "name": "PR",
+                    "name": "🔀 PR",
                     "value": "[#'"${PR_NUMBER}"']('"${PR_URL}"')",
                     "inline": true
                   },
                   {
-                    "name": "Merged to",
+                    "name": "🎯 Merged to",
                     "value": "'"${{ github.base_ref }}"'",
                     "inline": true
                   }
