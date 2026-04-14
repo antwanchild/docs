@@ -63,51 +63,42 @@ jobs:
     runs-on: ubuntu-latest
     if: github.actor == 'dependabot[bot]' && github.event.action == 'opened'
     steps:
-      - name: Classify Dependabot scope
-        id: scope
+      - name: Collect PR context
+        id: pr_context
         uses: actions/github-script@v8
         with:
           script: |
-            const files = await github.paginate(
-              github.rest.pulls.listFiles,
-              {
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                pull_number: context.payload.pull_request.number,
-                per_page: 100,
-              }
-            );
+            const { data: files } = await github.rest.pulls.listFiles({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+              per_page: 100,
+            });
 
-            const filenames = files.map(file => file.filename);
-            const touchesBlog = filenames.some(name =>
+            const filenames = files.map((file) => file.filename);
+            const touchesBlog = filenames.some((name) =>
               name === 'Dockerfile.blog' || name.startsWith('blog/')
             );
-            const touchesWiki = filenames.some(name =>
+            const touchesWiki = filenames.some((name) =>
               name === 'Dockerfile.wiki' || name.startsWith('wiki/')
             );
 
-            let value = 'Shared';
+            let scope = 'Shared';
             if (touchesBlog && !touchesWiki) {
-              value = 'Blog';
+              scope = 'Blog';
             } else if (touchesWiki && !touchesBlog) {
-              value = 'Wiki';
+              scope = 'Wiki';
             }
 
-            core.setOutput('value', value);
-
-      - name: Extract PR reference links
-        id: pr-links
-        uses: actions/github-script@v8
-        with:
-          script: |
             const body = context.payload.pull_request.body || '';
             const releaseNotesMatch = body.match(/\[Release notes\]\((https?:\/\/[^)\s]+)\)/i);
             const changelogMatch = body.match(/\[Changelog\]\((https?:\/\/[^)\s]+)\)/i);
             const commitsMatch = body.match(/\[Commits\]\((https?:\/\/[^)\s]+)\)/i);
 
-            core.setOutput('release-notes-url', releaseNotesMatch ? releaseNotesMatch[1] : '');
-            core.setOutput('changelog-url', changelogMatch ? changelogMatch[1] : '');
-            core.setOutput('commits-url', commitsMatch ? commitsMatch[1] : '');
+            core.setOutput('scope', scope);
+            core.setOutput('release_notes_url', releaseNotesMatch ? releaseNotesMatch[1] : '');
+            core.setOutput('changelog_url', changelogMatch ? changelogMatch[1] : '');
+            core.setOutput('commits_url', commitsMatch ? commitsMatch[1] : '');
 
       - name: Fetch Dependabot PR metadata
         id: metadata
@@ -122,16 +113,16 @@ jobs:
           PR_TITLE: ${{ github.event.pull_request.title }}
           PR_URL: ${{ github.event.pull_request.html_url }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
-          PR_SCOPE: ${{ steps.scope.outputs.value }}
+          PR_SCOPE: ${{ steps.pr_context.outputs.scope }}
           REPOSITORY: ${{ github.repository }}
           DEPENDENCY_NAMES: ${{ steps.metadata.outputs.dependency-names }}
           PREVIOUS_VERSION: ${{ steps.metadata.outputs.previous-version }}
           NEW_VERSION: ${{ steps.metadata.outputs.new-version }}
           UPDATE_TYPE: ${{ steps.metadata.outputs.update-type }}
           DEPENDENCY_TYPE: ${{ steps.metadata.outputs.dependency-type }}
-          RELEASE_NOTES_URL: ${{ steps.pr-links.outputs.release-notes-url }}
-          CHANGELOG_URL: ${{ steps.pr-links.outputs.changelog-url }}
-          COMMITS_URL: ${{ steps.pr-links.outputs.commits-url }}
+          RELEASE_NOTES_URL: ${{ steps.pr_context.outputs.release_notes_url }}
+          CHANGELOG_URL: ${{ steps.pr_context.outputs.changelog_url }}
+          COMMITS_URL: ${{ steps.pr_context.outputs.commits_url }}
         run: |
           FORMATTED_DATE="$(date +'%B %-d, %Y')"
           CHANGE_SUMMARY="${DEPENDENCY_NAMES}"
@@ -197,51 +188,42 @@ jobs:
       github.event.action == 'closed' &&
       github.event.pull_request.merged == true
     steps:
-      - name: Classify Dependabot scope
-        id: scope
+      - name: Collect PR context
+        id: pr_context
         uses: actions/github-script@v8
         with:
           script: |
-            const files = await github.paginate(
-              github.rest.pulls.listFiles,
-              {
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                pull_number: context.payload.pull_request.number,
-                per_page: 100,
-              }
-            );
+            const { data: files } = await github.rest.pulls.listFiles({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+              per_page: 100,
+            });
 
-            const filenames = files.map(file => file.filename);
-            const touchesBlog = filenames.some(name =>
+            const filenames = files.map((file) => file.filename);
+            const touchesBlog = filenames.some((name) =>
               name === 'Dockerfile.blog' || name.startsWith('blog/')
             );
-            const touchesWiki = filenames.some(name =>
+            const touchesWiki = filenames.some((name) =>
               name === 'Dockerfile.wiki' || name.startsWith('wiki/')
             );
 
-            let value = 'Shared';
+            let scope = 'Shared';
             if (touchesBlog && !touchesWiki) {
-              value = 'Blog';
+              scope = 'Blog';
             } else if (touchesWiki && !touchesBlog) {
-              value = 'Wiki';
+              scope = 'Wiki';
             }
 
-            core.setOutput('value', value);
-
-      - name: Extract PR reference links
-        id: pr-links
-        uses: actions/github-script@v8
-        with:
-          script: |
             const body = context.payload.pull_request.body || '';
             const releaseNotesMatch = body.match(/\[Release notes\]\((https?:\/\/[^)\s]+)\)/i);
             const changelogMatch = body.match(/\[Changelog\]\((https?:\/\/[^)\s]+)\)/i);
             const commitsMatch = body.match(/\[Commits\]\((https?:\/\/[^)\s]+)\)/i);
 
-            core.setOutput('release-notes-url', releaseNotesMatch ? releaseNotesMatch[1] : '');
-            core.setOutput('changelog-url', changelogMatch ? changelogMatch[1] : '');
-            core.setOutput('commits-url', commitsMatch ? commitsMatch[1] : '');
+            core.setOutput('scope', scope);
+            core.setOutput('release_notes_url', releaseNotesMatch ? releaseNotesMatch[1] : '');
+            core.setOutput('changelog_url', changelogMatch ? changelogMatch[1] : '');
+            core.setOutput('commits_url', commitsMatch ? commitsMatch[1] : '');
 
       - name: Fetch Dependabot PR metadata
         id: metadata
@@ -254,16 +236,16 @@ jobs:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           PR_URL: ${{ github.event.pull_request.html_url }}
-          PR_SCOPE: ${{ steps.scope.outputs.value }}
+          PR_SCOPE: ${{ steps.pr_context.outputs.scope }}
           REPOSITORY: ${{ github.repository }}
           DEPENDENCY_NAMES: ${{ steps.metadata.outputs.dependency-names }}
           PREVIOUS_VERSION: ${{ steps.metadata.outputs.previous-version }}
           NEW_VERSION: ${{ steps.metadata.outputs.new-version }}
           UPDATE_TYPE: ${{ steps.metadata.outputs.update-type }}
           DEPENDENCY_TYPE: ${{ steps.metadata.outputs.dependency-type }}
-          RELEASE_NOTES_URL: ${{ steps.pr-links.outputs.release-notes-url }}
-          CHANGELOG_URL: ${{ steps.pr-links.outputs.changelog-url }}
-          COMMITS_URL: ${{ steps.pr-links.outputs.commits-url }}
+          RELEASE_NOTES_URL: ${{ steps.pr_context.outputs.release_notes_url }}
+          CHANGELOG_URL: ${{ steps.pr_context.outputs.changelog_url }}
+          COMMITS_URL: ${{ steps.pr_context.outputs.commits_url }}
         run: |
           FORMATTED_DATE="$(date +'%B %-d, %Y')"
           CHANGE_SUMMARY="${DEPENDENCY_NAMES}"
