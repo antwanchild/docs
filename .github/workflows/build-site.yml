@@ -430,6 +430,7 @@ jobs:
           RELEASE_TAG: ${{ needs.version.outputs.tag }}
           RELEASE_NOTES: ${{ needs.version.outputs.release_notes }}
           RELEASE_URL: ${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ needs.version.outputs.tag }}
+          REPOSITORY: ${{ github.repository }}
         run: |
           # shellcheck disable=SC2034
           FORMATTED_DATE="$(date +'%B %-d, %Y')"
@@ -437,23 +438,28 @@ jobs:
           curl -H "Content-Type: application/json" \
             -d '{
               "embeds": [{
-                "title": "${{ inputs.site_emoji }} ${{ inputs.site_name }} Release — '"${RELEASE_TAG}"'",
+                "title": "${{ inputs.site_emoji }} ${{ inputs.site_name }} — Release Published",
                 "url": "'"${RELEASE_URL}"'",
                 "color": 3066993,
                 "fields": [
+                  {
+                    "name": "Release",
+                    "value": "'"${RELEASE_TAG}"'",
+                    "inline": true
+                  },
                   {
                     "name": "Changes",
                     "value": "'"${RELEASE_NOTES:-No release notes provided.}"'",
                     "inline": false
                   },
                   {
-                    "name": "Release",
+                    "name": "Link",
                     "value": "[View on GitHub]('"${RELEASE_URL}"')",
                     "inline": true
                   }
                 ],
                 "footer": {
-                  "text": "${{ inputs.site_emoji }} ${{ inputs.site_name }} Release — '"${RELEASE_TAG}"'"
+                  "text": "${{ inputs.site_name }} ${RELEASE_TAG} • github.com/'"${REPOSITORY}"' • '"${FORMATTED_DATE}"'"
                 }
               }]
             }' \
@@ -474,15 +480,16 @@ jobs:
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+          REPOSITORY: ${{ github.repository }}
         run: |
           # shellcheck disable=SC2034
           FORMATTED_DATE="$(date +'%B %-d, %Y')"
 
           if [[ "${{ contains(needs.*.result, 'failure') }}" == "true" ]]; then
-            EMBED_TITLE="❌ ${{ inputs.site_name }} Build — Failed"
+            EMBED_TITLE="❌ ${{ inputs.site_name }} — Build Failed"
             EMBED_COLOR=15158332
           else
-            EMBED_TITLE="✅ ${{ inputs.site_name }} Build — Success"
+            EMBED_TITLE="✅ ${{ inputs.site_name }} — Build Succeeded"
             EMBED_COLOR=3066993
           fi
 
@@ -566,7 +573,7 @@ jobs:
                   }
                 ],
                 "footer": {
-                  "text": "${{ inputs.site_name }} • '"${FORMATTED_DATE}"'"
+                  "text": "${{ inputs.site_name }} v'"${{ needs.docker.outputs.version }}"' • github.com/'"${REPOSITORY}"' • '"${FORMATTED_DATE}"'"
                 }
               }]
             }' \
