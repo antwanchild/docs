@@ -65,7 +65,7 @@ jobs:
     steps:
       - name: Collect PR context
         id: pr_context
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const { data: files } = await github.rest.pulls.listFiles({
@@ -190,7 +190,7 @@ jobs:
     steps:
       - name: Collect PR context
         id: pr_context
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const { data: files } = await github.rest.pulls.listFiles({
