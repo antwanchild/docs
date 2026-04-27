@@ -1,4 +1,4 @@
-mkdocs-material>=9.0.0
+mkdocs-material>=9.7.6
 mkdocs-macros-plugin>=1.0.0
 mkdocs-glightbox>=0.3.0
 mkdocs-minify-plugin>=0.7.0
