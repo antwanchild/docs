@@ -226,7 +226,7 @@ jobs:
             env_file=${{ secrets.ENV_FILE }}
 
       - name: Scan image for CVEs with Trivy
-        uses: aquasecurity/trivy-action@v0.35.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: ghcr.io/${{ github.repository_owner }}/${{ inputs.image_name }}:latest
           format: table
