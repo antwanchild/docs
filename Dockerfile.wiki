@@ -20,7 +20,7 @@ COPY wiki/main.py main.py
 RUN mkdocs build --strict --site-dir /site
 
 # Stage 2 — Serve with nginx
-FROM nginx:1.29-alpine
+FROM nginx:1.31-alpine
 
 # Remove default nginx page
 RUN rm -rf /usr/share/nginx/html/*
