@@ -14,6 +14,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # Copy wiki content and MkDocs config
 COPY wiki/docs docs/
 COPY wiki/mkdocs.yml mkdocs.yml
+COPY mkdocs_env.py mkdocs_env.py
 COPY wiki/main.py main.py
 
 # Build the static site
