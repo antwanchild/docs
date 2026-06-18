@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -15,8 +16,7 @@ def define_env(env):
     author = os.getenv("AUTHOR", "Anthony Child")
     env.variables["author"] = author
 
-    current_year = os.getenv("CURRENT_YEAR", "2026")
-    env.variables["current_year"] = current_year
+    env.variables["current_year"] = str(datetime.now().year)
 
     @env.macro
     def email_link(text: str = "Contact Me") -> str:
