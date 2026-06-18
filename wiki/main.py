@@ -1,9 +1,13 @@
 import os
+import sys
 from datetime import datetime
 from pathlib import Path
-from dotenv import load_dotenv
 
-env_path = Path(".env")
+ROOT = Path(__file__).resolve().parent.parent
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from mkdocs_env import load_site_env
 SERVICE_SUBDOMAINS = {
     "authentik": "authentik",
     "blog": "blog",
@@ -28,8 +32,7 @@ SERVICE_SUBDOMAINS = {
     "unmanic": "transcode",
 }
 
-if env_path.exists():
-    load_dotenv(dotenv_path=env_path)
+load_site_env()
 
 def define_env(env):
 
