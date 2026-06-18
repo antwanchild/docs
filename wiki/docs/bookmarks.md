@@ -47,7 +47,7 @@ hide:
 |Resource                                                                                 |Topic                           |
 |-----------------------------------------------------------------------------------------|--------------------------------|
 |[Docker Networking](https://docs.docker.com/network/)                                    |Understanding container networks|
-|[Docker Compose Include](https://docs.docker.com/compose/multiple-compose-files/include/)|Modular compose files           |
+|[Docker Compose Include](https://docs.docker.com/compose/how-tos/multiple-compose-files/include/)|Modular compose files           |
 |[Traefik Concepts](https://doc.traefik.io/traefik/getting-started/concepts/)             |How Traefik works               |
 |[Linux Permissions](https://wiki.archlinux.org/title/File_permissions_and_attributes)    |File ownership & permissions    |
 
