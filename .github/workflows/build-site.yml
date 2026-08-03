@@ -105,7 +105,7 @@ jobs:
 
       - name: Run spellcheck on changed files
         if: steps.changed-files.outputs.any_changed == 'true'
-        uses: rojopolis/spellcheck-github-actions@0.63.0
+        uses: rojopolis/spellcheck-github-actions@0.64.0
         with:
           source_files: ${{ steps.changed-files.outputs.all_changed_files }}
           output_file: spellcheck-results.txt
