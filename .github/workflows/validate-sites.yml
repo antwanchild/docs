@@ -84,6 +84,12 @@ jobs:
           grep -q "This is not the page you're looking for." /tmp/site-404.html
           curl -fsS http://localhost:8080/search.json > /dev/null
           curl -fsS http://localhost:8080/javascripts/open-in-new-tab.js > /dev/null
+          if [ "$SITE" = wiki ]; then
+            for asset in css/plex-token.css javascripts/plex-token.js; do
+              curl -fsS "http://localhost:8080/${asset}" > /dev/null
+              curl -fsSI "http://localhost:8080/${asset}" | grep -iq 'cache-control: no-cache'
+            done
+          fi
       - name: Check links
         uses: lycheeverse/lychee-action@v2
         with:

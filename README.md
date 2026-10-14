@@ -81,6 +81,11 @@ clipboard copying, and resetting the form. All Plex requests are intercepted;
 no real Plex account or credentials are used. Run just these tests with
 `python -m pytest tests/test_plex_token.py`.
 
+The generator's markup is in `wiki/docs/plex-token.html`, with styles in
+`wiki/docs/css/plex-token.css` and behavior in
+`wiki/docs/javascripts/plex-token.js`. nginx revalidates these custom assets
+so updates reach visitors without waiting for the general one-year asset cache.
+
 ## Contributing
 
 Open an [issue](https://github.com/antwanchild/docs/issues) to suggest content or report a bug.
