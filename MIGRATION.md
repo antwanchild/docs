@@ -1,5 +1,8 @@
 # Zensical migration
 
+This records the initial migration. Subsequent theme and TOML changes are
+tracked in [ZENSICAL-FOLLOWUP.md](ZENSICAL-FOLLOWUP.md).
+
 The `migrate-zensical` branch replaces Material for MkDocs with Zensical
 0.0.70 for both sites. It retains `mkdocs.yml`, the classic theme, existing
 content, custom macros, and nginx serving configuration.

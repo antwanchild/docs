@@ -42,15 +42,15 @@ source .venv/bin/activate
 pip install -r requirements.wiki.txt -r requirements.blog.txt
 
 # Serve one site at a time, from the repository root
-zensical serve -f wiki/mkdocs.yml
-zensical serve -f blog/mkdocs.yml
+zensical serve -f wiki/zensical.toml
+zensical serve -f blog/zensical.toml
 
 # Build either site
-zensical build --strict -f wiki/mkdocs.yml
-zensical build --strict -f blog/mkdocs.yml
+zensical build --strict -f wiki/zensical.toml
+zensical build --strict -f blog/zensical.toml
 ```
 
-Both sites default to `http://localhost:8000`. Builds write to `wiki/site/` and `blog/site/`. The existing `mkdocs.yml` configuration format and classic Material appearance are retained.
+Both sites default to `http://localhost:8000`. Builds write to `wiki/site/` and `blog/site/`. Both sites use native `zensical.toml` configuration and the modern theme.
 
 ## Contributing
 

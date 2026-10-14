@@ -1,0 +1,142 @@
+# Zensical site configuration
+
+[project]
+site_name = "Anthony's Homelab Docs"
+site_url = "https://wiki.anthonychild.com"
+site_description = "Documentation for my self-hosted homelab"
+site_author = "Anthony Child"
+copyright = "© <script>document.write(new Date().getFullYear())</script> Anthony Child • All rights reserved"
+repo_url = "https://github.com/antwanchild/docs"
+repo_name = "antwanchild/docs"
+edit_uri = "edit/main/wiki/docs/"
+nav = [
+  { Home = "index.md" },
+  { Dashboard = "dashboard/index.md" },
+  { Homelab = [{ Overview = "homelab/overview.md" }, { Services = "homelab/services.md" }, { Stacks = "homelab/stacks.md" }, { Networking = "homelab/networking.md" }, { "Plex Token Generator" = "plex-token.html" }] },
+  { "Quick Reference" = [{ "Quick Commands" = "reference/quick-commands.md" }, { Cheatsheet = "reference/cheatsheet.md" }, { Snippets = "reference/snippets.md" }, { Troubleshooting = "reference/troubleshooting.md" }] },
+  { "Notes & Tips" = [{ "General Notes" = "notes/general.md" }, { "Tech Tips" = "notes/tech-tips.md" }] },
+  { "Projects & Planning" = [{ Projects = "projects/index.md" }, { "Discord Cleanup Bot" = "projects/discord_cleanup_bot.md" }, { Wishlist = "planning/wishlist.md" }] },
+  { Resources = [{ Bookmarks = "bookmarks.md" }, { Examples = "fun/examples.md" }] },
+  { About = "about.md" },
+]
+extra_css = [
+  "css/extra.css",
+]
+extra_javascript = [
+  "javascripts/open-in-new-tab.js",
+  "javascripts/mathjax.js",
+  "https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js",
+]
+
+[project.theme]
+name = "material"
+variant = "modern"
+custom_dir = "docs/overrides"
+palette = [
+  { media = "(prefers-color-scheme: dark)", scheme = "slate", primary = "deep purple", accent = "amber", toggle = { icon = "material/brightness-4", name = "Switch to light mode" } },
+  { media = "(prefers-color-scheme: light)", scheme = "default", primary = "indigo", accent = "deep orange", toggle = { icon = "material/brightness-7", name = "Switch to dark mode" } },
+]
+features = [
+  "content.code.annotate",
+  "content.code.copy",
+  "content.tabs.link",
+  "header.autohide",
+  "announce.dismiss",
+  "navigation.tabs",
+  "navigation.tabs.sticky",
+  "navigation.top",
+  "navigation.tracking",
+  "toc.follow",
+  "search.suggest",
+  "search.highlight",
+  "search.share",
+]
+
+[project.theme.icon]
+logo = "fontawesome/brands/discord"
+
+[project.markdown_extensions]
+
+[project.markdown_extensions.abbr]
+
+[project.markdown_extensions.admonition]
+
+[project.markdown_extensions.attr_list]
+
+[project.markdown_extensions.def_list]
+
+[project.markdown_extensions.footnotes]
+
+[project.markdown_extensions.md_in_html]
+
+[project.markdown_extensions.tables]
+
+[project.markdown_extensions.toc]
+permalink = true
+toc_depth = 3
+
+[project.markdown_extensions."pymdownx.arithmatex"]
+generic = true
+
+[project.markdown_extensions."pymdownx.betterem"]
+smart_enable = "all"
+
+[project.markdown_extensions."pymdownx.caret"]
+
+[project.markdown_extensions."pymdownx.details"]
+
+[project.markdown_extensions."pymdownx.emoji"]
+emoji_index = "zensical.extensions.emoji.twemoji"
+emoji_generator = "zensical.extensions.emoji.to_svg"
+
+[project.markdown_extensions."pymdownx.highlight"]
+anchor_linenums = true
+
+[project.markdown_extensions."pymdownx.inlinehilite"]
+
+[project.markdown_extensions."pymdownx.keys"]
+
+[project.markdown_extensions."pymdownx.mark"]
+
+[project.markdown_extensions."pymdownx.smartsymbols"]
+
+[project.markdown_extensions."pymdownx.snippets"]
+
+[project.markdown_extensions."pymdownx.superfences"]
+custom_fences = [
+  { name = "mermaid", class = "mermaid", format = "pymdownx.superfences.fence_code_format" },
+]
+
+[project.markdown_extensions."pymdownx.tabbed"]
+alternate_style = true
+
+[project.markdown_extensions."pymdownx.tasklist"]
+custom_checkbox = true
+
+[project.markdown_extensions."pymdownx.tilde"]
+
+[project.plugins]
+
+[project.plugins.search]
+lang = "en"
+separator = "[\\s\\-,:!=\\[\\]()\"/]+|(?!\\b)(?=[A-Z][a-z])|\\.(?!\\d)|&[lg]t;"
+
+[project.plugins.macros]
+on_error_fail = true
+on_undefined = "strict"
+
+[project.plugins.glightbox]
+
+[project.plugins.minify]
+minify_html = true
+minify_js = true
+minify_css = true
+
+[project.plugins.minify.htmlmin_opts]
+remove_comments = true
+
+[project.extra]
+social = [
+  { icon = "fontawesome/brands/github", link = "https://github.com/antwanchild", name = "GitHub Repository" },
+  { icon = "fontawesome/brands/x-twitter", link = "https://x.com/antwanchild", name = "X / Twitter" },
+]

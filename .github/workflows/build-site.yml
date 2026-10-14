@@ -15,8 +15,8 @@ on:
         description: 'Path checked for new .md files to trigger a release'
         type: string
         required: true
-      mkdocs_dir:
-        description: 'Directory containing mkdocs.yml (wiki or blog)'
+      project_dir:
+        description: 'Directory containing zensical.toml (wiki or blog)'
         type: string
         required: true
       env_file_path:
@@ -79,7 +79,7 @@ jobs:
         continue-on-error: true
         with:
           globs: |
-            ${{ inputs.mkdocs_dir }}/**/*.md
+            ${{ inputs.project_dir }}/**/*.md
             !node_modules
 
   # ---------------------------------------------------------------
@@ -101,7 +101,7 @@ jobs:
         uses: tj-actions/changed-files@v47
         with:
           files: |
-            ${{ inputs.mkdocs_dir }}/**/*.md
+            ${{ inputs.project_dir }}/**/*.md
 
       - name: Run spellcheck on changed files
         if: steps.changed-files.outputs.any_changed == 'true'
@@ -312,7 +312,7 @@ jobs:
           config: cliff.toml
           args: >-
             --tag ${{ steps.release-check.outputs.tag }}
-            --include-path ${{ inputs.mkdocs_dir }}/**
+            --include-path ${{ inputs.project_dir }}/**
             ${{ steps.range.outputs.value }}
         env:
           OUTPUT: release-notes.md
@@ -334,7 +334,7 @@ jobs:
 
           # Fallback to git log if cliff produced nothing
           if [ ! -s release-notes.md ]; then
-            git log --pretty=format:"- %s" "$RANGE" -- "${{ inputs.mkdocs_dir }}/" > release-notes.md || true
+            git log --pretty=format:"- %s" "$RANGE" -- "${{ inputs.project_dir }}/" > release-notes.md || true
           fi
           if [ ! -s release-notes.md ]; then
             echo "- ${{ inputs.site_name }} update" > release-notes.md
@@ -362,7 +362,7 @@ jobs:
             --latest
 
   # ---------------------------------------------------------------
-  # Build the MkDocs site locally and check all links for broken URLs.
+  # Build the Zensical site locally and check all links for broken URLs.
   # Common excludes live in lychee.toml; site-specific base URL is an input.
   # Runs in parallel with docker/version — does not depend on them.
   # ---------------------------------------------------------------
@@ -387,7 +387,7 @@ jobs:
 
       - name: Build Zensical site
         run: |
-          cd ${{ inputs.mkdocs_dir }}
+          cd ${{ inputs.project_dir }}
           zensical build --strict
 
       - name: Check all links in built site
@@ -396,7 +396,7 @@ jobs:
           args: >
             --config lychee.toml
             --base-url '${{ inputs.base_url }}'
-            './${{ inputs.mkdocs_dir }}/site/**/*.html'
+            './${{ inputs.project_dir }}/site/**/*.html'
           fail: true
           output: link-check-results.md
           format: markdown
