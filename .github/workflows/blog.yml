@@ -7,6 +7,7 @@ on:
     paths:
       - 'blog/**'
       - 'Dockerfile.blog'
+      - '.dockerignore'
       - 'requirements.blog.txt'
       - 'requirements.shared.txt'
       - 'mkdocs_env.py'

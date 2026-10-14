@@ -7,6 +7,7 @@ on:
     paths:
       - 'wiki/**'
       - 'Dockerfile.wiki'
+      - '.dockerignore'
       - 'requirements.wiki.txt'
       - 'requirements.shared.txt'
       - 'mkdocs_env.py'
