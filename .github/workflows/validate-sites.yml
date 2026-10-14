@@ -48,6 +48,7 @@ jobs:
           docker run -d --name docs-validation -p 8080:80 "docs-${SITE}:validation"
           trap 'docker logs docs-validation; docker rm -f docs-validation' EXIT
           for attempt in {1..30}; do
+            echo "Waiting for nginx (attempt ${attempt})"
             if curl -fsS http://localhost:8080/ > /tmp/site-home.html; then
               break
             fi
