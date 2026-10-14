@@ -75,6 +75,12 @@ access to the sites' existing CDN resources. Failure screenshots are saved
 in `test-results/` and uploaded by PR CI. To use an installed Chrome instead
 of Playwright's Chromium, set `BROWSER_EXECUTABLE` to its executable path.
 
+The Plex token generator tests simulate PIN creation, authorization, polling,
+profile lookup, and errors. They also check input validation, timeout/retry,
+clipboard copying, and resetting the form. All Plex requests are intercepted;
+no real Plex account or credentials are used. Run just these tests with
+`python -m pytest tests/test_plex_token.py`.
+
 ## Contributing
 
 Open an [issue](https://github.com/antwanchild/docs/issues) to suggest content or report a bug.
