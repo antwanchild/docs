@@ -52,6 +52,40 @@ zensical build --strict -f blog/zensical.toml
 
 Both sites default to `http://localhost:8000`. Builds write to `wiki/site/` and `blog/site/`. Both sites use native `zensical.toml` configuration and the modern theme.
 
+## Tests
+
+With the virtual environment activated, install the test dependencies and browser once:
+
+```bash
+pip install -r requirements.test.txt
+python -m playwright install chromium
+```
+
+Run the complete suite from the repository root:
+
+```bash
+python -m pytest
+```
+
+For just the Python macro tests, use `python -m pytest -m "not browser"`.
+Browser tests build temporary copies of both sites without loading local
+`.env` files, then check search, themes, mobile navigation, wiki rendering,
+recipe metadata, and existing blog URLs. Mermaid and MathJax checks require
+access to the sites' existing CDN resources. Failure screenshots are saved
+in `test-results/` and uploaded by PR CI. To use an installed Chrome instead
+of Playwright's Chromium, set `BROWSER_EXECUTABLE` to its executable path.
+
+The Plex token generator tests simulate PIN creation, authorization, polling,
+profile lookup, and errors. They also check input validation, timeout/retry,
+clipboard copying, and resetting the form. All Plex requests are intercepted;
+no real Plex account or credentials are used. Run just these tests with
+`python -m pytest tests/test_plex_token.py`.
+
+The generator's markup is in `wiki/docs/plex-token.html`, with styles in
+`wiki/docs/css/plex-token.css` and behavior in
+`wiki/docs/javascripts/plex-token.js`. nginx revalidates these custom assets
+so updates reach visitors without waiting for the general one-year asset cache.
+
 ## Contributing
 
 Open an [issue](https://github.com/antwanchild/docs/issues) to suggest content or report a bug.

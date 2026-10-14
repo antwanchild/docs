@@ -10,6 +10,28 @@ permissions:
   contents: read
 
 jobs:
+  tests:
+    name: Site Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - name: Install test dependencies
+        run: pip install -r requirements.test.txt
+      - name: Install Chromium
+        run: python -m playwright install --with-deps chromium
+      - name: Run macro and browser tests
+        run: python -m pytest
+      - name: Upload failure screenshots
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: site-test-failures
+          path: test-results/
+          if-no-files-found: ignore
+
   workflows:
     name: Lint Workflows
     runs-on: ubuntu-latest
@@ -62,6 +84,12 @@ jobs:
           grep -q "This is not the page you're looking for." /tmp/site-404.html
           curl -fsS http://localhost:8080/search.json > /dev/null
           curl -fsS http://localhost:8080/javascripts/open-in-new-tab.js > /dev/null
+          if [ "$SITE" = wiki ]; then
+            for asset in css/plex-token.css javascripts/plex-token.js; do
+              curl -fsS "http://localhost:8080/${asset}" > /dev/null
+              curl -fsSI "http://localhost:8080/${asset}" | grep -iq 'cache-control: no-cache'
+            done
+          fi
       - name: Check links
         uses: lycheeverse/lychee-action@v2
         with:

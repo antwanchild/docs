@@ -37,6 +37,11 @@ desktop.ini
 
 # CI
 .github/
+tests/
+pytest.ini
+requirements.test.txt
+.pytest_cache/
+test-results/
 
 # Spellcheck output
 spellcheck-results.txt
