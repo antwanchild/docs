@@ -6,6 +6,13 @@ on:
       - main
     paths:
       - 'blog/**'
+      - 'Dockerfile.blog'
+      - 'requirements.blog.txt'
+      - 'requirements.shared.txt'
+      - 'mkdocs_env.py'
+      - 'nginx-blog.conf'
+      - '.github/workflows/build-site.yml'
+      - '.github/workflows/blog.yml'
   workflow_dispatch:
     inputs:
       force_release:
@@ -29,7 +36,7 @@ jobs:
       requirements_file: requirements.blog.txt
       image_name: blog
       dockerfile: Dockerfile.blog
-      docker_description: Personal blog built with MkDocs Material
+      docker_description: Personal blog built with Zensical
       tag_prefix: blog-
       base_url: https://blog.anthonychild.com
       force_release: ${{ inputs.force_release || false }}

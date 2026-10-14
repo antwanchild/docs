@@ -9,6 +9,7 @@ copyright: © <script>document.write(new Date().getFullYear())</script> Anthony 
 # ── Theme ────────────────────────────────────────────────────────────────────
 theme:
   name: material
+  variant: classic
   custom_dir: docs/overrides
   icon:
     logo: fontawesome/brands/discord
@@ -100,7 +101,6 @@ plugins:
       authors_profiles: true
       categories: true
       categories_url_format: "category/{slug}"
-  - open-in-new-tab
   - glightbox
   - minify:
       minify_html: true
@@ -109,4 +109,9 @@ plugins:
       htmlmin_opts:
         remove_comments: true
   - macros:
+      on_error_fail: true
+      on_undefined: strict
   - tags:
+
+extra_javascript:
+  - javascripts/open-in-new-tab.js
