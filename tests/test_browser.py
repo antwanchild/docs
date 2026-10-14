@@ -9,6 +9,7 @@ pytestmark = pytest.mark.browser
 
 
 def visit(page, base, path="/"):
+    """Open a successful site page and wait for its JavaScript runtime."""
     response = page.goto(base + path, wait_until="domcontentloaded")
     assert response.status == 200
     expect(page.locator(".md-content")).to_be_visible()
@@ -17,6 +18,7 @@ def visit(page, base, path="/"):
 
 @pytest.mark.parametrize("site, query", [("wiki", "Plex"), ("blog", "Lasagna")])
 def test_search_returns_matching_pages(page, site_urls, site, query):
+    """Search returns matching pages."""
     visit(page, site_urls[site])
     page.locator(".md-search__button").click()
     page.get_by_role("combobox", name="Search").fill(query)
@@ -29,16 +31,19 @@ def test_search_returns_matching_pages(page, site_urls, site, query):
 
 @pytest.mark.parametrize("site", ["wiki", "blog"])
 def test_theme_switching(page, site_urls, site):
+    """Theme switching."""
     visit(page, site_urls[site])
     schemes = set()
     for _ in range(4):
         schemes.add(page.locator("body").get_attribute("data-md-color-scheme"))
-        page.locator('.md-header__option label[for^="__palette"]').filter(visible=True).first.click()
+        toggle = page.locator('.md-header__option label[for^="__palette"]')
+        toggle.filter(visible=True).first.click()
     assert {"default", "slate"} <= schemes
 
 
 @pytest.mark.parametrize("site, target", [("wiki", "bookmarks"), ("blog", "tags")])
 def test_mobile_navigation(page, site_urls, site, target):
+    """Mobile navigation."""
     page.set_viewport_size({"width": 390, "height": 844})
     visit(page, site_urls[site])
     page.locator('.md-header label[for="__drawer"]').click()
@@ -52,6 +57,7 @@ def test_mobile_navigation(page, site_urls, site, target):
 
 
 def test_wiki_service_links_and_external_link_behavior(page, site_urls):
+    """Wiki service links and external link behavior."""
     visit(page, site_urls["wiki"], "/homelab/services/")
     for host in ("wiki", "logs", "photos", "movies"):
         link = page.locator(f'.md-content a[href="https://{host}.example.test"]').first
@@ -62,6 +68,7 @@ def test_wiki_service_links_and_external_link_behavior(page, site_urls):
 
 
 def test_wiki_diagrams_math_and_example_block_styles(page, site_urls):
+    """Wiki diagrams math and example block styles."""
     visit(page, site_urls["wiki"], "/fun/examples/")
     # Zensical renders SVGs inside closed shadow roots. Nonempty replacement
     # divs distinguish rendered diagrams from their source <pre> elements.
@@ -80,7 +87,8 @@ def test_wiki_diagrams_math_and_example_block_styles(page, site_urls):
         )
         assert actual == expected
         seen.add(scheme)
-        page.locator('.md-header__option label[for^="__palette"]').filter(visible=True).first.click()
+        toggle = page.locator('.md-header__option label[for^="__palette"]')
+        toggle.filter(visible=True).first.click()
     assert {"default", "slate"} <= seen
 
 
@@ -92,6 +100,7 @@ def test_wiki_diagrams_math_and_example_block_styles(page, site_urls):
     ("/tags/", "italian"),
 ])
 def test_blog_existing_urls_and_content(page, site_urls, path, text):
+    """Blog existing urls and content."""
     visit(page, site_urls["blog"], path)
     expect(page.locator(".md-content")).to_contain_text(text)
     if "lasagna" in path:
@@ -102,6 +111,7 @@ def test_blog_existing_urls_and_content(page, site_urls, path, text):
 @pytest.mark.parametrize("site", ["wiki", "blog"])
 def test_custom_404_content(page, site_urls, site):
     # Static serving checks the content; CI's nginx check verifies HTTP 404.
+    """Custom 404 content."""
     visit(page, site_urls[site], "/404.html")
     expect(page.locator(".md-content")).to_contain_text(
         "This is not the page you're looking for.",

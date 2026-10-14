@@ -12,27 +12,32 @@ import mkdocs_env
 ROOT = Path(__file__).resolve().parents[1]
 
 
-class MacroEnvironment:
+# This test double implements only the macro registration hook.
+class MacroEnvironment:  # pylint: disable=too-few-public-methods
     """Capture functions registered by the public define_env hook."""
 
     def __init__(self, meta=None):
+        """Initialize the minimal registration and page metadata interface."""
         self.variables = {}
         self.macros = {}
         self.page = SimpleNamespace(meta=meta or {})
 
     def macro(self, function):
+        """Register a macro and preserve decorator behavior."""
         self.macros[function.__name__] = function
         return function
 
 
-@pytest.fixture
-def define_env(monkeypatch):
+@pytest.fixture(name="define_env")
+def macro_loader_fixture(monkeypatch):
+    """Load site macros without reading developer environment files."""
     # Importing the real modules must never load the developer's .env.
     monkeypatch.setattr(mkdocs_env, "load_site_env", lambda: None)
     for name in ("DOMAIN", "AUTHOR", "EMAIL"):
         monkeypatch.delenv(name, raising=False)
 
     def load(site, meta=None):
+        """Create a fresh site macro environment for each test."""
         spec = importlib.util.spec_from_file_location(
             f"test_{site}_macros", ROOT / site / "main.py",
         )
@@ -47,6 +52,7 @@ def define_env(monkeypatch):
 
 @pytest.mark.parametrize("site", ["wiki", "blog"])
 def test_site_defaults(define_env, site):
+    """Site defaults."""
     env = define_env(site)
     assert env.variables["domain"] == "anthonychild.com"
     assert env.variables["author"] == "Anthony Child"
@@ -55,6 +61,7 @@ def test_site_defaults(define_env, site):
 
 @pytest.mark.parametrize("site", ["wiki", "blog"])
 def test_environment_overrides(define_env, monkeypatch, site):
+    """Environment overrides."""
     monkeypatch.setenv("DOMAIN", "example.test")
     monkeypatch.setenv("AUTHOR", "Example Author")
     monkeypatch.setenv("EMAIL", "hello@example.test")
@@ -73,12 +80,14 @@ def test_environment_overrides(define_env, monkeypatch, site):
 def test_service_links_use_aliases_and_custom_domain(
     define_env, monkeypatch, service, subdomain,
 ):
+    """Service links use aliases and custom domain."""
     monkeypatch.setenv("DOMAIN", "example.test")
     env = define_env("wiki")
     assert env.macros["service_url"](service) == f"https://{subdomain}.example.test"
 
 
 def test_recipe_optional_metadata(define_env):
+    """Recipe optional metadata."""
     env = define_env("blog", {
         "prep_time": "15 minutes", "cook_time": "45 minutes", "servings": 6,
         "yield": "one pan", "difficulty": "Easy", "contributor": "Recipe Contributor",
@@ -100,6 +109,7 @@ def test_recipe_optional_metadata(define_env):
     ({}, None),
 ])
 def test_recipe_missing_fields_and_author_fallback(define_env, meta, expected):
+    """Recipe missing fields and author fallback."""
     result = define_env("blog", meta).macros["recipe_header"]()
     if expected:
         assert expected in result
@@ -112,6 +122,7 @@ def test_recipe_missing_fields_and_author_fallback(define_env, meta, expected):
 
 
 def test_dotenv_preserves_existing_environment(tmp_path, monkeypatch):
+    """Dotenv preserves existing environment."""
     monkeypatch.setenv("DOMAIN", "existing.test")
     monkeypatch.delenv("AUTHOR", raising=False)
     path = tmp_path / ".env"
@@ -122,4 +133,5 @@ def test_dotenv_preserves_existing_environment(tmp_path, monkeypatch):
 
 
 def test_missing_dotenv_is_optional(tmp_path):
+    """Missing dotenv is optional."""
     mkdocs_env.load_site_env(str(tmp_path / "missing.env"))
