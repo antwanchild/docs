@@ -6,6 +6,13 @@ on:
       - main
     paths:
       - 'wiki/**'
+      - 'Dockerfile.wiki'
+      - 'requirements.wiki.txt'
+      - 'requirements.shared.txt'
+      - 'mkdocs_env.py'
+      - 'nginx-wiki.conf'
+      - '.github/workflows/build-site.yml'
+      - '.github/workflows/wiki.yml'
   workflow_dispatch:
     inputs:
       force_release:
@@ -29,7 +36,7 @@ jobs:
       requirements_file: requirements.wiki.txt
       image_name: wiki
       dockerfile: Dockerfile.wiki
-      docker_description: Personal wiki built with MkDocs Material
+      docker_description: Personal wiki built with Zensical
       tag_prefix: wiki-
       base_url: https://wiki.anthonychild.com
       force_release: ${{ inputs.force_release || false }}

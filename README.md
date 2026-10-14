@@ -1,6 +1,6 @@
 # docs
 
-Source for my personal wiki and blog, both built with [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/) and served via Docker + nginx.
+Source for my personal wiki and blog, both built with [Zensical](https://zensical.org/) and served via Docker + nginx.
 
 | Site | URL |
 |------|-----|
@@ -11,8 +11,8 @@ Source for my personal wiki and blog, both built with [Material for MkDocs](http
 
 ```
 docs/
-├── wiki/           # Wiki site (MkDocs source + config)
-├── blog/           # Blog site (MkDocs source + config)
+├── wiki/           # Wiki site (Markdown source + config)
+├── blog/           # Blog site (Markdown source + config)
 ├── Dockerfile.wiki
 ├── Dockerfile.blog
 └── .github/
@@ -24,34 +24,33 @@ docs/
 Each site is built independently:
 
 1. **Lint & spellcheck** — markdownlint and pyspelling run against the content directory
-2. **Docker build** — MkDocs builds the static site, nginx serves it; the image is pushed to GHCR
+2. **Docker build** — Zensical builds the static site, nginx serves it; the image is pushed to GHCR
 3. **Release** — a versioned Git tag (`wiki-YYYY.MM` / `blog-YYYY.MM`) is created when new content is detected; release notes are generated with [git-cliff](https://git-cliff.org/)
 4. **Link check** — lychee scans all outbound links
 5. **Notify** — a Discord notification is sent on completion
 
-Pushing to `main` triggers the workflow for whichever site was changed (`wiki/**` or `blog/**`). The two pipelines are independent.
+Pushing to `main` triggers the workflow for whichever site was changed (`wiki/**` or `blog/**`). Changes to shared dependencies, helpers, or the reusable build workflow trigger both pipelines. The two pipelines are independent.
 
 ## Running locally
 
 **Prerequisites:** Python 3, pip, Docker (optional)
 
 ```bash
-# Install dependencies
-pip install mkdocs-material \
-    mkdocs-macros-plugin \
-    mkdocs-open-in-new-tab \
-    mkdocs-glightbox \
-    mkdocs-minify-plugin \
-    python-dotenv
+# Install dependencies (Python 3.12 recommended)
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.wiki.txt -r requirements.blog.txt
 
-# Serve the wiki
-cd wiki && mkdocs serve
+# Serve one site at a time, from the repository root
+zensical serve -f wiki/mkdocs.yml
+zensical serve -f blog/mkdocs.yml
 
-# Serve the blog
-cd blog && mkdocs serve
+# Build either site
+zensical build --strict -f wiki/mkdocs.yml
+zensical build --strict -f blog/mkdocs.yml
 ```
 
-Both sites default to `http://localhost:8000`.
+Both sites default to `http://localhost:8000`. Builds write to `wiki/site/` and `blog/site/`. The existing `mkdocs.yml` configuration format and classic Material appearance are retained.
 
 ## Contributing
 

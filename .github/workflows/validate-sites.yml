@@ -1,0 +1,81 @@
+name: Validate Sites
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  workflows:
+    name: Lint Workflows
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: raven-actions/actionlint@v2
+
+  sites:
+    name: Validate ${{ matrix.site }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        site: [wiki, blog]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install -r requirements.${{ matrix.site }}.txt
+      - name: Build site
+        run: zensical build --strict -f ${{ matrix.site }}/mkdocs.yml
+      - name: Lint Markdown
+        uses: DavidAnson/markdownlint-cli2-action@v24.2.0
+        continue-on-error: true
+        with:
+          globs: |
+            ${{ matrix.site }}/docs/**/*.md
+      - name: Build container
+        run: docker build -f Dockerfile.${{ matrix.site }} -t docs-${{ matrix.site }}:validation .
+      - name: Verify nginx serving and health check
+        env:
+          SITE: ${{ matrix.site }}
+        run: |
+          docker run -d --name docs-validation -p 8080:80 "docs-${SITE}:validation"
+          trap 'docker logs docs-validation; docker rm -f docs-validation' EXIT
+          for attempt in {1..30}; do
+            if curl -fsS http://localhost:8080/ > /tmp/site-home.html; then
+              break
+            fi
+            sleep 1
+          done
+          grep -q 'zensical-0.0.70' /tmp/site-home.html
+          docker exec docs-validation nginx -t
+          docker exec docs-validation sh -c 'curl -f http://localhost/ >/dev/null'
+          status=$(curl -sS -o /tmp/site-404.html -w '%{http_code}' http://localhost:8080/validation-missing-page)
+          test "$status" = 404
+          grep -q "This is not the page you're looking for." /tmp/site-404.html
+          curl -fsS http://localhost:8080/search.json > /dev/null
+          curl -fsS http://localhost:8080/javascripts/open-in-new-tab.js > /dev/null
+      - name: Check links
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: >-
+            --config lychee.toml
+            --base-url 'https://${{ matrix.site }}.anthonychild.com'
+            './${{ matrix.site }}/site/**/*.html'
+          fail: true
+          output: link-check-${{ matrix.site }}.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload link results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: links-${{ matrix.site }}
+          path: link-check-${{ matrix.site }}.md
+          if-no-files-found: ignore

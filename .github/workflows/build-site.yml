@@ -382,13 +382,13 @@ jobs:
       - name: Install Python dependencies
         run: pip install -r ${{ inputs.requirements_file }}
 
-      - name: Write .env file for MkDocs macros plugin
+      - name: Write .env file for site macros
         run: echo "${{ secrets.ENV_FILE }}" > ${{ inputs.env_file_path }}
 
-      - name: Build MkDocs site
+      - name: Build Zensical site
         run: |
           cd ${{ inputs.mkdocs_dir }}
-          mkdocs build --site-dir ../site
+          zensical build --strict
 
       - name: Check all links in built site
         uses: lycheeverse/lychee-action@v2
@@ -396,7 +396,7 @@ jobs:
           args: >
             --config lychee.toml
             --base-url '${{ inputs.base_url }}'
-            './site/**/*.html'
+            './${{ inputs.mkdocs_dir }}/site/**/*.html'
           fail: true
           output: link-check-results.md
           format: markdown

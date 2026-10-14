@@ -4,6 +4,10 @@
 
 # MkDocs build output
 site/
+wiki/site/
+blog/site/
+wiki/.cache/
+blog/.cache/
 
 # Python
 __pycache__/
