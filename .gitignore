@@ -35,6 +35,10 @@ desktop.ini
 spellcheck-results.txt
 misspelled-words.txt
 
+# Tests
+.pytest_cache/
+test-results/
+
 # MkDocs
 .cache/
 

@@ -52,6 +52,29 @@ zensical build --strict -f blog/zensical.toml
 
 Both sites default to `http://localhost:8000`. Builds write to `wiki/site/` and `blog/site/`. Both sites use native `zensical.toml` configuration and the modern theme.
 
+## Tests
+
+With the virtual environment activated, install the test dependencies and browser once:
+
+```bash
+pip install -r requirements.test.txt
+python -m playwright install chromium
+```
+
+Run the complete suite from the repository root:
+
+```bash
+python -m pytest
+```
+
+For just the Python macro tests, use `python -m pytest -m "not browser"`.
+Browser tests build temporary copies of both sites without loading local
+`.env` files, then check search, themes, mobile navigation, wiki rendering,
+recipe metadata, and existing blog URLs. Mermaid and MathJax checks require
+access to the sites' existing CDN resources. Failure screenshots are saved
+in `test-results/` and uploaded by PR CI. To use an installed Chrome instead
+of Playwright's Chromium, set `BROWSER_EXECUTABLE` to its executable path.
+
 ## Contributing
 
 Open an [issue](https://github.com/antwanchild/docs/issues) to suggest content or report a bug.

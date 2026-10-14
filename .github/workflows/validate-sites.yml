@@ -10,6 +10,28 @@ permissions:
   contents: read
 
 jobs:
+  tests:
+    name: Site Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - name: Install test dependencies
+        run: pip install -r requirements.test.txt
+      - name: Install Chromium
+        run: python -m playwright install --with-deps chromium
+      - name: Run macro and browser tests
+        run: python -m pytest
+      - name: Upload failure screenshots
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: site-test-failures
+          path: test-results/
+          if-no-files-found: ignore
+
   workflows:
     name: Lint Workflows
     runs-on: ubuntu-latest
