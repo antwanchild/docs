@@ -40,9 +40,9 @@ the development machine. Migration builds are in `wiki/site/` and
 - Zensical places blog post tags below the article rather than above it.
   Tag listings also omit the previous heading permalink symbols.
 - Review the captured screenshots and the successful PR checks.
-- Record the image digests currently running in production before merging.
-  Anonymous GHCR access returned HTTP 401, so current rollback image versions
-  could not be inspected from this environment.
+- The latest successful production build logs provide the rollback image
+  references below. These are the last published images; the running
+  containers were not inspected directly. GHCR requires authentication.
 - The local file-target check did not validate anchor fragments; the PR
   also ran the existing lychee outbound-link configuration.
 
@@ -50,9 +50,22 @@ the development machine. Migration builds are in `wiki/site/` and
 
 Review the branch and validation results before merging. A push to `main`
 triggers the existing deployment pipelines; shared build changes now
-trigger both sites. The migration branch has been pushed as PR #60. No merge or deployment
-has been performed.
+trigger both sites. The migration is reviewed in PR #60. Merging publishes new images through
+the existing production workflows.
 
-Retain the current production image versions before deployment. If needed,
-restore those images and revert the migration changes to return to the
-MkDocs build. Keep TOML conversion and modern theme adoption separate.
+The latest successful wiki and blog publication runs were on July 19,
+2026 (America/Boise), with the tag `2026.07.19`. Their manifest digests
+provide fixed rollback references even if tags are overwritten:
+
+- Wiki: `ghcr.io/antwanchild/wiki@sha256:aa637975e7ddd4bc5d5ff723b387075f7255352174f3d135cf6daad38afa5c7f`
+- Blog: `ghcr.io/antwanchild/blog@sha256:ab332a34cbf0e3b905d951c023ed53b05ae9444144f57d8ebd793140fcbdb6fc`
+
+Sources: [wiki build](https://github.com/antwanchild/docs/actions/runs/29714406146)
+and [blog build](https://github.com/antwanchild/docs/actions/runs/29714397196).
+These references were recovered from build logs, not verified against
+running production containers or pulled from the private registry.
+
+If needed, configure the homelab deployment to use these image references
+and recreate the containers. Revert the migration changes to restore the
+MkDocs build pipeline. Keep TOML conversion and modern theme adoption
+separate.
