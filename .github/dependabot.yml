@@ -1,7 +1,7 @@
 version: 2
 updates:
 
-  # Python dependencies (MkDocs and plugins)
+  # Python dependencies (Zensical and environment loading)
   - package-ecosystem: "pip"
     directory: "/"
     schedule:

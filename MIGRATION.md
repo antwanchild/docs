@@ -1,11 +1,23 @@
 # Zensical migration
 
-This records the initial migration. Subsequent theme and TOML changes are
-tracked in [ZENSICAL-FOLLOWUP.md](ZENSICAL-FOLLOWUP.md).
+## Completed
 
-The `migrate-zensical` branch replaces Material for MkDocs with Zensical
-0.0.70 for both sites. It retains `mkdocs.yml`, the classic theme, existing
-content, custom macros, and nginx serving configuration.
+The migration and follow-up work are complete:
+
+- [PR #60](https://github.com/antwanchild/docs/pull/60) migrated both sites
+  from Material for MkDocs to Zensical.
+- [PR #61](https://github.com/antwanchild/docs/pull/61) adopted the modern theme.
+- [PR #62](https://github.com/antwanchild/docs/pull/62) converted both sites
+  to native `zensical.toml` configuration.
+
+All three changes passed validation and published new Docker images.
+The site owner confirmed that both containers were refreshed and both live
+sites were verified on October 13, 2026 (America/Boise).
+
+Both sites now use Zensical 0.0.70, the modern theme, and TOML configuration.
+The original migration initially retained YAML and the classic theme;
+those were replaced by the subsequent PRs. See
+[ZENSICAL-FOLLOWUP.md](ZENSICAL-FOLLOWUP.md) for follow-up validation.
 
 ## Validation completed
 
@@ -33,30 +45,23 @@ content, custom macros, and nginx serving configuration.
   and script serving, custom 404 status/content, health-check commands,
   and outbound links. Workflow lint also passed.
 
-Baseline build artifacts are temporarily available at
-`/private/tmp/docs-baseline-wiki` and `/private/tmp/docs-baseline-blog` on
-the development machine. Migration builds are in `wiki/site/` and
-`blog/site/` (ignored by Git).
+## Compatibility notes
 
-## Review before deployment
-
-- Zensical places blog post tags below the article rather than above it.
-  Tag listings also omit the previous heading permalink symbols.
-- Review the captured screenshots and the successful PR checks.
-- The latest successful production build logs provide the rollback image
-  references below. These are the last published images; the running
-  containers were not inspected directly. GHCR requires authentication.
-- The local file-target check did not validate anchor fragments; the PR
-  also ran the existing lychee outbound-link configuration.
+Zensical places blog tags below posts, and tag listings omit the previous
+heading permalink symbols. These differences were reviewed during migration.
+Local file-target checks did not validate anchor fragments; CI also ran
+outbound link checks using the existing lychee configuration.
 
 ## Deployment and rollback
 
-Review the branch and validation results before merging. A push to `main`
-triggers the existing deployment pipelines; shared build changes now
-trigger both sites. The migration is reviewed in PR #60. Merging publishes new images through
-the existing production workflows.
+A push to `main` runs the existing image publication workflows. Shared
+build changes trigger both sites. Refresh the homelab containers to pick
+up new images unless an automatic updater handles this.
 
-The latest successful wiki and blog publication runs were on July 19,
+The image references below are historical rollback points from before
+PR #60, not the currently running Zensical images.
+
+The pre-migration wiki and blog publication runs were on July 19,
 2026 (America/Boise), with the tag `2026.07.19`. Their manifest digests
 provide fixed rollback references even if tags are overwritten:
 
@@ -70,5 +75,4 @@ running production containers or pulled from the private registry.
 
 If needed, configure the homelab deployment to use these image references
 and recreate the containers. Revert the migration changes to restore the
-MkDocs build pipeline. Keep TOML conversion and modern theme adoption
-separate.
+MkDocs build pipeline. Theme and TOML conversion were delivered in separate PRs.

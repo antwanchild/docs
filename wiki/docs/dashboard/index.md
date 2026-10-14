@@ -44,7 +44,7 @@ hide:
 ## :material-book: Documentation
 
 - [**These Docs**]({{ service_url("docs") }}) - You’re here! 📚
-- [***New* Blog**]({{ service_url("blog") }}) - Moving Blog from Wordpress to MkDocs
+- [**Blog**]({{ service_url("blog") }}) - Recipes, thoughts, and projects
 - [Quick Commands](../reference/quick-commands.md) - Daily commands ⚡
 - [Troubleshooting](../reference/troubleshooting.md) - Fix issues 🛠️
 - [Services List](../homelab/services.md) - All containers 📋
