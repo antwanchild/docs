@@ -2,17 +2,19 @@
 
 ## Current progress
 
-The modern-theme preview on `preview-modern-theme` has been reviewed and
-approved for adoption.
-Both strict builds pass. All 34 HTML paths and article text match the
-classic builds. Chrome checks passed for search, theme switching, mobile
-navigation, Mermaid, MathJax, recipe metadata, custom 404 content, and
-external link behavior, with no browser exceptions.
+The modern theme was adopted in PR #61. Both sites now use native TOML
+configuration on `convert-zensical-toml`; Docker, CI, and local commands
+have been updated, and the superseded YAML files removed.
 
-Screenshots are in `/private/tmp/docs-modern-preview`, including desktop
-and mobile views of both sites. No CSS adjustments were needed for the
-reviewed views. The theme change proceeds through a separate PR and the existing site
-validation workflow. TOML conversion remains a separate follow-up.
+Both strict TOML builds pass. Zensical's resolved settings exactly match
+those of the YAML baseline. All generated files are byte-for-byte identical
+(35 wiki files and 24 blog files), including HTML, assets, and search data.
+This conversion introduces no visual or content changes.
+
+Browser checks passed for both sites with no exceptions. Both flattened
+Docker builder layouts also build successfully. Actual container, nginx,
+lint, and outbound-link checks run in the separate TOML PR.
+Rollback by reverting that PR to restore YAML configurations and commands.
 
 ## 1. Preview the modern theme
 

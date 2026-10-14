@@ -31,7 +31,7 @@ jobs:
       site_name: Wiki
       site_emoji: "📖"
       content_dir: wiki/docs/
-      mkdocs_dir: wiki
+      project_dir: wiki
       env_file_path: wiki/.env
       requirements_file: requirements.wiki.txt
       image_name: wiki

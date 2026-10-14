@@ -12,7 +12,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
 
 # Copy blog content and Zensical config
 COPY blog/docs docs/
-COPY blog/mkdocs.yml mkdocs.yml
+COPY blog/zensical.toml zensical.toml
 COPY mkdocs_env.py mkdocs_env.py
 COPY blog/main.py main.py
 

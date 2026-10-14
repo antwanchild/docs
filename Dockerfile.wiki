@@ -12,7 +12,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
 
 # Copy wiki content and Zensical config
 COPY wiki/docs docs/
-COPY wiki/mkdocs.yml mkdocs.yml
+COPY wiki/zensical.toml zensical.toml
 COPY mkdocs_env.py mkdocs_env.py
 COPY wiki/main.py main.py
 

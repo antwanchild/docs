@@ -31,7 +31,7 @@ jobs:
       site_name: Blog
       site_emoji: "✏️"
       content_dir: blog/docs/posts/
-      mkdocs_dir: blog
+      project_dir: blog
       env_file_path: blog/.env
       requirements_file: requirements.blog.txt
       image_name: blog

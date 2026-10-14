@@ -32,7 +32,7 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.${{ matrix.site }}.txt
       - name: Build site
-        run: zensical build --strict -f ${{ matrix.site }}/mkdocs.yml
+        run: zensical build --strict -f ${{ matrix.site }}/zensical.toml
       - name: Lint Markdown
         uses: DavidAnson/markdownlint-cli2-action@v24.2.0
         continue-on-error: true
