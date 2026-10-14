@@ -68,6 +68,7 @@ python -m pytest
 ```
 
 For just the Python macro tests, use `python -m pytest -m "not browser"`.
+Lint the test code with `python -m pylint --persistent=n --source-roots=. --ignore-patterns='^\._' tests`.
 Browser tests build temporary copies of both sites without loading local
 `.env` files, then check search, themes, mobile navigation, wiki rendering,
 recipe metadata, and existing blog URLs. Mermaid and MathJax checks require

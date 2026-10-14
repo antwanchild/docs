@@ -20,6 +20,8 @@ jobs:
           python-version: '3.12'
       - name: Install test dependencies
         run: pip install -r requirements.test.txt
+      - name: Lint test code
+        run: python -m pylint --persistent=n --source-roots=. --ignore-patterns='^\._' tests
       - name: Install Chromium
         run: python -m playwright install --with-deps chromium
       - name: Run macro and browser tests

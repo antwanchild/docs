@@ -13,6 +13,8 @@ TEST_TOKEN = "synthetic-token-for-browser-tests"
 
 @dataclass
 class PlexResponses:
+    """Control simulated API responses and record outgoing requests."""
+
     calls: list = field(default_factory=list)
     unexpected: list = field(default_factory=list)
     poll_result: dict = field(default_factory=lambda: {"authToken": None})
@@ -21,6 +23,7 @@ class PlexResponses:
     fail_user: bool = False
 
     def route(self, route, local_origin):
+        """Fulfill simulated Plex endpoints and block unexpected external traffic."""
         request = route.request
         url = urlsplit(request.url)
         if request.url.startswith(local_origin + "/"):
@@ -44,11 +47,9 @@ class PlexResponses:
             else:
                 route.fulfill(json={"id": 42, "code": "TEST-PIN"}, headers=headers)
         elif url.hostname == "plex.tv" and url.path == "/api/v2/pins/42":
-            if self.fail_next_poll:
-                self.fail_next_poll = False
-                route.abort("failed")
-            else:
-                route.fulfill(json=self.poll_result, headers=headers)
+            failure = self.fail_next_poll
+            self.fail_next_poll = False
+            self.respond(route, self.poll_result, headers, failure)
         elif url.hostname == "plex.tv" and url.path == "/api/v2/user":
             if self.fail_user:
                 route.abort("failed")
@@ -62,9 +63,18 @@ class PlexResponses:
             self.unexpected.append(request.url)
             route.abort("blockedbyclient")
 
+    @staticmethod
+    def respond(route, payload, headers, failure):
+        """Deliver a polling response or simulate a transport failure."""
+        if failure:
+            route.abort("failed")
+        else:
+            route.fulfill(json=payload, headers=headers)
 
-@pytest.fixture
-def plex(page, site_urls):
+
+@pytest.fixture(name="plex")
+def plex_fixture(page, site_urls):
+    """Open the generator with intercepted Plex requests and a controllable clock."""
     responses = PlexResponses()
     # Intercept every request, including new tabs, before visiting the page.
     # Only the local server is contacted; no request reaches a Plex service.
@@ -79,6 +89,7 @@ def plex(page, site_urls):
 
 
 def start(page, app="Homepage"):
+    """Select an app and request its simulated authorization PIN."""
     page.locator("#app-select").select_option(app)
     page.get_by_role("button", name="Authenticate with Plex").click()
     expect(page.locator("#pin-display")).to_have_text("TEST-PIN")
@@ -86,6 +97,7 @@ def start(page, app="Homepage"):
 
 
 def authorize(page, plex):
+    """Return a synthetic token on the next polling interval."""
     plex.poll_result = {"authToken": TEST_TOKEN}
     page.clock.fast_forward(2000)
     expect(page.locator("#result-container")).to_be_visible()
@@ -98,6 +110,7 @@ def authorize(page, plex):
     ("other", "   ", "Please enter an app name."),
 ])
 def test_invalid_app_does_not_contact_plex(page, plex, selection, custom, message):
+    """Invalid app does not contact plex."""
     if selection:
         page.locator("#app-select").select_option(selection)
         expect(page.locator("#custom-app-name")).to_be_visible()
@@ -111,6 +124,7 @@ def test_invalid_app_does_not_contact_plex(page, plex, selection, custom, messag
 
 @pytest.mark.parametrize("app", ["Homepage", "Kometa", "Unmanic", "My App & Tools"])
 def test_pin_request_and_authorization_link(page, plex, app):
+    """Pin request and authorization link."""
     if app == "My App & Tools":
         page.locator("#app-select").select_option("other")
         page.locator("#custom-app-name").fill("  " + app + "  ")
@@ -122,7 +136,8 @@ def test_pin_request_and_authorization_link(page, plex, app):
     assert parse_qs(urlsplit(pin["url"]).query) == {"strong": ["true"]}
     assert pin["headers"]["x-plex-product"] == app
     client = pin["headers"]["x-plex-client-identifier"]
-    assert re.fullmatch(r"[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}", client)
+    uuid_pattern = r"[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}"
+    assert re.fullmatch(uuid_pattern, client)
     link = page.get_by_role("link", name="Authorize with Plex")
     url = urlsplit(link.get_attribute("href"))
     assert (url.scheme, url.netloc, url.path) == ("https", "app.plex.tv", "/auth")
@@ -139,6 +154,7 @@ def test_pin_request_and_authorization_link(page, plex, app):
 
 
 def test_authorized_token_profile_clipboard_and_reset(page, plex, site_urls):
+    """Authorized token profile clipboard and reset."""
     page.context.grant_permissions(["clipboard-read", "clipboard-write"], origin=site_urls["wiki"])
     start(page, "Kometa")
     authorize(page, plex)
@@ -153,9 +169,10 @@ def test_authorized_token_profile_clipboard_and_reset(page, plex, site_urls):
     poll_request = next(call for call in plex.calls if call["url"].endswith("/pins/42"))
     assert poll_request["method"] == "GET"
     assert user_request["method"] == "GET"
-    assert poll_request["headers"]["x-plex-client-identifier"] == plex.calls[0]["headers"]["x-plex-client-identifier"]
+    client = plex.calls[0]["headers"]["x-plex-client-identifier"]
+    assert poll_request["headers"]["x-plex-client-identifier"] == client
     assert user_request["headers"]["x-plex-token"] == TEST_TOKEN
-    assert user_request["headers"]["x-plex-client-identifier"] == plex.calls[0]["headers"]["x-plex-client-identifier"]
+    assert user_request["headers"]["x-plex-client-identifier"] == client
     page.get_by_title("Copy to clipboard").click()
     expect(page.locator("#copy-status")).to_be_visible()
     assert page.evaluate("navigator.clipboard.readText()") == TEST_TOKEN
@@ -174,9 +191,12 @@ def test_authorized_token_profile_clipboard_and_reset(page, plex, site_urls):
 
 
 def test_timeout_stops_polling_and_allows_retry(page, plex):
+    """Timeout stops polling and allows retry."""
     start(page)
     page.clock.fast_forward(300000)
-    expect(page.locator("#status-message")).to_have_text("Authentication timed out. Please try again.")
+    expect(page.locator("#status-message")).to_have_text(
+        "Authentication timed out. Please try again.",
+    )
     expect(page.locator("#pin-container")).to_be_hidden()
     expect(page.locator("#auth-btn")).to_be_enabled()
     calls = len(plex.calls)
@@ -188,6 +208,7 @@ def test_timeout_stops_polling_and_allows_retry(page, plex):
 
 
 def test_pin_network_failure_can_be_retried(page, plex):
+    """Pin network failure can be retried."""
     plex.fail_pin = True
     page.locator("#app-select").select_option("Homepage")
     page.get_by_role("button", name="Authenticate with Plex").click()
@@ -200,6 +221,7 @@ def test_pin_network_failure_can_be_retried(page, plex):
 
 
 def test_transient_polling_failure_keeps_waiting(page, plex):
+    """Transient polling failure keeps waiting."""
     plex.fail_next_poll = True
     start(page)
     with page.expect_event("requestfailed"):
@@ -210,16 +232,18 @@ def test_transient_polling_failure_keeps_waiting(page, plex):
 
 
 def test_profile_failure_preserves_the_token(page, plex):
+    """Profile failure preserves the token."""
     plex.fail_user = True
     start(page)
     authorize(page, plex)
     expect(page.locator("#username")).to_have_text("Authenticated")
-    for field in ("email", "userid", "plexpass", "joinedat"):
-        expect(page.locator("#" + field)).to_have_text("N/A")
+    for field_name in ("email", "userid", "plexpass", "joinedat"):
+        expect(page.locator("#" + field_name)).to_have_text("N/A")
     expect(page.locator("#token-box")).to_have_text(TEST_TOKEN)
 
 
 def test_clipboard_rejection_uses_fallback(page, plex):
+    """Clipboard rejection uses fallback."""
     start(page)
     authorize(page, plex)
     page.evaluate("""() => {

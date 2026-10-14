@@ -19,12 +19,12 @@ ROOT = Path(__file__).resolve().parents[1]
 class QuietHandler(SimpleHTTPRequestHandler):
     """Keep successful HTTP requests out of the test output."""
 
-    def log_message(self, format, *args):
-        pass
+    def log_message(self, format, *args):  # pylint: disable=redefined-builtin
+        """Suppress request logs while preserving the standard-library signature."""
 
 
-@pytest.fixture(scope="session")
-def built_sites(tmp_path_factory):
+@pytest.fixture(scope="session", name="built_sites")
+def build_sites_fixture(tmp_path_factory):
     """Build from copied sources, without copying local secrets or caches."""
     root = tmp_path_factory.mktemp("sites")
     shutil.copy2(ROOT / "mkdocs_env.py", root / "mkdocs_env.py")
@@ -47,6 +47,7 @@ def built_sites(tmp_path_factory):
 
 @pytest.fixture(scope="session")
 def site_urls(built_sites):
+    """Serve both built sites on ephemeral localhost ports."""
     servers = []
     urls = {}
     for site in ("wiki", "blog"):
@@ -63,8 +64,9 @@ def site_urls(built_sites):
         thread.join()
 
 
-@pytest.fixture(scope="session")
-def browser():
+@pytest.fixture(scope="session", name="browser")
+def browser_fixture():
+    """Launch Chromium once for the browser test session."""
     with sync_playwright() as playwright:
         options = {}
         if os.getenv("BROWSER_EXECUTABLE"):
@@ -76,12 +78,14 @@ def browser():
 
 @pytest.hookimpl(hookwrapper=True)
 def pytest_runtest_makereport(item, call):
+    """Store test outcomes for failure screenshot capture."""
     outcome = yield
     setattr(item, f"report_{call.when}", outcome.get_result())
 
 
 @pytest.fixture
 def page(browser, request):
+    """Create an isolated page and reject uncaught JavaScript errors."""
     context = browser.new_context(viewport={"width": 1440, "height": 1000})
     instance = context.new_page()
     instance.set_default_timeout(20000)
