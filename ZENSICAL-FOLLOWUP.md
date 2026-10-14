@@ -1,55 +1,41 @@
-# Zensical follow-up plan
+# Zensical follow-up: completed
 
-## Current progress
+The modern theme and TOML configuration changes are complete. Both Docker
+images were published, and the site owner confirmed container refresh and
+live checks on October 13, 2026 (America/Boise).
 
-The modern theme was adopted in PR #61. Both sites now use native TOML
-configuration on `convert-zensical-toml`; Docker, CI, and local commands
-have been updated, and the superseded YAML files removed.
+## Modern theme — PR #61
 
-Both strict TOML builds pass. Zensical's resolved settings exactly match
-those of the YAML baseline. All generated files are byte-for-byte identical
-(35 wiki files and 24 blog files), including HTML, assets, and search data.
-This conversion introduces no visual or content changes.
+[PR #61](https://github.com/antwanchild/docs/pull/61) adopted the reviewed
+modern appearance for both sites while retaining YAML configuration.
+All 34 HTML paths and article text matched the classic baseline. Strict
+builds, desktop/mobile browser checks, container builds, nginx checks,
+lint, and outbound-link validation passed.
 
-Browser checks passed for both sites with no exceptions. Both flattened
-Docker builder layouts also build successfully. Actual container, nginx,
-lint, and outbound-link checks run in the separate TOML PR.
-Rollback by reverting that PR to restore YAML configurations and commands.
+No custom CSS changes were needed to adopt the modern theme. Browser
+checks covered search, light/dark switching, mobile navigation, Mermaid,
+MathJax, recipes, custom 404s, and external links without exceptions.
 
-## 1. Preview the modern theme
+Rollback: restore `variant = "classic"` under `[project.theme]` in both
+current TOML configurations, then rebuild and refresh the containers.
 
-- Work on `preview-modern-theme`, retaining the YAML configuration.
-- Save the classic build as a comparison baseline and enable `modern` on
-  both sites.
-- Build both sites in strict mode and compare page URLs and article text.
-- Check desktop/mobile layout, navigation, search, palettes, wiki CSS,
-  diagrams, math, recipe metadata, custom 404s, and external links.
-- Capture screenshots for review. Decide whether to adopt the modern
-  appearance after reviewing the preview.
-- If adopted, open a theme-only PR, run container/CI checks, and merge.
-  Roll back by restoring `variant: classic`.
+## TOML configuration — PR #62
 
-## 2. Convert configuration to TOML separately
+[PR #62](https://github.com/antwanchild/docs/pull/62) replaced both YAML
+configurations with native `zensical.toml` files. Docker, CI, and local
+commands were updated; the reusable workflow input is now `project_dir`.
 
-- Branch from the chosen theme baseline so visual changes are isolated.
-- Convert both `mkdocs.yml` files to `zensical.toml`, preserving project
-  settings, navigation, palettes, features, extensions, plugins, and assets.
-- Translate Python callable references using Zensical's supported TOML
-  representation and verify custom macro loading.
-- Update Dockerfile config copies, build/preview commands, workflow inputs,
-  validation commands, and README instructions.
-- Compare normalized configuration, HTML URLs, article text, search data,
-  blog-generated pages, and representative browser views against YAML.
-- Verify both flattened Docker builder layouts and run PR container,
-  nginx, lint, and link checks before merging.
-- Remove the superseded YAML files only after parity is established.
-  Roll back by reverting the configuration conversion PR.
+Zensical resolved YAML and TOML to identical settings. Generated output
+was byte-for-byte identical: 35 wiki files and 24 blog files, including
+all 34 HTML paths, assets, and search data. Browser checks, flattened
+Docker layouts, actual container/nginx checks, lint, and outbound-link
+validation passed. No visual or content changes were introduced.
 
-## Completion criteria
+Rollback: revert PR #62 to restore YAML files and corresponding build
+commands. The modern theme is independent of this conversion.
 
-Both sites retain existing URLs and content. Strict builds, browser checks,
-container checks, and CI pass. The chosen appearance is reviewed before
-deployment. TOML conversion introduces no additional visual changes.
+## Final state
 
-Estimated effort: 2–4 hours for theme adoption and 1–3 hours for TOML
-conversion, with additional time if preview or compatibility issues arise.
+Both sites use the modern theme and native TOML configuration. Existing
+URLs and content were preserved. Automated checks and owner verification
+of the live sites passed; no migration tasks remain.

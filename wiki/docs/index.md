@@ -20,9 +20,10 @@ Your personal knowledge base for homelab infrastructure, configurations, and tec
 ## :material-rocket-launch: Getting Started
 
 !!! tip ":material-file-document-edit: Editing Documentation"
-    1. Edit any `.md` file in the `docs/` folder
-    2. Run `docker compose -f app.mkdocs-builder.yml up` to rebuild
-    3. Changes appear at [docs.anthonychild.com](https://docs.anthonychild.com)
+    1. Edit a Markdown file in `wiki/docs/`.
+    2. From the repository root, preview with `zensical serve -f wiki/zensical.toml`.
+    3. Push changes to `main` to build and publish the wiki image, then refresh the wiki container.
+    4. View the updated site at [wiki.anthonychild.com]({{ service_url("docs") }}).
 
 !!! info ":material-text-box-search: Using Search"
     Press ++f++ or ++s++ to quickly search across all documentation
