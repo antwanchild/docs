@@ -37,6 +37,7 @@ palette = [
   { media = "(prefers-color-scheme: light)", scheme = "default", primary = "indigo", accent = "deep orange", toggle = { icon = "material/brightness-7", name = "Switch to dark mode" } },
 ]
 features = [
+  "content.action.copy",
   "content.code.annotate",
   "content.code.copy",
   "content.tabs.link",
@@ -120,6 +121,19 @@ custom_checkbox = true
 [project.plugins.search]
 lang = "en"
 separator = "[\\s\\-,:!=\\[\\]()\"/]+|(?!\\b)(?=[A-Z][a-z])|\\.(?!\\d)|&[lg]t;"
+
+[project.plugins.llmstxt]
+full_output = "llms-full.txt"
+
+[project.plugins.llmstxt.sections]
+Homelab = ["homelab/*.md"]
+"Quick Reference" = ["reference/*.md"]
+"Notes & Tips" = ["notes/*.md"]
+"Projects & Planning" = ["projects/*.md", "planning/*.md"]
+
+[project.plugins.redirects]
+
+[project.plugins.redirects.redirect_maps]
 
 [project.plugins.macros]
 on_error_fail = true
