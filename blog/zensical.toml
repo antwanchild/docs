@@ -20,9 +20,6 @@ palette = [
   { media = "(prefers-color-scheme: dark)", scheme = "slate", primary = "deep purple", accent = "amber", toggle = { icon = "material/brightness-4", name = "Switch to system preference" } },
 ]
 features = [
-  "navigation.instant",
-  "navigation.instant.prefetch",
-  "navigation.instant.progress",
   "navigation.tabs",
   "navigation.tabs.sticky",
   "navigation.sections",
