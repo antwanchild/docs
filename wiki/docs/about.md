@@ -4,296 +4,141 @@ hide:
 ---
 # :material-home-heart: About This Homelab
 
-Built and maintained with ❤️ by **Anthony Child** since 2024.
+Built and maintained by **Anthony Child** since 2024.
 
-!!! success ":material-check-all: Current Status"
-    Fully operational, automated, and secured! 🚀  
-    28 containers running smoothly as of December 2025.
+This is a single-server Ubuntu homelab built around Docker Compose, modular service stacks, secure remote access, media automation, personal applications, and documentation that lives alongside the infrastructure it describes.
 
------
+!!! info ":material-source-branch: Living Documentation"
+    The homelab changes frequently. The `ubuntu_Desktop` Compose configuration is the source of truth for deployed services, while this wiki explains how the pieces fit together.
 
 ## :material-chart-box: Quick Stats
 
-|Category            |Details                                                                                     |
-|--------------------|--------------------------------------------------------------------------------------------|
-|**Domain**          |anthonychild.com                                                                            |
-|**Primary Focus**   |Media streaming, photo backup, personal tools                                               |
-|**Platform**        |Docker + Docker Compose                                                                     |
-|**Stacks**          |6 modular stacks (networking, security, monitoring, media-download, media-server, utilities)|
-|**Total Containers**|28 active services                                                                          |
-|**Networks**        |5 isolated Docker networks                                                                  |
-|**Ingress**         |Traefik + Cloudflare Tunnel                                                                 |
-|**Remote Access**   |Tailscale VPN 🌐                                                                             |
-|**Authentication**  |Authentik SSO 🔐                                                                             |
-|**Security**        |CrowdSec IPS 🛡️ + Cloudflare Protection                                                      |
-|**Documentation**   |This site (MkDocs with Material theme) 📚                                                    |
-
------
+| Category | Details |
+| --- | --- |
+| **Domain** | anthonychild.com |
+| **Operating system** | Ubuntu |
+| **Platform** | Docker + Docker Compose |
+| **Stacks** | 6 modular stacks |
+| **Ingress** | Traefik + Cloudflare Tunnel |
+| **Remote access** | Tailscale |
+| **Authentication** | Authentik SSO |
+| **Security** | CrowdSec + Anubis + Cloudflare |
+| **Documentation** | Zensical wiki and blog |
 
 ## :material-lightbulb: Philosophy
 
-**Guiding Principles:**
+- :material-view-module: **Modular design:** Related services live in separate Compose stacks for easier maintenance and troubleshooting.
+- :material-robot: **Automation first:** Media management, metadata, notifications, updates, and maintenance should require as little repetitive work as practical.
+- :material-shield-lock: **Security by design:** Public-facing services sit behind layered routing, authentication, and threat protection.
+- :material-file-document-multiple: **Document everything:** Useful decisions, commands, architecture, and troubleshooting notes belong in version control.
+- :material-test-tube: **Keep experimenting:** The homelab is both useful infrastructure and a place to learn new tools.
 
-- :material-view-module: **Modular Design**:   Everything in separate Docker stacks for easy management, updates, and troubleshooting. One stack down doesn’t affect the others.
-- :material-robot: **Automation First**:   Let the machines do the work. *arr stack for media, Kometa for metadata, automated backups, and health checks.
-- :material-shield-lock: **Security by Design**:   Nothing exposed without authentication. Multiple layers of security with SSO, IPS, and zero-trust networking.
-- :material-file-document-multiple: **Document Everything**:   If it’s not documented, it doesn’t exist. This wiki ensures I (and you) can understand and replicate everything.
-- :material-test-tube: **Always Learning**:   The homelab is a playground for experimentation. Breaking things is how we learn to fix them better.
-- :material-heart: **Fun is Required**:   Because tinkering, optimizing, and seeing it all work together is the best part! 😄
-
-!!! quote "My Homelab Mantra"
-    “The best setup is the one that just works… until you make it better.”  
-    — Anthony Child
-
------
-
-## :material-star-shooting: What Makes This Special
+## :material-star-shooting: What Makes This Setup Useful
 
 ### :material-network: Network Architecture
 
-- **Segmented networks** for isolation (proxy, media-backend, monitoring-net, security-net, utils-net)
-- **Zero open ports** on firewall thanks to Cloudflare Tunnel
-- **Tailscale VPN** for secure admin access from anywhere
+Traefik handles reverse proxy routing, Cloudflare Tunnel provides selected external access without conventional inbound port forwarding, and Tailscale provides private remote access to the home network.
 
-### :material-shield-account: Security Stack
+### :material-shield-account: Security
 
-- **Authentik SSO** protecting all services with one login
-- **CrowdSec** watching for threats and auto-banning bad actors
-- **Cloudflare Bouncer** syncing bans to edge network
-- **MFA support** for critical services
+Authentik provides SSO, CrowdSec analyzes hostile traffic patterns, Anubis adds bot protection where appropriate, and Cloudflare provides the external edge.
 
-### :material-movie: Media Excellence
+### :material-movie: Media
 
-- **Fully automated** media acquisition (Sonarr, Radarr, Prowlarr, SABnzbd)
-- **Request system** for users via Seerr
-- **Custom metadata** with Kometa collections and overlays
-- **Episode title cards** generated automatically
-- **Library optimization** with Unmanic transcoding
+Plex anchors the media environment, with Sonarr, Radarr, Prowlarr, SABnzbd, Seerr, Kometa, Unmanic, artwork tools, and supporting utilities automating much of the lifecycle.
 
 ### :material-monitor-dashboard: Observability
 
-- **Homepage dashboard** showing all service status
-- **Real-time logs** via Dozzle
-- **Plex analytics** with Tautulli
-- **Discord notifications** for important events
+Homepage provides the central dashboard, while Beszel, Dockwatch, Dozzle, Tautulli, Tracearr, and Notifiarr cover system monitoring, image updates, logs, Plex activity, playback analysis, and notifications.
 
------
+### :material-tools: Personal Services
 
-## :material-timeline: Evolution Timeline
+The utilities stack also hosts projects and services such as Coordinator, Cutco Vault, Discord Cleanup, File Browser Quantum, Immich, PrivateBin, and this documentation.
 
-**2024** - Initial Setup
-:   - Started with basic Plex server
-:   - Added Sonarr and Radarr for automation
-:   - Implemented Traefik for reverse proxy
+## :material-timeline: Evolution
 
-**Early 2025** - Security Hardening
-:   - Deployed Authentik for SSO
-:   - Added CrowdSec for intrusion prevention
-:   - Implemented Cloudflare Tunnel
+**2024 · Initial setup**
+:   Plex and the first media automation services established the foundation of the homelab.
 
-**Mid 2025** - Monitoring & Automation
-:   - Added Homepage dashboard
-:   - Deployed Kometa for metadata management
-:   - Implemented automated backups
+**2025 · Security and automation**
+:   Traefik, Authentik, CrowdSec, Cloudflare Tunnel, Homepage, Kometa, and additional automation expanded the environment beyond a media server.
 
-**Late 2025** - Documentation & Refinement
-:   - Created this comprehensive wiki
-:   - Optimized network segmentation
-:   - Fine-tuned automation workflows
-
------
+**2026 · Ubuntu and documentation modernization**
+:   The current environment is organized as six numbered Docker Compose stacks on Ubuntu, with the wiki and blog migrated to Zensical and CI/CD increasingly focused on validation, security, and build traceability.
 
 ## :material-server: Technology Stack
 
 ### Core Infrastructure
 
-- **Operating System:** [Your OS - Linux/Ubuntu/Debian/etc.]
+- **Operating system:** Ubuntu
 - **Containerization:** Docker + Docker Compose
-- **Reverse Proxy:** Traefik v3
+- **Reverse proxy:** Traefik
 - **Tunnel:** Cloudflare Tunnel
 - **VPN:** Tailscale
 
 ### Security & Authentication
 
 - **SSO:** Authentik
-- **IPS:** CrowdSec
-- **Edge Protection:** Cloudflare
-- **Database:** PostgreSQL
+- **Threat detection:** CrowdSec
+- **Bot protection:** Anubis
+- **Edge protection:** Cloudflare
 
 ### Media Services
 
-- **Server:** Plex Media Server
-- **TV Automation:** Sonarr
-- **Movie Automation:** Radarr
-- **Indexer Manager:** Prowlarr
+- **Media server:** Plex
+- **TV automation:** Sonarr
+- **Movie automation:** Radarr
+- **Indexer management:** Prowlarr
 - **Downloader:** SABnzbd
-- **Requests:** Overseerr/Seerr
+- **Requests:** Seerr
 - **Metadata:** Kometa
 - **Transcoding:** Unmanic
 
 ### Monitoring & Management
 
 - **Dashboard:** Homepage
+- **System monitoring:** Beszel
+- **Container updates:** Dockwatch
 - **Logs:** Dozzle
-- **Analytics:** Tautulli
+- **Plex analytics:** Tautulli and Tracearr
 - **Notifications:** Notifiarr
 
 ### Utilities
 
 - **Photos:** Immich
-- **Filebrowsing:** Filebrowser Quantum
-- **Pastebin:** Privatebin
-- **Documentation:** MkDocs with Material theme
-
------
-
-## :material-target: Goals
-
-### Completed ✅
-
-- [x] Fully automated media acquisition
-- [x] Single Sign-On across all services
-- [x] Zero-trust network architecture
-- [x] Comprehensive documentation
-- [x] Monitoring and alerting
-- [x] Secure remote access
-
-### In Progress 🚧
-
-- [ ] Automated backup testing
-- [ ] High availability for critical services
-- [ ] Enhanced media organization
-- [ ] Performance optimization
-
-### Future Plans 🎯
-
-- [ ] Expanded photo management
-- [ ] Home automation integration
-- [ ] Network storage expansion
-- [ ] Additional monitoring tools
-
-See the full [Wishlist](planning/wishlist.md) for details.
-
------
-
-## :material-school: What I’ve Learned
-
-Building this homelab has taught me:
-
-- **Docker networking** - How to properly segment and secure containerized services
-- **Reverse proxies** - Traefik configuration, middleware, and SSL automation
-- **Authentication** - Implementing enterprise-grade SSO for home use
-- **Security** - Layered security approach, threat detection, and response
-- **Automation** - Writing scripts, setting up workflows, and reducing manual tasks
-- **Documentation** - The importance of documenting everything clearly
-- **Troubleshooting** - Reading logs, debugging issues, and finding root causes
-
-And most importantly: **When to rebuild vs. when to patch** 😄
-
------
+- **Files:** File Browser Quantum
+- **Paste sharing:** PrivateBin
+- **Personal projects:** Coordinator, Cutco Vault, Discord Cleanup
+- **Documentation:** Zensical
 
 ## :material-information: About the Documentation
 
-This wiki is built with:
+The wiki and blog are Markdown-based Zensical sites built and deployed through Docker and GitHub Actions. They support full-text search, responsive layouts, syntax highlighting, Mermaid diagrams, tabs, and admonitions.
 
-- **[MkDocs](https://www.mkdocs.org/)** - Static site generator
-- **[Material for MkDocs](https://squidfunk.github.io/mkdocs-material/)** - Beautiful, feature-rich theme
-- **[Docker](https://www.docker.com/)** - Containerized deployment
-- **Version Control** - Git for tracking changes
-
-**Features:**
-
-- Full-text search
-- Dark/light mode toggle
-- Mobile-responsive design
-- Code syntax highlighting
-- Mermaid diagrams
-- Tabbed content
-- Admonitions and callouts
-
-The docs are automatically rebuilt and deployed whenever changes are made.
-
------
+The documentation is deliberately kept in Git so changes to the infrastructure and changes to its documentation can be reviewed and tracked.
 
 ## :material-frequently-asked-questions: FAQ
 
-??? question "How much does this cost to run?"
-    The hardware was a one-time investment. Ongoing costs are minimal:
+??? question "Why Docker Compose instead of Kubernetes?"
+    The homelab is a single-server environment. Compose provides the orchestration needed without introducing infrastructure that would be more complex than the workloads it manages.
 
-    - Domain registration (~$15/year)
-    - Electricity (varies by hardware)
-    - Internet (already paying for it)
-    - Cloudflare is free tier
-    - All software is open source and free
+??? question "Why self-host?"
+    Privacy, control, learning, and the ability to tailor services to the household instead of fitting everything into hosted products.
 
-??? question "How much time does maintenance take?"
-    :   - **Daily:** ~5 minutes checking dashboards
-    :   - **Weekly:** ~30 minutes for updates and monitoring
-    :   - **Monthly:** ~2 hours for major updates and improvements
-
-    Automation handles most of the work!
-
-??? question "What happens if something breaks?"
-    That’s why I have:
-
-    - Comprehensive documentation (this site)
-    - Regular backups
-    - Modular architecture (one stack failure doesn't affect others)
-    - Monitoring and alerts
-    - Remote access via Tailscale for emergency fixes
-
-??? question "Can I copy your setup?"
-    Absolutely! That’s partly why this documentation exists. Everything here is reproducible. Check out the [Services](homelab/services.md), [Networking](homelab/networking.md), and [Stacks](homelab/stacks.md) pages for details.
-
-??? question "Why self-host instead of using cloud services?"
-    - **Privacy:** My data stays on my hardware
-    - **Control:** I decide how everything works
-    - **Learning:** Hands-on experience with real infrastructure
-    - **Cost:** After initial investment, minimal ongoing costs
-    - **Fun:** Because I enjoy it! 😊
-
------
+??? question "Can I copy the setup?"
+    Absolutely. Start with the [Homelab Overview](homelab/overview.md), then explore [Services](homelab/services.md), [Networking](homelab/networking.md), and [Stacks](homelab/stacks.md).
 
 ## :material-account: About Me
 
-I’m Anthony, a tech enthusiast who believes in:
-
-- Self-hosting over cloud dependency
-- Open source software
-- Privacy and security
-- Learning by doing
-- Documenting the journey
-
-This homelab started as a simple Plex server and evolved into a comprehensive self-hosted infrastructure. It’s been an incredible learning experience and continues to be a playground for new ideas.
-
------
+I'm Anthony, a tech enthusiast who enjoys self-hosting, open source software, automation, infrastructure, and documenting the journey. What started as a Plex server has grown into a practical lab for learning, building, and running personal services.
 
 ## :material-email: Get in Touch
 
 !!! tip ":material-chat: Contact"
-    - Have questions about the setup?
-    - Want to share your own homelab?
-    - Found an issue in the docs?
-
-    {{ email_link("Feel free to reach out!") }}
-
------
-
-## :material-hand-wave: Acknowledgments
-
-Big thanks to the open source community and all the amazing projects that make this possible:
-
-- The developers of Docker, Traefik, Authentik, Plex, and all the *arr apps
-- The MkDocs and Material for MkDocs teams
-- The homelab community for inspiration and troubleshooting help
-- Everyone who creates and maintains open source software
-
------
+    Found an issue in the docs, have a question about the setup, or want to compare homelab notes? {{ email_link("Feel free to reach out!") }}
 
 <div class="center" markdown>
 
 **Thanks for visiting my digital garden!** :material-sprout:
-
-*Last updated: January 2026*
 
 </div>
