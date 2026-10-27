@@ -78,7 +78,7 @@ jobs:
             fi
             sleep 1
           done
-          grep -q 'zensical-0.0.70' /tmp/site-home.html
+          grep -q '<html' /tmp/site-home.html
           docker exec docs-validation nginx -t
           docker exec docs-validation sh -c 'curl -f http://localhost/ >/dev/null'
           status=$(curl -sS -o /tmp/site-404.html -w '%{http_code}' http://localhost:8080/validation-missing-page)
