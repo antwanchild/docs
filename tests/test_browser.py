@@ -58,9 +58,6 @@ def test_mobile_navigation(page, site_urls, site, target):
         page.locator(".md-sidebar--primary label.md-nav__link").filter(
             has_text=re.compile(r"^\s*Resources\s*$"),
         ).click()
-    link = page.locator(".md-sidebar--primary a[href]").filter(
-        has=page.locator(f':scope[href$="/{target}/"], :scope[href="./{target}/"]'),
-    )
     # Match by the resolved URL instead of assuming Zensical emits a specific
     # relative href form. Instant navigation may normalize sidebar links.
     candidates = page.locator(".md-sidebar--primary a[href]")
