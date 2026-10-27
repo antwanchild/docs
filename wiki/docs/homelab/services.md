@@ -62,10 +62,12 @@ The media-server stack contains Plex plus supporting metadata, artwork, inspecti
 | Service / tool | Purpose | Access |
 | --- | --- | --- |
 | **Plex** | Media server | <{{ service_url("plex") }}> |
-| **Kometa / PMM tooling** | Plex metadata, collections, overlays, and automation | Scheduled/internal |
+| **Kometa / PMM** | Plex metadata, collections, overlays, and automation | Scheduled/internal |
 | **ImageMaid** | Plex image cleanup | Scheduled/internal |
 | **MediaInfo** | Media inspection tooling | Internal |
-| **Poster / title-card tooling** | Artwork generation and management | Web UI or scheduled, depending on service |
+| **PPM** | Poster and artwork tooling | Web UI or scheduled, as configured |
+| **Quickstart-PMM** | Kometa/PMM setup and supporting workflow | Internal |
+| **TCM** | Title-card management tooling | Web UI or scheduled, as configured |
 | **Unmanic** | Media transcoding and optimization | <{{ service_url("transcode") }}> |
 
 !!! note ":material-flask: Experimental and Supporting Services"
