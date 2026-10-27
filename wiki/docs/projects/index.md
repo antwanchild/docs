@@ -1,67 +1,116 @@
-# :material-rocket-launch: Projects 🚀
+# :material-rocket-launch: Projects
 
-Current experiments, planned work, and completed homelab projects. 🧰
+**Current, planned, and completed homelab projects** - because tinkering is the best part!
 
-!!! info ":material-information: Project vs. Deployment"
-    This page tracks work and ideas. The [Homelab Overview](../homelab/overview.md) and current Compose configuration describe what is actually deployed. 🐳
+!!! tip ":material-information: How This Works"
+    Active projects are in progress, planned ones are next, completed get ✅.
 
-## :material-progress-clock: Active Themes 🔄
+-----
 
-- [ ] Improve Homepage widgets and dashboard usefulness 🎛️
-- [ ] Strengthen automated backup verification and notifications 💾
-- [ ] Improve monitoring, health checks, and actionable alerts 📊
-- [ ] Continue tightening Traefik, authentication, and security configuration 🛡️
-- [ ] Improve staging/testing for infrastructure changes 🧪
+## :material-progress-clock: Active Projects
 
-## :material-calendar-clock: Planned Projects 📅
+- [ ] Custom Homepage widgets (server stats, quick actions, weather) 🎛️
+- [ ] Automated backup verification script with notifications 📩
+- [ ] MeTube implementation 🎥
+- [ ] Draw.io implementation 🎨
+- [ ] ImageMaid scheduling improvements (trigger on Plex events) 🧹
+- [ ] Dark mode toggle for all internal dashboards 🌙
 
-### Near Term ⚡
+-----
 
-- [ ] Expand external uptime monitoring ⏱️
-- [ ] Improve offsite backup coverage ☁️
-- [ ] Add automated restore testing 💾
-- [ ] Continue documentation automation and validation 📚
+## :material-calendar-clock: Planned Projects
 
-### Longer Term 🌠
+### Short Term (Next 3 Months)
 
-- [ ] Evaluate personal finance and document-management services 💰
-- [ ] Explore additional home automation and camera integrations 🏠
-- [ ] Consider a secondary host or clustered design only if the single-server setup outgrows its current role 🖥️
-- [ ] Explore local AI integrations that provide practical homelab value 🧠
+- [ ] External monitoring with Uptime Kuma ⏱️
+- [ ] Automated offsite backups (Immich, Plex metadata) ☁️
+- [ ] Add Traefik to services where not currently
+- [ ] Cleanup Traefik certs not needed for Cloudflare Tunnels
+- [ ] Add authentication to services on reverse proxy
+- [ ] Enhanced monitoring dashboards
+- [ ] Container health checks and auto-restart
 
-## :material-check-all: Completed Projects ✅
+### Medium Term (6-12 Months)
+
+- [ ] Personal finance dashboard (Actual Budget or Firefly III) 💰
+- [ ] Vaultwarden for password management 🔐
+- [ ] Nextcloud or Syncthing for file sync 📂
+- [ ] Frigate for security cameras 🕵️
+- [ ] Full Proxmox migration with HA 🖥️
+
+### Long Term Dreams
+
+- [ ] Local AI media tagging assistant 🧠
+- [ ] Voice commands integration 🎤
+- [ ] Energy monitoring (solar + power usage) ⚡
+- [ ] Home Assistant integration 🏠
+- [ ] Multi-node cluster with failover
+
+-----
+
+## :material-check-all: Completed Projects
 
 ### 2026
 
 - [x] File Browser Quantum implementation 🗄️
 - [x] Ubuntu six-stack Compose organization 🐳
 - [x] Zensical wiki and blog migration 📚
-- [x] Homelab documentation refresh against current Compose configuration 📝
-- [x] Documentation CI/CD and provenance improvements 🔍
+- [x] Homelab documentation refresh ✨
 
 ### 2025
 
-- [x] Modular Docker stack design 🧩
-- [x] Authentik SSO expansion 🔐
-- [x] Cloudflare Tunnel + Traefik routing ☁️
-- [x] Tailscale remote access 🔗
-- [x] CrowdSec protection 🛡️
-- [x] Media automation with the *arr stack 🎬
-- [x] Kometa metadata management 🎨
-- [x] Artwork and title-card automation 🖼️
+- [x] Modular Docker stack setup
+- [x] Authentik SSO expansion
+- [x] Full homelab documentation (this site!)
+- [x] Cloudflare Tunnel + Traefik routing
+- [x] Tailscale remote access
+- [x] CrowdSec IPS implementation
+- [x] Media stack automation (*arr apps)
+- [x] Kometa metadata management
+- [x] Custom title cards for TV shows
 
 ### 2024
 
-- [x] Initial Plex server 🎥
-- [x] Sonarr/Radarr automation 📺
-- [x] Traefik reverse proxy 🌐
-- [x] Docker containerization 🐳
+- [x] Basic Plex server
+- [x] Sonarr/Radarr automation
+- [x] Traefik reverse proxy
+- [x] Docker containerization
 
-!!! success ":material-trophy: Direction"
-    The project has evolved from a media-server setup into a modular Ubuntu homelab with dedicated networking, security, monitoring, media, utility, and documentation workflows. 🎉
+-----
 
-## :material-lightbulb-on: Ideas & Inspiration 💡
+!!! success ":material-trophy: Looking Back"
+    From a single Docker Compose file to a full modular, secure lab! 🎉
 
-Potential areas to explore include Paperless-ngx, Mealie, Actual Budget, Audiobookshelf, Stirling-PDF, Home Assistant, improved backup automation, infrastructure-as-code workflows, and stronger deployment validation. 🧪
+!!! quote ":material-thought-bubble: Project Philosophy"
+    "Start small, automate everything, and never stop improving."  
+    — Anthony Child
 
-For the broader idea backlog, see the **[Planning & Wishlist](../planning/wishlist.md)** page. 🗺️
+-----
+
+## :material-lightbulb-on: Ideas & Inspiration
+
+**Services to Explore:**
+
+- Paperless-ngx (document management)
+- Vikunja (task/project management)
+- Mealie (recipe manager)
+- Uptime Kuma (uptime monitoring)
+- Grafana + Prometheus (advanced monitoring)
+- n8n (workflow automation)
+
+**Wishlist Features:**
+
+- Automated testing for backups
+- Staging environment for testing
+- CI/CD pipeline for updates
+- Advanced alerting system
+
+-----
+
+<div class="center" markdown>
+
+**What should I build next?** :material-head-question:
+
+*Always open to ideas and suggestions!*
+
+</div>
