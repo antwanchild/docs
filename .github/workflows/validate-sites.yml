@@ -57,6 +57,18 @@ jobs:
         run: pip install -r requirements.${{ matrix.site }}.txt
       - name: Build site
         run: zensical build --strict -f ${{ matrix.site }}/zensical.toml
+      - name: Verify generated features
+        env:
+          SITE: ${{ matrix.site }}
+        run: |
+          if [ "$SITE" = wiki ]; then
+            test -s wiki/site/llms.txt
+            test -s wiki/site/llms-full.txt
+          else
+            find blog/site -type f \( -iname '*rss*.xml' -o -iname '*feed*.xml' \) -print -quit | grep -q .
+            find blog/site -type f \( -iname '*feed*.json' -o -iname '*rss*.json' \) -print -quit | grep -q .
+            find blog/site -type f -path '*/assets/images/social/*' -print -quit | grep -q .
+          fi
       - name: Lint Markdown
         uses: DavidAnson/markdownlint-cli2-action@v24.2.0
         continue-on-error: true
