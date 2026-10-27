@@ -112,6 +112,16 @@ authors_profiles = true
 categories = true
 categories_url_format = "category/{slug}"
 
+[project.plugins.social]
+
+[project.plugins.rss]
+feed_title = "Anthony's Blog"
+match_path = "^posts/.*"
+
+[project.plugins.redirects]
+
+[project.plugins.redirects.redirect_maps]
+
 [project.plugins.glightbox]
 
 [project.plugins.minify]
