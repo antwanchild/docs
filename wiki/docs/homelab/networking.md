@@ -4,405 +4,141 @@ hide:
 ---
 # :material-network: Homelab Networking Architecture
 
-Custom Docker bridge networks for isolation, security, and clean service communication.
+The homelab uses Docker networking, Traefik, Cloudflare Tunnel, and Tailscale to keep service routing predictable while minimizing direct exposure.
 
-!!! success ":material-shield-check: Network Design Philosophy"
-    Minimal public exposure — only necessary services on the `proxy` network. Everything else stays internal and secure!
+!!! info ":material-source-branch: Source of Truth"
+    The current `ubuntu_Desktop` Compose files are authoritative. Network membership is defined per service, so this page avoids hard-coded subnets and static membership lists that can drift over time.
 
------
+## :material-sitemap: Network Model
 
-## :material-sitemap: Network Overview
-
-|Network           |Purpose                        |Subnet       |Driver|Services                   |
-|------------------|-------------------------------|-------------|------|---------------------------|
-|**proxy**         |Traefik ingress (public-facing)|172.20.0.0/16|bridge|All web-accessible services|
-|**media-backend** |Media stack communication      |172.21.0.0/16|bridge|*arr apps, Plex, SABnzbd   |
-|**monitoring-net**|Monitoring & dashboards        |172.22.0.0/16|bridge|Homepage, Dozzle, Tautulli |
-|**security-net**  |Security & authentication      |172.23.0.0/16|bridge|Authentik, CrowdSec        |
-|**utils-net**     |Isolated utilities             |172.24.0.0/16|bridge|FileBrowser, Immich, Privatebin, Docs   |
-
-!!! info ":material-information: Subnets"
-    Each network uses a /16 subnet providing 65,534 possible IP addresses per network.
-
------
-
-## :material-chart-sankey: Network Topology
+The shared `proxy` network is the primary cross-stack network. The networking stack declares it as an external Docker bridge, and other stacks attach only the services that need Traefik or cross-stack communication.
 
 ```mermaid
 graph TB
-    Internet["🌐 Internet"] --> CF["☁️ Cloudflare"]
-    CF --> Tunnel["🔌 Cloudflared Tunnel"]
-    Tunnel --> Traefik["🔀 Traefik"]
-    
-    Traefik --> Proxy{"🔗 proxy network"}
-    
-    Proxy --> Auth["🛡️ Authentik"]
-    Proxy --> Home["📊 Homepage"]
-    Proxy --> Dozzle["📝 Dozzle"]
-    Proxy --> Files["📁 Files"]
-    Proxy --> Plex["▶️ Plex"]
-    Proxy --> Seerr["🎟️ Seerr"]
-    Proxy --> Sonarr["📺 Sonarr"]
-    Proxy --> Radarr["🎬 Radarr"]
-    Proxy --> Prowlarr["🔍 Prowlarr"]
-    Proxy --> SAB["⬇️ SABnzbd"]
-    Proxy --> Immich["🖼️ Immich"]
-    Proxy --> Paste["📋 Privatebin"]
-    Proxy --> Docs["📚 Docs"]
+    Internet["Internet"] --> CF["Cloudflare"]
+    CF --> Tunnel["Cloudflared Tunnel"]
+    Tunnel --> Traefik["Traefik"]
+    Traefik --> Proxy{"proxy network"}
 
-    Media{"🎞️ media-backend"} --> Plex
-    Media --> Sonarr
-    Media --> Radarr
-    Media --> SAB
-    Media --> Tautulli["📈 Tautulli"]
-    
-    Monitor{"🖥️ monitoring-net"} --> Home
-    Monitor --> Dozzle
-    Monitor --> Tautulli
-    
-    Security{"🔐 security-net"} --> Auth
-    Security --> CrowdSec["🚨 CrowdSec"]
-    
-    Utils{"🔧 utils-net"} --> Immich
-    Utils --> Files
-    Utils --> Paste
-    Utils --> Docs
+    Proxy --> Auth["Authentik"]
+    Proxy --> Media["Media services"]
+    Proxy --> Monitor["Monitoring services"]
+    Proxy --> Utils["Utility services"]
 
-    
-    style Internet fill:#e3f2fd
-    style CF fill:#ff9800
-    style Traefik fill:#37b24d
-    style Proxy fill:#1976d2
-    style Media fill:#9c27b0
-    style Monitor fill:#00897b
-    style Security fill:#d32f2f
-    style Utils fill:#5e35b1
+    Tail["Tailscale"] --> Home["Home network"]
 ```
 
------
+## :material-web: Proxy Network
 
-## :material-network-outline: Network Details
+The `proxy` network is an externally managed Docker bridge named `proxy`.
 
-### :material-web: proxy
+Its jobs are simple:
 
-**Public-facing ingress network**
+- allow Traefik to reach routed containers by container name
+- provide shared connectivity where services in separate Compose projects need to communicate
+- avoid publishing unnecessary application ports directly on the host
 
-- **Purpose:** Routes all external web traffic through Traefik
-- **Subnet:** `172.20.0.0/16`
-- **Gateway:** `172.20.0.1`
-- **Exposure:** Public internet via Cloudflare Tunnel
+!!! warning ":material-alert: Do Not Treat proxy as Public Internet"
+    Joining `proxy` does not automatically expose a container. Exposure still depends on Traefik routing, middleware, and Cloudflare configuration. Services should only join networks they actually need.
 
-**Connected Services:**
+## :material-cloud-lock: External Web Access
 
-- Traefik (gateway)
-- Authentik
-- Homepage
-- Dozzle
-- Plex
-- All *arr apps (Sonarr, Radarr, Prowlarr)
-- SABnzbd
-- Seerr
-- Tautulli
-- Filebrowser Quantum
-- Immich
-- Privatebin
-- These Docs
-- Title Card Maker
-- Unmanic
-- Posterizarr
+Public web traffic follows this path:
 
-!!! danger ":material-alert: Security Critical"
-    This is your only network exposed to the internet. Only add services that NEED web access!
+1. A request reaches Cloudflare.
+2. Cloudflare Tunnel carries it to the homelab without requiring inbound port forwarding.
+3. Traefik matches the hostname and routes the request to the target container.
+4. The applicable middleware chain handles authentication, threat protection, headers, rate limiting, or other policy before the request reaches the application.
 
-??? example "Creating the proxy network"
-    `bash docker network create \ --driver bridge \ --subnet 172.20.0.0/16 \ --gateway 172.20.0.1 \ proxy`
+The networking stack currently includes **Cloudflared**, **Traefik**, **Tailscale**, **error pages**, and a **Whoami** test service.
 
------
+## :material-shield-lock: Security Path
 
-### :material-movie: media-backend
+The security stack currently includes **Authentik**, **CrowdSec**, and **Anubis**. These services participate in request protection rather than relying on a separate hard-coded `security-net` topology.
 
-**Internal media stack communication**
+Typical request protection can include:
 
-- **Purpose:** Allows *arr apps to communicate with Plex and each other
-- **Subnet:** `172.21.0.0/16`
-- **Gateway:** `172.21.0.1`
-- **Exposure:** Internal only
+- **CrowdSec** for malicious-client detection and blocking
+- **Anubis** for bot/challenge protection where enabled
+- **Authentik** for SSO on protected applications
+- **Traefik middleware** for redirects, security headers, compression, and rate limiting
 
-**Connected Services:**
+!!! tip ":material-order-bool-ascending-variant: Middleware Order Matters"
+    Keep security middleware ordering intentional. CrowdSec should reject known bad traffic before more expensive authentication or bot-challenge work whenever the route design allows it.
 
-- Plex
-- Sonarr
-- Radarr
-- Prowlarr
-- SABnzbd
-- Tautulli
-- Kometa
-- Title Card Maker
-- ImageMaid
-- Posterizarr
-- Unmanic
+## :material-vpn: Tailscale
 
-**Communication Flows:**
+Tailscale provides a second access path that is separate from the public web path. It is useful for private administration and reaching home-network addresses without publishing those services through Cloudflare.
 
-- Sonarr/Radarr → Prowlarr (indexer queries)
-- Sonarr/Radarr → SABnzbd (download requests)
-- Sonarr/Radarr → Plex (library updates)
-- Tautulli → Plex (statistics gathering)
-- Kometa → Plex (metadata management)
+| Method | Best for |
+| --- | --- |
+| **Cloudflare Tunnel + Traefik** | Selected browser-accessible applications |
+| **Tailscale** | Private administration and home-network access |
 
-!!! info ":material-information: Why Separate?"
-    This network keeps media-related traffic isolated from monitoring and security services.
+## :material-docker: Container-to-Container Routing
 
-??? example "Creating the media-backend network"
-    `bash docker network create \ --driver bridge \ --subnet 172.21.0.0/16 \ --gateway 172.21.0.1 \ media-backend`
+Prefer container names over fixed container IP addresses. Docker DNS keeps names stable even when container addresses change.
 
------
+```text
+sonarr:8989
+radarr:7878
+prowlarr:9696
+sabnzbd:8080
+```
 
-### :material-monitor-dashboard: monitoring-net
+The exact port depends on the application, but the principle is the same: when two containers share the required Docker network, route to the service name rather than pinning an IP.
 
-**Monitoring and dashboard services**
+## :material-plus-circle: Adding a New Routed Service
 
-- **Purpose:** Isolates monitoring tools from production services
-- **Subnet:** `172.22.0.0/16`
-- **Gateway:** `172.22.0.1`
-- **Exposure:** Internal only
+When adding a web application:
 
-**Connected Services:**
+1. Connect it to `proxy` if Traefik must reach it.
+2. Add the required Traefik router/service labels or dynamic configuration.
+3. Apply the appropriate middleware chain.
+4. Keep application ports un-published unless host/LAN access specifically requires them.
+5. Verify the route from both the intended local and remote access paths.
+6. Add the service to the wiki after the deployment is working.
 
-- Homepage
-- Dozzle
-- Tautulli
-- Notifiarr
-
-**Communication Flows:**
-
-- Homepage → All services (status checks via APIs)
-- Dozzle → Docker socket (log streaming)
-- Notifiarr → *arr apps (notifications)
-
-!!! tip ":material-lightbulb: Monitoring Best Practice"
-    Keep monitoring separate so issues in production don’t affect your ability to troubleshoot.
-
-??? example "Creating the monitoring-net network"
-    `bash docker network create \ --driver bridge \ --subnet 172.22.0.0/16 \ --gateway 172.22.0.1 \ monitoring-net`
-
------
-
-### :material-shield-lock: security-net
-
-**Security and authentication services**
-
-- **Purpose:** Isolates security-critical services
-- **Subnet:** `172.23.0.0/16`
-- **Gateway:** `172.23.0.1`
-- **Exposure:** Internal only
-
-**Connected Services:**
-
-- Authentik
-- Authentik PostgreSQL
-- CrowdSec
-- Cloudflare Bouncer
-
-**Communication Flows:**
-
-- Authentik → Authentik DB (user data)
-- CrowdSec → Traefik logs (threat analysis)
-- Cloudflare Bouncer → Cloudflare API (ban sync)
-- All services → Authentik (SSO authentication)
-
-!!! danger ":material-shield-alert: Maximum Security"
-    Never expose this network publicly. Contains master authentication and security systems!
-
-??? example "Creating the security-net network"
-    `bash docker network create \ --driver bridge \ --subnet 172.23.0.0/16 \ --gateway 172.23.0.1 \ security-net`
-
------
-
-### :material-tools: utils-net
-
-**Utility services**
-
-- **Purpose:** Isolates miscellaneous utility services
-- **Subnet:** `172.24.0.0/16`
-- **Gateway:** `172.24.0.1`
-- **Exposure:** Internal only (web access via proxy network)
-
-**Connected Services:**
-
-- Filebrowser Quantum
-- Immich
-- Privatebin
-- These Docs (MkDocs)
-
-!!! info ":material-information: Isolation Benefits"
-    Keeps utility services separate from critical infrastructure.
-
-??? example "Creating the utils-net network"
-    `bash docker network create \ --driver bridge \ --subnet 172.24.0.0/16 \ --gateway 172.24.0.1 \ utils-net`
-
------
-
-## :material-transit-connection-variant: Multi-Network Containers
-
-Some containers connect to multiple networks for different purposes:
-
-### Services on Both proxy + media-backend
-
-- **Plex** - Web access + media stack communication
-- **Sonarr** - Web UI + *arr coordination
-- **Radarr** - Web UI + *arr coordination
-- **Prowlarr** - Web UI + indexer sharing
-- **SABnzbd** - Web UI + download coordination
-- **Tautulli** - Web UI + Plex monitoring
-
-### Services on Both proxy + monitoring-net
-
-- **Homepage** - Web access + service monitoring
-- **Dozzle** - Web access + container monitoring
-- **Tautulli** - Web access + Plex statistics
-
-### Services on Both proxy + security-net
-
-- **Authentik** - Web access + authentication provider
-
-### Services on Both proxy + utils-net
-
-- **Filebrowser Quantum** - Web access + file browsing
-- **Immich** - Web access + photo storage
-- **Privatebin** - Web access + paste storage
-- **These Docs** - Web access + documentation
-
------
-
-## :material-network-strength-4: Network Security Matrix
-
-|Network           |Public Internet |Traefik  |Internal Only|Database Access|
-|------------------|:----------------:|:---------:|:-----------:|:-------------:|
-|**proxy**         |✅ Via Cloudflare|✅ Gateway|❌            |❌              |
-|**media-backend** |❌               |Via proxy|✅            |❌              |
-|**monitoring-net**|❌               |Via proxy|✅            |❌              |
-|**security-net**  |❌               |Via proxy|✅            |✅ (Authentik)  |
-|**utils-net**     |❌               |Via proxy|✅            |❌              |
-
------
-
-## :material-vpn: Host-Level Networking
-
-### Tailscale VPN
-
-**Secure remote access without Docker networking**
-
-- **Type:** Host-level service (not a Docker network)
-- **Purpose:** Secure remote access from anywhere
-- **Authentication:** Tailscale account + MagicDNS
-- **Features:**
-  - Zero-config VPN
-  - Encrypted tunnels
-  - No port forwarding
-  - Works alongside Cloudflare Tunnel
-
-!!! tip ":material-cellphone-link: Access Methods"
-    You have TWO ways to access your homelab remotely:
-
-    1. **Cloudflare Tunnel** - Public web access via HTTPS
-    2. **Tailscale** - Private VPN access to your entire network
-
------
-
-## :material-check-decagram: Network Best Practices
-
-!!! success ":material-lightbulb: Design Principles"
-    - ✅ **Principle of Least Privilege** - Only connect services to networks they need
-    - ✅ **Defense in Depth** - Multiple layers of isolation and security
-    - ✅ **Clear Segmentation** - Separate concerns (media, monitoring, security, etc.)
-    - ✅ **Single Point of Entry** - All public traffic flows through Traefik
-
-!!! warning ":material-alert: Security Rules"
-    - ❌ Never expose databases directly to the internet
-    - ❌ Never attach internal tools to proxy without authentication
-    - ❌ Never skip Traefik for public-facing services
-    - ❌ Never run services as root unless absolutely necessary
-
------
-
-## :material-plus-circle: Adding Services to Networks
-
-When deploying a new service:
-
-!!! tip ":material-clipboard-check: Network Selection Guide"
-    **Ask yourself:**
-
-    1. Does it need web access? → Add to `proxy`
-    2. Is it part of media stack? → Add to `media-backend`  
-    3. Is it monitoring/dashboards? → Add to `monitoring-net`
-    4. Is it security-related? → Add to `security-net`
-    5. Is it a utility? → Add to `utils-net`
-
-    Services can belong to multiple networks!
-
-??? example "Docker Compose Network Configuration"
+??? example "Minimal network declaration"
     ```yaml
-    version: ‘3.8’
-
     services:
-    myservice:
-        image: myimage:latest
-        container_name: myservice
+      myservice:
+        image: example/myservice:1.2.3
         networks:
-        - proxy  # (1)!
-        - media-backend  # (2)!
+          - proxy
 
     networks:
-    proxy:
-        external: true  # (3)!
-    media-backend:
+      proxy:
         external: true
+        name: proxy
     ```
 
-    1. Connects to proxy network for web access via Traefik
-    2. Connects to media-backend for internal media stack communication
-    3. `external: true` means the network already exists (created manually)
+## :material-console: Useful Network Commands
 
------
+```bash
+# List Docker networks
+docker network ls
 
-## :material-information: Network Commands
+# Inspect the shared proxy network
+docker network inspect proxy
 
-??? info "Useful Docker Network Commands"
-    ```bash
-    # List all networks
-    docker network ls
+# Inspect a container's network membership
+docker inspect <container>
 
-    # Inspect a specific network
-    docker network inspect proxy
+# Test name resolution from a container
+docker exec <container> getent hosts <target-container>
+```
 
-    # See which containers are on a network
-    {% raw %}
-    docker network inspect proxy --format '{{range .Containers}}{{.Name}} {{% endraw %}}'
+!!! warning ":material-delete-alert: Be Careful with Pruning"
+    `docker network prune` can remove unused networks. Inspect the environment first rather than using prune as a routine troubleshooting step.
 
-    # Connect a running container to a network
-    docker network connect media-backend mycontainer
+## :material-check-decagram: Networking Principles
 
-    # Disconnect a container from a network
-    docker network disconnect media-backend mycontainer
+- **Least privilege:** connect a service only to networks it needs.
+- **Container-name routing:** avoid fixed Docker IP dependencies.
+- **Single ingress layer:** route selected web traffic through Traefik.
+- **Layered protection:** combine Cloudflare, CrowdSec, Anubis, Authentik, and Traefik middleware as appropriate.
+- **Private administration:** use Tailscale when a service does not need public web exposure.
+- **Compose as truth:** check the current service files before relying on documentation for exact network membership.
 
-    # Remove an unused network
-    docker network rm oldnetwork
-
-    # Prune all unused networks
-    docker network prune
-    ```
-
------
-
-## :material-eye: Monitoring Network Traffic
-
-!!! tip ":material-chart-line: Check Network Usage"
-    Use the Traefik dashboard at <{{ service_url("traefik") }}> to monitor:
-
-    - Active routes
-    - Request rates  
-    - HTTP status codes
-    - Connected services
-
-Your network architecture is secure, segmented, and optimized for a single-server homelab! 🛡️
+Your network documentation describes the architecture, while Compose describes the exact wiring. That separation keeps this page useful even as the homelab evolves.
