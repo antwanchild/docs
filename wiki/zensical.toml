@@ -43,6 +43,9 @@ features = [
   "content.tabs.link",
   "header.autohide",
   "announce.dismiss",
+  "navigation.instant",
+  "navigation.instant.prefetch",
+  "navigation.instant.progress",
   "navigation.tabs",
   "navigation.tabs.sticky",
   "navigation.top",
@@ -121,6 +124,8 @@ custom_checkbox = true
 [project.plugins.search]
 lang = "en"
 separator = "[\\s\\-,:!=\\[\\]()\"/]+|(?!\\b)(?=[A-Z][a-z])|\\.(?!\\d)|&[lg]t;"
+
+[project.plugins.privacy]
 
 [project.plugins.llmstxt]
 full_output = "llms-full.txt"
