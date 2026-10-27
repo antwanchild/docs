@@ -22,8 +22,9 @@ RUN zensical build --strict
 # Stage 2 — Serve with nginx
 FROM nginx:1.31-alpine
 
-# Remove default nginx page
-RUN rm -rf /usr/share/nginx/html/*
+# Pull patched Alpine packages into the runtime image.
+RUN apk upgrade --no-cache && \
+    rm -rf /usr/share/nginx/html/*
 
 # Copy built site from builder
 COPY --from=builder /build/site /usr/share/nginx/html
