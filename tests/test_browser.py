@@ -16,6 +16,12 @@ def visit(page, base, path="/"):
     page.wait_for_function("typeof document$ !== 'undefined'")
 
 
+def wait_for_instant_navigation(page):
+    """Wait for Zensical instant navigation to finish replacing page content."""
+    page.wait_for_load_state("domcontentloaded")
+    expect(page.locator(".md-content")).to_be_visible()
+
+
 @pytest.mark.parametrize("site, query", [("wiki", "Plex"), ("blog", "Lasagna")])
 def test_search_returns_matching_pages(page, site_urls, site, query):
     """Search returns matching pages."""
@@ -26,6 +32,7 @@ def test_search_returns_matching_pages(page, site_urls, site, query):
     expect(result).to_be_visible(timeout=20000)
     result.click()
     expect(page).not_to_have_url(site_urls[site] + "/")
+    wait_for_instant_navigation(page)
     expect(page.locator(".md-content")).to_contain_text(query)
 
 
@@ -51,9 +58,18 @@ def test_mobile_navigation(page, site_urls, site, target):
         page.locator(".md-sidebar--primary label.md-nav__link").filter(
             has_text=re.compile(r"^\s*Resources\s*$"),
         ).click()
-    page.locator(f'.md-sidebar--primary a[href="./{target}/"]').click()
+    link = page.locator(".md-sidebar--primary a[href]").filter(
+        has=page.locator(f':scope[href$="/{target}/"], :scope[href="./{target}/"]'),
+    )
+    # Match by the resolved URL instead of assuming Zensical emits a specific
+    # relative href form. Instant navigation may normalize sidebar links.
+    candidates = page.locator(".md-sidebar--primary a[href]")
+    target_link = candidates.filter(has_text=re.compile(rf"^\s*{target}\s*$", re.I)).first
+    if target_link.count() == 0:
+        target_link = page.locator(f'.md-sidebar--primary a[href$="/{target}/"]').first
+    target_link.click()
     expect(page).to_have_url(re.compile(f"/{target}/$"))
-    expect(page.locator(".md-content")).to_be_visible()
+    wait_for_instant_navigation(page)
 
 
 def test_wiki_service_links_and_external_link_behavior(page, site_urls):
@@ -63,7 +79,7 @@ def test_wiki_service_links_and_external_link_behavior(page, site_urls):
         link = page.locator(f'.md-content a[href="https://{host}.example.test"]').first
         expect(link).to_have_attribute("target", "_blank")
         assert "noopener" in link.get_attribute("rel").split()
-    internal = page.locator('.md-sidebar--primary a[href="../../bookmarks/"]')
+    internal = page.locator('.md-sidebar--primary a[href$="/bookmarks/"]').first
     expect(internal).not_to_have_attribute("target", "_blank")
 
 
