@@ -68,8 +68,8 @@ docker logs --tail 200 <container>
 # Follow logs
 docker logs -f <container>
 
-# Inspect network membership
-docker inspect <container> --format '{{json .NetworkSettings.Networks}}'
+# Inspect the container, including its network membership
+docker inspect <container>
 ```
 
 ## :material-backup-restore: Backup Reminders
