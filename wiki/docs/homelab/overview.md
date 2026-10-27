@@ -4,247 +4,117 @@ search:
 ---
 # :material-home-analytics: Homelab Overview
 
-Single-server self-hosted infrastructure running on Docker with modular stacks for easy management and updates.
+Single-server self-hosted infrastructure running on Ubuntu with Docker Compose and six modular stacks for straightforward management and updates.
 
-**Last Updated:** February 2026
-
------
+!!! info ":material-source-branch: Source of Truth"
+    The live Compose configuration in `ubuntu_Desktop` is the source of truth for deployed services. This page intentionally avoids hard-coded container totals so it does not drift as services are added or removed.
 
 ## :material-shield-check: Core Principles
 
-- :material-view-module: **Modularity**:   One stack per logical group with separate directories and Docker networks
-- :material-lock: **Security**:   Authentik SSO, CrowdSec protection, Cloudflare tunneling, and Tailscale VPN
-- :material-robot: **Automation**:   *arr stack for media acquisition, Kometa/Posterizarr for metadata, ImageMaid for cleanup
-- :material-monitor-eye: **Monitoring**:   Homepage dashboard, Tautulli analytics, Dozzle log viewer, Notifiarr notifications
-- :material-book-open-variant: **Documentation**:   This wiki! Everything documented and version controlled
+- :material-view-module: **Modularity:** One stack per logical group with separate directories and Docker networks
+- :material-lock: **Security:** Authentik SSO, CrowdSec protection, Anubis bot protection, Cloudflare tunneling, and Tailscale VPN
+- :material-robot: **Automation:** *arr services for media acquisition, Kometa and related tools for metadata and artwork, plus automated maintenance utilities
+- :material-monitor-eye: **Monitoring:** Homepage, Beszel, Dockwatch, Dozzle, Tautulli, Tracearr, and Notifiarr
+- :material-book-open-variant: **Documentation:** The wiki and blog are version controlled and built with Zensical
 
-!!! success ":material-check-all: All Systems Operational"
-    The lab is stable, backed up, and running smoothly!
+## :material-server: Platform
 
------
-
-## :material-server: Hardware
-
-|Component  |Specification                     |
-|-----------|----------------------------------|
-|**Server** |[Your server model]               |
-|**CPU**    |[Processor details]               |
-|**RAM**    |[Memory amount]                   |
-|**Storage**|[e.g., 4× HDD in RAID + SSD cache]|
-|**Network**|[Network setup]                   |
-
-**Remote Access:**
-
-- :material-vpn: Tailscale mesh VPN
-- :material-cloud: Cloudflare Tunnel
-
------
+| Component | Current setup |
+| --- | --- |
+| **Operating system** | Ubuntu |
+| **Container runtime** | Docker + Docker Compose |
+| **Reverse proxy** | Traefik |
+| **External access** | Cloudflare Tunnel |
+| **Private remote access** | Tailscale |
+| **Authentication** | Authentik |
+| **Threat protection** | CrowdSec + Anubis |
+| **Documentation** | Zensical wiki + blog |
 
 ## :material-layers: Infrastructure Stacks
 
-### :material-network: Networking Stack
+### :material-network: 1 · Networking
 
-**Purpose:** Ingress routing and secure tunneling
+Ingress, routing, tunneling, and remote access. The current stack includes Traefik, Cloudflared, Tailscale, error pages, and a Whoami test service.
 
-|Service    |Role               |
-|-----------|-------------------|
-|Traefik    |Reverse proxy & SSL|
-|Cloudflared|Cloudflare Tunnel  |
-|Tailscale  |VPN mesh network   |
+### :material-shield-lock: 2 · Security
 
-**Status:** ✅ Active
+Authentication and threat protection. The current stack includes Authentik, CrowdSec, and Anubis.
 
------
+### :material-monitor-dashboard: 3 · Monitoring
 
-### :material-shield-lock: Security Stack
+Dashboards, logs, analytics, update monitoring, and service health. The current stack includes Beszel, Dockwatch, Dozzle, Homepage, Tautulli, and Tracearr.
 
-**Purpose:** Authentication and threat protection
+### :material-download: 4 · Media Download
 
-|Service             |Role                   |
-|--------------------|-----------------------|
-|Authentik           |SSO & identity provider|
-|Authentik PostgreSQL|Authentication database|
-|CrowdSec            |Intrusion prevention   |
-|Cloudflare Bouncer  |Edge-level blocking    |
+Media acquisition and request handling. The current stack includes Notifiarr, Prowlarr, Radarr, SABnzbd, Seerr, Sonarr, and StarrProxy.
 
-**Status:** 🔒 Secure
+### :material-plex: 5 · Media Server
 
------
+Media serving, metadata, artwork, and optimization. The current configuration includes Plex, Kometa/PMM tooling, ImageMaid, MediaInfo, Poster/Title Card tooling, and Unmanic.
 
-### :material-monitor-dashboard: Monitoring Stack
+### :material-tools: 6 · Utilities
 
-**Purpose:** Dashboards, logging, and oversight
+Personal applications and supporting services. The current configuration includes Coordinator, Cutco Vault, Discord Cleanup, File Browser Quantum, Immich, PrivateBin, and the wiki/blog deployment services.
 
-|Service  |Role                |
-|---------|--------------------|
-|Homepage |Unified dashboard   |
-|Dozzle   |Real-time log viewer|
-|Tautulli |Plex analytics      |
-|Notifiarr|Notification hub    |
-
-**Status:** 👁️ Watching
-
------
-
-### :material-download: Media Download Stack
-
-**Purpose:** Automated media acquisition
-
-|Service   |Role              |
-|----------|------------------|
-|Prowlarr  |Indexer manager   |
-|Radarr    |Movie automation  |
-|Sonarr    |TV show automation|
-|SABnzbd   |Usenet downloader |
-|Seerr     |Request interface |
-|Notifiarr |Notifications     |
-|Starrproxy|API proxy         |
-
-**Status:** 📥 Running
-
------
-
-### :material-plex: Media Server Stack
-
-**Purpose:** Media streaming and management
-
-|Service         |Role                |
-|----------------|--------------------|
-|Plex            |Media server        |
-|Kometa          |Metadata manager    |
-|Title Card Maker|Custom episode cards|
-|Unmanic         |Media transcoding   |
-|Posterizarr     |Poster management   |
-|ImageMaid       |Image cleanup       |
-
-**Status:** ▶️ Streaming
-
------
-
-### :material-tools: Utilities Stack
-
-**Purpose:** Miscellaneous tools and services
-
-|Service   |Role              |
-|----------|------------------|
-|Immich    |Photo management  |
-|Privatebin|Encrypted pastebin|
-|These Docs|Documentation wiki|
-
-**Status:** 🔧 Ready
-
------
-
-## :material-chart-box: Stack Summary
-
-|Stack             |Services|Networks             |Public Endpoints              |
-|------------------|--------|---------------------|------------------------------|
-|**networking**    |3       |proxy                |traefik.anthonychild.com      |
-|**security**      |4       |security-net, proxy  |auth.anthonychild.com         |
-|**monitoring**    |4       |monitoring-net, proxy|home, logs, tautulli          |
-|**media-download**|7       |media-backend, proxy |prowlarr, radarr, sonarr, etc.|
-|**media-server**  |6       |media-backend, proxy |plex, titlecards, unmanic     |
-|**utilities**     |3       |utils-net, proxy     |photos, paste, docs           |
-
-**Total Containers:** 28 | **Active Networks:** 5 | **SSL Certificates:** Auto-managed by Traefik
-
------
-
-## :material-file-tree: Directory Structure
+## :material-file-tree: Repository Structure
 
 ```text
-/opt/homelab/
-├── networking/
-│   ├── traefik/
-│   ├── cloudflared/
-│   └── tailscale/
-├── security/
-│   ├── authentik/
-│   └── crowdsec/
-├── monitoring/
-│   ├── homepage/
-│   ├── dozzle/
-│   └── tautulli/
-├── media-download/
-│   ├── prowlarr/
-│   ├── radarr/
-│   ├── sonarr/
-│   └── sabnzbd/
-├── media-server/
-│   ├── plex/
-│   ├── kometa/
-│   └── unmanic/
-└── utilities/
-    ├── immich/
-    ├── privatebin/
-    └── docs/
+ubuntu_Desktop/
+├── 1-networking/
+├── 2-security/
+├── 3-monitoring/
+├── 4-media-download/
+├── 5-media-server/
+└── 6-utilities/
 ```
 
------
+Each stack has a root `docker-compose.yml` and service-specific Compose fragments, making individual services easier to maintain without turning the deployment into one giant Compose file.
 
 ## :material-link-variant: Quick Links
 
 !!! info "Essential Services"
-    - **[Homepage Dashboard]({{ service_url("homepage") }})** - Central hub for all services
-    - **[Traefik Dashboard]({{ service_url("traefik") }})** - Routing and SSL status
+    - **[Homepage Dashboard]({{ service_url("homepage") }})** - Central hub for services
+    - **[Traefik Dashboard]({{ service_url("traefik") }})** - Routing and TLS status
     - **[Plex]({{ service_url("plex") }})** - Media streaming
-    - **[Seerr]({{ service_url("seerr") }})** - Request movies & TV shows
+    - **[Seerr]({{ service_url("seerr") }})** - Media requests
 
 !!! tip "Administration"
-    - **[Authentik]({{ service_url("authentik") }})** - Manage users and SSO
-    - **[Dozzle]({{ service_url("dozzle") }})** - View container logs
-    - **[These Docs]({{ service_url("docs") }})** - You are here!
-
------
+    - **[Authentik]({{ service_url("authentik") }})** - Identity and SSO
+    - **[Dozzle]({{ service_url("dozzle") }})** - Container logs
+    - **[These Docs]({{ service_url("docs") }})** - Wiki
 
 ## :material-file-document-multiple: Documentation
 
-|Page                                                  |Description                            |
-|------------------------------------------------------|---------------------------------------|
-|**[Services](services.md)**                           |Complete inventory of all 28 containers|
-|**[Networking](networking.md)**                       |Network architecture and topology      |
-|**[Stacks](stacks.md)**                               |Docker compose stack details           |
-|**[Quick Commands](../reference/quick-commands.md)**  |Useful commands reference              |
-|**[Troubleshooting](../reference/troubleshooting.md)**|Common issues and fixes                |
-
------
+| Page | Description |
+| --- | --- |
+| **[Services](services.md)** | Service inventory and purpose |
+| **[Networking](networking.md)** | Network architecture and topology |
+| **[Stacks](stacks.md)** | Docker Compose stack details |
+| **[Quick Commands](../reference/quick-commands.md)** | Useful commands reference |
+| **[Troubleshooting](../reference/troubleshooting.md)** | Common issues and fixes |
 
 ## :material-lightbulb-on: Design Decisions
 
 ??? question "Why Docker Compose instead of Kubernetes?"
-    **Simplicity for single-server setups.** Docker Compose provides all the orchestration needed without the complexity of K8s. Perfect for homelab scale.
+    Docker Compose provides the orchestration this single-server homelab needs without adding Kubernetes complexity.
 
-??? question "Why separate networks for each stack?"
-    **Security through isolation.** Keeps services segmented - media apps can’t directly access security services, monitoring is separate from production, etc.
+??? question "Why separate stacks instead of one giant Compose file?"
+    Separate stacks keep related services together and make updates, restarts, and troubleshooting more targeted.
 
-??? question "Why Authentik over other SSO solutions?"
-    **Feature-rich and self-hosted.** Supports LDAP, OAuth2, SAML, has great UI, and integrates well with all services.
-
-??? question "Why Cloudflare Tunnel + Tailscale?"
-    **Defense in depth.** Cloudflare Tunnel for public web access with DDoS protection, Tailscale for secure admin access without exposing anything.
-
------
+??? question "Why use both Cloudflare Tunnel and Tailscale?"
+    They solve different access problems: Cloudflare Tunnel handles selected web services, while Tailscale provides private administrative access to the home network.
 
 ## :material-trending-up: Future Plans
 
-See the **[Wishlist](../planning/wishlist.md)** for:
-
-- Planned upgrades
-- New services to try
-- Infrastructure improvements
-- Automation enhancements
-
------
+See the **[Wishlist](../planning/wishlist.md)** for planned upgrades, services to evaluate, infrastructure improvements, and automation ideas.
 
 ## :material-help-circle: Getting Help
 
 !!! tip "Troubleshooting Resources"
-    1. Check **[Dozzle logs]({{ service_url("dozzle") }})** for container errors
-    2. Review **[Troubleshooting guide](../reference/troubleshooting.md)**
-    3. Search this documentation (Press ++f++)
-    4. Check service-specific docs in [Services](services.md)
-
------
+    1. Check **[Dozzle]({{ service_url("dozzle") }})** for container errors.
+    2. Review the **[Troubleshooting guide](../reference/troubleshooting.md)**.
+    3. Search this documentation.
+    4. Check service-specific information in **[Services](services.md)**.
 
 <div class="center" markdown>
 
