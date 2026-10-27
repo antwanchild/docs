@@ -1,78 +1,73 @@
 ---
-title: Pozole – Momma Lola’s recipe
-prep_time: 
-cook_time:
-servings:       #how many people it feeds
-yield:          #how much or how many items it makes
+title: Pozole - Momma Lola's Recipe
+prep_time:
+cook_time: 2-2.5 hours
+servings:
+yield:
 difficulty: Medium
 contributor: Gonzo Carillo
-date: 
-    created: 2026-01-12
-authors: 
-    - antwanchild
-description: Pozole – Momma Lola’s recipe
+date:
+  created: 2026-01-12
+authors:
+  - antwanchild
+description: Momma Lola's pork pozole with hominy, dried chiles, and all the classic toppings.
 tags:
-    - mexican
-    - soup
-    - CBCMA
-
+  - mexican
+  - soup
+  - CBCMA
 categories:
-    - recipe
+  - recipe
 ---
-# Pozole – Momma Lola’s recipe.
+
+# Pozole - Momma Lola's Recipe
+
+A rich pork and hominy pozole built around a homemade chile sauce and plenty of toppings.
 
 <!-- more -->
+
 {{ recipe_header() }}
 
-## Ingredients You’ll Need
+## Ingredients
 
-| For the soup base                                   | For the chile (sauce)                       |
-|-----------------------------------------------------|---------------------------------------------|
-| 2 lbs pork shoulder (or a mix of shoulder and ribs) | 4 dried guajillo chiles, stemmed and seeded |
-| 1 onion, halved                                     | 2 dried ancho chiles                        |
-| 5 garlic cloves                                     | 3 garlic cloves                             |
-| 2 bay leaves                                        | 1 tsp cumin                                 |
-| Salt and pepper to taste                            | 1/4 tsp ground clove (optional)             |
-| 8 cups chicken broth                                | 1 cup water (for blending)                  |
+### Soup base
 
-### Other essentials:
+- 2 lbs pork shoulder, or a mix of shoulder and ribs
+- 1 onion, halved
+- 5 garlic cloves
+- 2 bay leaves
+- Salt and pepper, to taste
+- 8 cups chicken broth
+- 2 (25 oz) cans hominy, rinsed and drained
 
-- 2 (25 oz) cans of hominy, rinsed and drained
-- Toppings (Suggested):
-  - shredded cabbage
-  - radish slices
-  - lime wedges
-  - dried oregano
-  - chopped onion
-  - tostadas
+### Chile sauce
 
-## Step-by-Step Instructions
+- 4 dried guajillo chiles, stemmed and seeded
+- 2 dried ancho chiles
+- 3 garlic cloves
+- 1 tsp cumin
+- 1/4 tsp ground clove (optional)
+- 1 cup water, for blending
 
-- Cook the Pork
-  - In a large pot, brown the pork.
-  - Once brown, add onion, garlic, salt and pepper.
-  - Add stock to cover. Add bay leaves and bring it to a boil.
-  - Then lower the heat and simmer for about 1.5 to 2 hours until the meat is tender.
-- Make the Chile Sauce
-  - While the pork simmers, toast (or boil) the dried chiles in a hot skillet for a few seconds on each side until fragrant (not burnt).
-  - Then soak them in hot water for 15–20 minutes to soften. Blend the chiles with garlic, cumin, clove, and water until smooth.
-  - Strain the sauce through a fine sieve for a velvety texture (optional).
-- Combine and Simmer
-  - Drain the hominy and it to the pot along with chile (sauce). For a thicker broth blend a cup
-of the hominy with the chile (sauce) and add to pot.
-  - Simmer everything together for another 30-45 minutes until the hominy is soft.
-  - Taste and adjust seasoning as needed.
+### Toppings
 
-???+ tip "^^Don’t Skip the Toppings!!^^"
-    What makes pozole extra special? The toppings/garnishes!
-    Pozole is traditionally served con todo (with everything). Here are classic add-ons to keep on hand:
+- Shredded cabbage
+- Radish slices
+- Lime wedges
+- Dried oregano
+- Chopped onion
+- Tostadas or tortilla chips
 
-    * Thinly sliced radishes for crunch
-    * Finely shredded cabbage for freshness
-    * A dash of dried oregano
-    * A squeeze of lime
-    * Chopped onions for bite
-    * Tostadas or tortilla chips on the side
-    * ==**Hot sauce, ketchup is absolutely not acceptable**==.
-    
-    Let guests build their own bowl.
+## Instructions
+
+1. **Cook the pork.** In a large pot, brown the pork. Add the onion, garlic, salt, and pepper. Add enough chicken broth to cover, then add the bay leaves. Bring to a boil, lower the heat, and simmer for 1.5-2 hours, until the meat is tender.
+2. **Make the chile sauce.** While the pork simmers, lightly toast the dried chiles in a hot skillet for a few seconds on each side until fragrant, taking care not to burn them. Soak them in hot water for 15-20 minutes to soften.
+3. Blend the softened chiles with the garlic, cumin, clove, and 1 cup water until smooth. For an extra-smooth sauce, strain it through a fine sieve.
+4. **Combine and simmer.** Add the drained hominy and chile sauce to the pot. For a thicker broth, blend about 1 cup of the hominy with some of the chile sauce before adding it to the pot.
+5. Simmer everything together for another 30-45 minutes, until the hominy is tender. Taste and adjust the seasoning as needed.
+
+!!! tip "Don't Skip the Toppings!"
+    Pozole is traditionally served *con todo*, with everything. Set out radishes, shredded cabbage, oregano, lime, chopped onion, and tostadas so everyone can build their own bowl.
+
+    **Hot sauce is welcome. Ketchup is absolutely not acceptable.**
+
+**Enjoy!**
