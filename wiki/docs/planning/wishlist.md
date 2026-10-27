@@ -1,172 +1,73 @@
 # :material-calendar-star: Planning & Wishlist
 
-**Future ideas and upgrades** - what’s coming next?
+Future ideas and upgrades for the homelab. This page is intentionally a planning board, not a statement of what is currently deployed.
 
-!!! info ":material-information: Status Key"
-    - ✅ Completed
-    - 🔄 In Progress
-    - 📅 Planned
-    - 💭 Dream/Maybe Someday
+!!! info ":material-source-branch: Current State"
+    For deployed services, use the [Homelab Overview](../homelab/overview.md) and current `ubuntu_Desktop` Compose configuration as the source of truth.
 
------
-
-## :material-clock-fast: Short-Term Goals (Next 3 Months)
+## :material-clock-fast: Near-Term Ideas
 
 ### Infrastructure
 
-- [ ] Add Codex or Claude extension to VSCode
-- [ ] Add meTube for one-off downloads, playlists, and converting to MP3 🔄
-- [ ] Add draw.io - creating flowcharts, org charts and floorplans 🔄
-- [ ] Add external monitoring with Uptime Kuma 📅
-- [ ] Implement automated offsite backups ☁️
-- [ ] Set up regular ImageMaid scheduled runs 📅
+- [ ] Strengthen automated offsite backups
+- [ ] Add automated backup-restore testing
+- [ ] Expand external uptime monitoring
+- [ ] Continue improving container health checks and alerting
+- [ ] Create a safer staging path for infrastructure changes
 
-### Features
+### Dashboard & Automation
 
-- [ ] Custom Homepage widgets (weather, server stats) 🔄
-- [ ] Enhanced notification system
-- [ ] Automated backup testing
-- [ ] Container health monitoring
+- [ ] Continue developing custom Homepage widgets
+- [ ] Improve notification signal-to-noise
+- [ ] Expand useful automation around routine maintenance
+- [ ] Improve monitoring coverage where it provides actionable information
 
------
+## :material-calendar: Services to Evaluate
 
-## :material-calendar: Medium-Term Upgrades (3-12 Months)
+These are candidates, not commitments:
 
-### New Services
+- [ ] **Vaultwarden** - password management
+- [ ] **Paperless-ngx** - document management
+- [ ] **Mealie** - recipe management
+- [ ] **Actual Budget** - personal finance
+- [ ] **Audiobookshelf** - audiobook hosting
+- [ ] **Stirling-PDF** - PDF utilities
+- [ ] **Home Assistant** - home automation
+- [ ] **Frigate** - local NVR and camera analysis
 
-- [ ] **Vaultwarden** - Self-hosted password manager 🔐
-- [ ] **Nextcloud** - File sync and collaboration 📂
-- [ ] **Frigate** - Local NVR with AI detection 🕵️
-- [ ] **Uptime Kuma** - Uptime monitoring ⏱️
-- [ ] **Grafana + Prometheus** - Advanced metrics 📊
+## :material-flask: Technical Experiments
 
-### Infrastructure Improvements
-
-- [ ] Upgrade to Proxmox cluster with failover 🖥️
-- [ ] Implement proper staging environment
-- [ ] Set up CI/CD for updates
-- [ ] Enhanced backup strategy with versioning
-- [ ] Network storage expansion (NAS upgrade)
-
-### Automation
-
-- [ ] Automated backup verification with reports
-- [ ] Self-healing containers (auto-restart on failure)
-- [ ] Automated security updates
-- [ ] Smart alerting (reduce noise, increase signal)
-
------
-
-## :material-star-shooting: Long-Term Dreams
-
-### Advanced Features
-
-- [ ] **Local AI integration** 🧠
-  - AI-powered media tagging
-  - Smart assistant for homelab
-  - Automated troubleshooting suggestions
-- [ ] **Voice Control** 🎤
-  - "Hey Lab, restart Plex"
-  - "What’s the status of my services?"
-  - Voice-activated maintenance tasks
-- [ ] **Home Automation** 🏠
-  - Full Home Assistant integration
-  - Smart home device management
-  - Automation based on presence/time
-- [ ] **Energy Management** ⚡☀️
-  - Solar power integration
-  - Battery monitoring
-  - Power usage optimization
-  - Off-grid capability
-
-### Infrastructure Dreams
-
-- [ ] **Multi-site setup**
-  - Primary site + remote backup site
-  - WAN failover
-  - Geographic redundancy
-- [ ] **Zero-trust everything**
-  - WireGuard mesh
-  - Service mesh architecture
-  - Mutual TLS everywhere
-- [ ] **Advanced monitoring**
-  - Predictive failure detection
-  - ML-based anomaly detection
-  - Performance optimization suggestions
-
------
-
-## :material-thought-bubble: Ideas to Explore
-
-**Potential Services:**
-
-- Paperless-ngx (document management)
-- Mealie (recipe manager)
-- Vikunja (task management)
-- Linkwarden (bookmark manager)
-- Actual Budget (finance tracking)
-- Audiobookshelf (audiobook server)
-- Kavita (ebook/manga server)
-- Stirling-PDF (PDF tools)
-
-**Technical Experiments:**
-
-- Kubernetes homelab
-- Service mesh (Istio/Linkerd)
 - GitOps workflows
-- Infrastructure as Code (Terraform)
+- Infrastructure as Code
 - Container security scanning
-- Automated penetration testing
+- Better automated deployment validation
+- Local AI integrations where they solve a real problem
+- Multi-node orchestration if the homelab eventually outgrows a single-server design
 
------
+## :material-star-shooting: Long-Term Ideas
 
-## :material-trophy: Recently Completed
+- More resilient backups with an off-site recovery path
+- Better energy and power monitoring
+- Home automation integration
+- A secondary host or failover strategy if the additional complexity becomes worthwhile
+- More proactive monitoring and anomaly detection
 
-### Q1 2026
+## :material-trophy: Milestones
 
-- [x] Migrate to fully modular Docker stacks
-- [x] Enable Authentik SSO across all services
-- [x] Add remote file browser with File Browser Quantum
+### 2026
 
-### Q4 2025
+- [x] Organize the Ubuntu homelab into six modular Docker Compose stacks
+- [x] Migrate the wiki and blog to Zensical
+- [x] Refresh homelab documentation against the current Compose configuration
+- [x] Improve documentation CI/CD validation and build traceability
+- [x] Add newer monitoring and security tooling to the documented architecture
 
-- [x] Full documentation site (MkDocs Material)
-- [x] Specialized page organization
-- [x] Enhanced troubleshooting guides
-- [x] Comprehensive quick commands
+### 2025
 
-### Q3 2025
+- [x] Build out the original documentation site
+- [x] Expand Authentik SSO and CrowdSec protection
+- [x] Establish Cloudflare Tunnel and Tailscale remote-access patterns
+- [x] Expand media automation and metadata tooling
 
-- [x] CrowdSec IPS implementation
-- [x] Cloudflare Bouncer integration
-- [x] Network segmentation
-- [x] Media stack optimization
-
-### Q2 2025
-
-- [x] Authentik SSO rollout
-- [x] Tailscale VPN setup
-- [x] Modular stack migration
-- [x] Backup automation
-
------
-
-!!! quote ":material-format-quote-close: Homelab Philosophy"
-    "The best homelab is the one that grows with you — never stop tinkering!"  
-    — Anthony Child
-
-!!! success ":material-progress-check: Progress Report"
-    Core infrastructure: 95% complete  
-    Automation: 85% complete  
-    Documentation: 90% complete  
-    Always improving! 🌟
-
------
-
-<div class="center" markdown>
-
-**What should I tackle next?** :material-head-question:
-
-*Suggestions always welcome!*
-
-</div>
+!!! tip ":material-lightbulb-on: Planning Rule"
+    Keep experiments here until they are actually deployed. Once something becomes part of the homelab, document it in the appropriate Homelab page and let Compose describe the exact implementation.
