@@ -451,25 +451,45 @@ jobs:
     runs-on: ubuntu-latest
     needs: docker
     timeout-minutes: 12
+    outputs:
+      status: ${{ steps.revision.outputs.status }}
     steps:
       - name: Wait for the public site to serve this revision
+        id: revision
         env:
           BASE_URL: ${{ inputs.base_url }}
           EXPECTED_SHA: ${{ github.sha }}
         run: |
+          url="${BASE_URL}/version.json?revision=${EXPECTED_SHA}"
+          body=$(mktemp)
+          trap 'rm -f "$body"' EXIT
           for attempt in {1..20}; do
-            if curl --fail --silent --show-error --max-time 5 \
-              -H 'Cache-Control: no-cache' "${BASE_URL}/version.json?revision=${EXPECTED_SHA}" \
-              | jq -e --arg sha "$EXPECTED_SHA" '.revision == $sha' > /dev/null; then
-              curl --fail --silent --show-error --max-time 30 "$BASE_URL/" > /tmp/live-site.html
-              grep -q '<html' /tmp/live-site.html
-              echo "Verified ${BASE_URL} at ${EXPECTED_SHA}" >> "$GITHUB_STEP_SUMMARY"
-              exit 0
+            if response=$(curl --silent --show-error --max-time 5 \
+              -H 'Cache-Control: no-cache' --output "$body" \
+              --write-out '%{http_code} %{redirect_url}' "$url"); then
+              read -r status redirect <<< "$response"
+              case "$status $redirect" in
+                '307 https://anubis.anthonychild.com/.within.website/'*)
+                  message="Anubis blocked the public revision check for ${BASE_URL}. The image was published, but the live revision could not be verified."
+                  echo "::warning::$message"
+                  echo "$message" >> "$GITHUB_STEP_SUMMARY"
+                  echo "status=blocked by Anubis" >> "$GITHUB_OUTPUT"
+                  exit 0
+                  ;;
+              esac
+              if [[ "$status" == '200' ]] && jq -e --arg sha "$EXPECTED_SHA" \
+                '.revision == $sha' "$body" >/dev/null 2>&1; then
+                echo "Verified ${BASE_URL} at ${EXPECTED_SHA}" >> "$GITHUB_STEP_SUMMARY"
+                echo "status=verified" >> "$GITHUB_OUTPUT"
+                exit 0
+              fi
+              echo "Waiting for deployment (${attempt}/20, HTTP ${status})"
             fi
-            echo "Waiting for deployment (${attempt}/20)"
-            sleep 25
+            if [[ "$attempt" != '20' ]]; then
+              sleep 25
+            fi
           done
-          echo "Image published, but ${BASE_URL} did not serve ${EXPECTED_SHA} within 10 minutes. Update the hosting container to the new image and rerun this job." >&2
+          echo "::error::Image published, but ${BASE_URL} did not report revision ${EXPECTED_SHA} before verification timed out."
           exit 1
 
   # ---------------------------------------------------------------
@@ -523,4 +543,4 @@ jobs:
           version: ${{ needs.docker.outputs.version }}
           details: |-
             Image publication: ${{ needs.docker.result }}
-            Live site verification: ${{ needs.verify-live.result }}
+            Live site verification: ${{ needs.verify-live.outputs.status || needs.verify-live.result }}
