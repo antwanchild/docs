@@ -7,10 +7,6 @@ on:
         description: 'Human-readable site name (Wiki or Blog)'
         type: string
         required: true
-      site_emoji:
-        description: 'Emoji used in Discord release notifications'
-        type: string
-        required: true
       content_dir:
         description: 'Path checked for new .md files to trigger a release'
         type: string
@@ -484,112 +480,47 @@ jobs:
     runs-on: ubuntu-latest
     needs: [version]
     if: needs.version.outputs.should_release == 'true'
+    permissions:
+      contents: read
     steps:
-      - name: Send release notification to Discord
-        env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          RELEASE_TAG: ${{ needs.version.outputs.tag }}
-          RELEASE_NOTES: ${{ needs.version.outputs.release_notes }}
-          RELEASE_URL: ${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ needs.version.outputs.tag }}
-          REPOSITORY: ${{ github.repository }}
-          SITE_NAME: ${{ inputs.site_name }}
-          SITE_EMOJI: ${{ inputs.site_emoji }}
-        run: |
-          FORMATTED_DATE="$(date +'%B %-d, %Y at %-I:%M %p %Z')"
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Send Discord result
+        uses: ./.github/actions/discord-result
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          project: ${{ inputs.site_name }}
+          event: Release
+          result: success
+          sha: ${{ github.sha }}
+          version: ${{ needs.version.outputs.tag }}
+          details: ${{ needs.version.outputs.release_notes }}
+          release-url: ${{ format('{0}/{1}/releases/tag/{2}', github.server_url, github.repository, needs.version.outputs.tag) }}
 
-          jq -n \
-            --arg title "${SITE_EMOJI} ${SITE_NAME} — Release Published" \
-            --arg url "$RELEASE_URL" \
-            --arg tag "$RELEASE_TAG" \
-            --arg notes "${RELEASE_NOTES:-No release notes provided.}" \
-            --arg footer "${SITE_NAME} ${RELEASE_TAG} • github.com/${REPOSITORY} • ${FORMATTED_DATE}" \
-            '{embeds: [{title: $title, url: $url, color: 3066993,
-              fields: [
-                {name: "🏷️ Release", value: $tag, inline: true},
-                {name: "📝 Changes", value: $notes[0:1024], inline: false},
-                {name: "🔗 Link", value: ("[View on GitHub](" + $url + ")"), inline: true}
-              ], footer: {text: $footer}}]}' \
-            | curl --fail-with-body -sS -H 'Content-Type: application/json' --data-binary @- "$DISCORD_WEBHOOK_URL"
-
-  # ---------------------------------------------------------------
-  # Send a Discord embed notification with the overall build result
-  # and individual job statuses for each stage of the pipeline.
-  # Always runs regardless of upstream job results.
-  # ---------------------------------------------------------------
   notify:
     name: Discord Notification
     runs-on: ubuntu-latest
     needs: [markdownlint, spellcheck, docker, version, link-check, verify-live]
     if: always()
+    permissions:
+      contents: read
+      actions: read
     steps:
-      - name: Send build result to Discord
-        env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
-          REPOSITORY: ${{ github.repository }}
-          SITE_NAME: ${{ inputs.site_name }}
-          GITHUB_ACTOR_NAME: ${{ github.actor }}
-          GITHUB_REF_NAME: ${{ github.ref_name }}
-          DOCKER_VERSION: ${{ needs.docker.outputs.version }}
-          GITHUB_COMMIT_URL: ${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}
-          GITHUB_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          MARKDOWNLINT_RESULT: ${{ needs.markdownlint.result }}
-          SPELLCHECK_RESULT: ${{ needs.spellcheck.result }}
-          DOCKER_RESULT: ${{ needs.docker.result }}
-          LINKCHECK_RESULT: ${{ needs.link-check.result }}
-          VERSION_RESULT: ${{ needs.version.result }}
-          LIVE_RESULT: ${{ needs.verify-live.result }}
-          HAS_FAILURES: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
-        run: |
-          FORMATTED_DATE="$(date +'%B %-d, %Y at %-I:%M %p %Z')"
-
-          if [[ "${HAS_FAILURES}" == "true" ]]; then
-            EMBED_TITLE="❌ ${SITE_NAME} — Build Failed"
-            EMBED_COLOR=15158332
-          else
-            EMBED_TITLE="✅ ${SITE_NAME} — Build Succeeded"
-            EMBED_COLOR=3066993
-          fi
-
-          job_status_label() {
-            case "$1" in
-              success) echo "✅ Passed" ;;
-              failure) echo "❌ Failed" ;;
-              skipped) echo "⚠️ Skipped" ;;
-              cancelled) echo "⚠️ Cancelled" ;;
-              *)       echo "❓ Unknown" ;;
-            esac
-          }
-
-          LINT_STATUS=$(job_status_label "${MARKDOWNLINT_RESULT}")
-          SPELL_STATUS=$(job_status_label "${SPELLCHECK_RESULT}")
-          DOCKER_STATUS=$(job_status_label "${DOCKER_RESULT}")
-          LINK_STATUS=$(job_status_label "${LINKCHECK_RESULT}")
-
-          jq -n \
-            --arg title "$EMBED_TITLE" \
-            --argjson color "$EMBED_COLOR" \
-            --arg actor "$GITHUB_ACTOR_NAME" \
-            --arg branch "$GITHUB_REF_NAME" \
-            --arg version "${DOCKER_VERSION:-unpublished}" \
-            --arg lint "$LINT_STATUS" --arg spell "$SPELL_STATUS" \
-            --arg docker "$DOCKER_STATUS" --arg links "$LINK_STATUS" \
-            --arg live "$(job_status_label "$LIVE_RESULT")" \
-            --arg release "$(job_status_label "$VERSION_RESULT")" \
-            --arg commit "[${GITHUB_SHA::7}](${GITHUB_COMMIT_URL}) — ${COMMIT_MESSAGE:-Manual or recovered build}" \
-            --arg run "[View Run](${GITHUB_RUN_URL})" \
-            --arg footer "${SITE_NAME} • github.com/${REPOSITORY} • ${FORMATTED_DATE}" \
-            '{embeds: [{title: $title, color: $color, fields: [
-              {name: "👤 Triggered by", value: $actor, inline: true},
-              {name: "🌿 Branch", value: $branch, inline: true},
-              {name: "🏷️ Version", value: $version, inline: true},
-              {name: "📝 Markdown Lint", value: $lint, inline: true},
-              {name: "🔤 Spellcheck", value: $spell, inline: true},
-              {name: "🐳 Docker Build", value: $docker, inline: true},
-              {name: "🔗 Link Checker", value: $links, inline: true},
-              {name: "🌐 Published Site", value: $live, inline: true},
-              {name: "📦 Release", value: $release, inline: true},
-              {name: "💬 Commit", value: $commit[0:1024], inline: false},
-              {name: "🔗 Actions", value: $run, inline: false}
-            ], footer: {text: $footer}}]}' \
-            | curl --fail-with-body -sS -H 'Content-Type: application/json' --data-binary @- "$DISCORD_WEBHOOK_URL"
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Send Discord result
+        uses: ./.github/actions/discord-result
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          project: ${{ inputs.site_name }}
+          event: Build
+          result: ${{ contains(needs.*.result, 'failure') && 'failure' || contains(needs.*.result, 'cancelled') && 'cancelled' || 'success' }}
+          sha: ${{ github.sha }}
+          version: ${{ needs.docker.outputs.version }}
+          details: |-
+            Image publication: ${{ needs.docker.result }}
+            Live site verification: ${{ needs.verify-live.result }}
