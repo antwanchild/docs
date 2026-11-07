@@ -138,13 +138,12 @@ jobs:
   # Build and push the Docker image to GHCR.
   # Determines the version tag based on whether new pages were added.
   # Scans the built image for known CVEs using Trivy.
-  # Always runs even if lint or spellcheck fail.
+  # Publish only after the strict build, link check and image scan pass.
   # ---------------------------------------------------------------
   docker:
     name: Docker Build and Push
     runs-on: ubuntu-latest
-    needs: [markdownlint, spellcheck]
-    if: ${{ always() && !cancelled() }}
+    needs: [markdownlint, spellcheck, link-check]
     permissions:
       contents: read
       packages: write
@@ -214,27 +213,60 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
 
-      - name: Build and push image
+      - name: Build image for scanning
         uses: docker/build-push-action@v7
         with:
           context: .
           file: ${{ inputs.dockerfile }}
-          push: true
+          push: false
+          load: true
+          provenance: false
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           secrets: |
             env_file=${{ secrets.ENV_FILE }}
+          build-args: |
+            SOURCE_REVISION=${{ github.sha }}
 
       - name: Scan image for CVEs with Trivy
         uses: aquasecurity/trivy-action@v0.36.0
+        env:
+          TRIVY_IMAGE_SRC: docker
         with:
-          image-ref: ghcr.io/${{ github.repository_owner }}/${{ inputs.image_name }}:latest
+          image-ref: ghcr.io/${{ github.repository_owner }}/${{ inputs.image_name }}:${{ steps.version.outputs.version }}
           format: table
           exit-code: 1
           severity: CRITICAL,HIGH
           ignore-unfixed: true
+
+      - name: Verify the built image revision and HTTP endpoints
+        env:
+          IMAGE: ghcr.io/${{ github.repository_owner }}/${{ inputs.image_name }}:${{ steps.version.outputs.version }}
+          EXPECTED_SHA: ${{ github.sha }}
+        run: |
+          docker run -d --name site-validation -p 8080:80 "$IMAGE"
+          trap 'docker logs site-validation; docker rm -f site-validation' EXIT
+          for attempt in {1..30}; do
+            echo "Waiting for local site (${attempt}/30)"
+            if curl -fsS http://localhost:8080/ > /tmp/site-home.html; then
+              break
+            fi
+            sleep 1
+          done
+          grep -q '<html' /tmp/site-home.html
+          curl -fsS http://localhost:8080/search.json > /dev/null
+          curl -fsS http://localhost:8080/version.json | jq -e --arg sha "$EXPECTED_SHA" '.revision == $sha'
+
+      - name: Publish the scanned image
+        env:
+          IMAGE_TAGS: ${{ steps.meta.outputs.tags }}
+        run: |
+          while IFS= read -r tag; do
+            [ -z "$tag" ] && continue
+            docker push "$tag"
+          done <<< "$IMAGE_TAGS"
 
   # ---------------------------------------------------------------
   # Create a GitHub release when new pages are added.
@@ -363,7 +395,7 @@ jobs:
   # ---------------------------------------------------------------
   # Build the Zensical site locally and check all links for broken URLs.
   # Common excludes live in lychee.toml; site-specific base URL is an input.
-  # Runs in parallel with docker/version — does not depend on them.
+  # Gates image publication so failed builds or links cannot update latest.
   # ---------------------------------------------------------------
   link-check:
     name: Link Checker
@@ -418,6 +450,32 @@ jobs:
         if: always()
         run: rm -f ${{ inputs.env_file_path }}
 
+  verify-live:
+    name: Verify Published Site
+    runs-on: ubuntu-latest
+    needs: docker
+    timeout-minutes: 12
+    steps:
+      - name: Wait for the public site to serve this revision
+        env:
+          BASE_URL: ${{ inputs.base_url }}
+          EXPECTED_SHA: ${{ github.sha }}
+        run: |
+          for attempt in {1..20}; do
+            if curl --fail --silent --show-error --max-time 5 \
+              -H 'Cache-Control: no-cache' "${BASE_URL}/version.json?revision=${EXPECTED_SHA}" \
+              | jq -e --arg sha "$EXPECTED_SHA" '.revision == $sha' > /dev/null; then
+              curl --fail --silent --show-error --max-time 30 "$BASE_URL/" > /tmp/live-site.html
+              grep -q '<html' /tmp/live-site.html
+              echo "Verified ${BASE_URL} at ${EXPECTED_SHA}" >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            echo "Waiting for deployment (${attempt}/20)"
+            sleep 25
+          done
+          echo "Image published, but ${BASE_URL} did not serve ${EXPECTED_SHA} within 10 minutes. Update the hosting container to the new image and rerun this job." >&2
+          exit 1
+
   # ---------------------------------------------------------------
   # Send a Discord embed when a release is created.
   # ---------------------------------------------------------------
@@ -439,35 +497,19 @@ jobs:
         run: |
           FORMATTED_DATE="$(date +'%B %-d, %Y at %-I:%M %p %Z')"
 
-          curl -H "Content-Type: application/json" \
-            -d '{
-              "embeds": [{
-                "title": "'"${SITE_EMOJI} ${SITE_NAME}"' — Release Published",
-                "url": "'"${RELEASE_URL}"'",
-                "color": 3066993,
-                "fields": [
-                  {
-                    "name": "🏷️ Release",
-                    "value": "'"${RELEASE_TAG}"'",
-                    "inline": true
-                  },
-                  {
-                    "name": "📝 Changes",
-                    "value": "'"${RELEASE_NOTES:-No release notes provided.}"'",
-                    "inline": false
-                  },
-                  {
-                    "name": "🔗 Link",
-                    "value": "[View on GitHub]('"${RELEASE_URL}"')",
-                    "inline": true
-                  }
-                ],
-                "footer": {
-                  "text": "'"${SITE_NAME}"' '"${RELEASE_TAG}"' • github.com/'"${REPOSITORY}"' • '"${FORMATTED_DATE}"'"
-                }
-              }]
-            }' \
-            "$DISCORD_WEBHOOK_URL"
+          jq -n \
+            --arg title "${SITE_EMOJI} ${SITE_NAME} — Release Published" \
+            --arg url "$RELEASE_URL" \
+            --arg tag "$RELEASE_TAG" \
+            --arg notes "${RELEASE_NOTES:-No release notes provided.}" \
+            --arg footer "${SITE_NAME} ${RELEASE_TAG} • github.com/${REPOSITORY} • ${FORMATTED_DATE}" \
+            '{embeds: [{title: $title, url: $url, color: 3066993,
+              fields: [
+                {name: "🏷️ Release", value: $tag, inline: true},
+                {name: "📝 Changes", value: $notes[0:1024], inline: false},
+                {name: "🔗 Link", value: ("[View on GitHub](" + $url + ")"), inline: true}
+              ], footer: {text: $footer}}]}' \
+            | curl --fail-with-body -sS -H 'Content-Type: application/json' --data-binary @- "$DISCORD_WEBHOOK_URL"
 
   # ---------------------------------------------------------------
   # Send a Discord embed notification with the overall build result
@@ -477,7 +519,7 @@ jobs:
   notify:
     name: Discord Notification
     runs-on: ubuntu-latest
-    needs: [markdownlint, spellcheck, docker, version, link-check]
+    needs: [markdownlint, spellcheck, docker, version, link-check, verify-live]
     if: always()
     steps:
       - name: Send build result to Discord
@@ -495,7 +537,9 @@ jobs:
           SPELLCHECK_RESULT: ${{ needs.spellcheck.result }}
           DOCKER_RESULT: ${{ needs.docker.result }}
           LINKCHECK_RESULT: ${{ needs.link-check.result }}
-          HAS_FAILURES: ${{ contains(needs.*.result, 'failure') }}
+          VERSION_RESULT: ${{ needs.version.result }}
+          LIVE_RESULT: ${{ needs.verify-live.result }}
+          HAS_FAILURES: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
         run: |
           FORMATTED_DATE="$(date +'%B %-d, %Y at %-I:%M %p %Z')"
 
@@ -512,6 +556,7 @@ jobs:
               success) echo "✅ Passed" ;;
               failure) echo "❌ Failed" ;;
               skipped) echo "⚠️ Skipped" ;;
+              cancelled) echo "⚠️ Cancelled" ;;
               *)       echo "❓ Unknown" ;;
             esac
           }
@@ -521,74 +566,30 @@ jobs:
           DOCKER_STATUS=$(job_status_label "${DOCKER_RESULT}")
           LINK_STATUS=$(job_status_label "${LINKCHECK_RESULT}")
 
-          FAILED_JOB_COUNT=0
-          [[ "${MARKDOWNLINT_RESULT}" == "failure" ]] && FAILED_JOB_COUNT=$((FAILED_JOB_COUNT+1))
-          [[ "${SPELLCHECK_RESULT}" == "failure" ]] && FAILED_JOB_COUNT=$((FAILED_JOB_COUNT+1))
-          [[ "${DOCKER_RESULT}" == "failure" ]] && FAILED_JOB_COUNT=$((FAILED_JOB_COUNT+1))
-          [[ "${LINKCHECK_RESULT}" == "failure" ]] && FAILED_JOB_COUNT=$((FAILED_JOB_COUNT+1))
-
-          if [[ $FAILED_JOB_COUNT -eq 0 ]]; then
-            EMBED_DESCRIPTION="All jobs passed"
-          else
-            EMBED_DESCRIPTION="${FAILED_JOB_COUNT} job(s) failed"
-          fi
-
-          curl -H "Content-Type: application/json" \
-            -d '{
-              "embeds": [{
-                "title": "'"${EMBED_TITLE}"'",
-                "description": "'"${EMBED_DESCRIPTION}"'",
-                "color": '"${EMBED_COLOR}"',
-                "fields": [
-                  {
-                    "name": "👤 Triggered by",
-                    "value": "'"${GITHUB_ACTOR_NAME}"'",
-                    "inline": true
-                  },
-                  {
-                    "name": "🌿 Branch",
-                    "value": "'"${GITHUB_REF_NAME}"'",
-                    "inline": true
-                  },
-                  {
-                    "name": "🏷️ Version",
-                    "value": "'"${DOCKER_VERSION}"'",
-                    "inline": true
-                  },
-                  {
-                    "name": "📝 Markdown Lint",
-                    "value": "'"${LINT_STATUS}"'",
-                    "inline": true
-                  },
-                  {
-                    "name": "🔤 Spellcheck",
-                    "value": "'"${SPELL_STATUS}"'",
-                    "inline": true
-                  },
-                  {
-                    "name": "🐳 Docker Build",
-                    "value": "'"${DOCKER_STATUS}"'",
-                    "inline": true
-                  },
-                  {
-                    "name": "🔗 Link Checker",
-                    "value": "'"${LINK_STATUS}"'",
-                    "inline": true
-                  },
-                  {
-                    "name": "💬 Commit",
-                    "value": "['"${GITHUB_SHA::7}"']('"${GITHUB_COMMIT_URL}"') — '"${COMMIT_MESSAGE}"'",
-                    "inline": false
-                  },
-                  {
-                    "name": "🔗 Actions",
-                    "value": "[View Run]('"${GITHUB_RUN_URL}"')",
-                    "inline": false
-                  }
-                ],
-                "footer": {
-                  "text": "'"${SITE_NAME}"' v'"${DOCKER_VERSION}"' • github.com/'"${REPOSITORY}"' • '"${FORMATTED_DATE}"'"
-                }
-              }]
-            }' \
-            "$DISCORD_WEBHOOK_URL"
+          jq -n \
+            --arg title "$EMBED_TITLE" \
+            --argjson color "$EMBED_COLOR" \
+            --arg actor "$GITHUB_ACTOR_NAME" \
+            --arg branch "$GITHUB_REF_NAME" \
+            --arg version "${DOCKER_VERSION:-unpublished}" \
+            --arg lint "$LINT_STATUS" --arg spell "$SPELL_STATUS" \
+            --arg docker "$DOCKER_STATUS" --arg links "$LINK_STATUS" \
+            --arg live "$(job_status_label "$LIVE_RESULT")" \
+            --arg release "$(job_status_label "$VERSION_RESULT")" \
+            --arg commit "[${GITHUB_SHA::7}](${GITHUB_COMMIT_URL}) — ${COMMIT_MESSAGE:-Manual or recovered build}" \
+            --arg run "[View Run](${GITHUB_RUN_URL})" \
+            --arg footer "${SITE_NAME} • github.com/${REPOSITORY} • ${FORMATTED_DATE}" \
+            '{embeds: [{title: $title, color: $color, fields: [
+              {name: "👤 Triggered by", value: $actor, inline: true},
+              {name: "🌿 Branch", value: $branch, inline: true},
+              {name: "🏷️ Version", value: $version, inline: true},
+              {name: "📝 Markdown Lint", value: $lint, inline: true},
+              {name: "🔤 Spellcheck", value: $spell, inline: true},
+              {name: "🐳 Docker Build", value: $docker, inline: true},
+              {name: "🔗 Link Checker", value: $links, inline: true},
+              {name: "🌐 Published Site", value: $live, inline: true},
+              {name: "📦 Release", value: $release, inline: true},
+              {name: "💬 Commit", value: $commit[0:1024], inline: false},
+              {name: "🔗 Actions", value: $run, inline: false}
+            ], footer: {text: $footer}}]}' \
+            | curl --fail-with-body -sS -H 'Content-Type: application/json' --data-binary @- "$DISCORD_WEBHOOK_URL"

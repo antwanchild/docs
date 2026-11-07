@@ -1,0 +1,44 @@
+name: Recover Missing Site Builds
+
+on:
+  workflow_run:
+    workflows: [Dependabot, Validate Sites]
+    types: [completed]
+  # GITHUB_TOKEN merges can suppress push/PR events. Reconcile main even when
+  # the merge happens after the PR workflows have already completed.
+  schedule:
+    - cron: '17,47 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: recover-site-builds
+  cancel-in-progress: false
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dispatch missing builds for main
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const repo = { owner: context.repo.owner, repo: context.repo.repo };
+            const { data: branch } = await github.rest.repos.getBranch({ ...repo, branch: 'main' });
+            const sha = branch.commit.sha;
+            for (const workflow_id of ['wiki.yml', 'blog.yml']) {
+              const { data } = await github.rest.actions.listWorkflowRuns({
+                ...repo, workflow_id, branch: 'main', head_sha: sha, per_page: 100,
+              });
+              // Include queued/in-progress/failed runs: do not duplicate builds
+              // or automatically retry a genuine failure on every schedule.
+              if (data.workflow_runs.some(run => ['push', 'workflow_dispatch'].includes(run.event))) {
+                core.info(`${workflow_id}: a build already exists for ${sha}`);
+                continue;
+              }
+              await github.rest.actions.createWorkflowDispatch({ ...repo, workflow_id, ref: 'main' });
+              core.info(`${workflow_id}: dispatched missing main build (observed ${sha})`);
+            }
