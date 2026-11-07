@@ -26,6 +26,7 @@ concurrency:
   cancel-in-progress: false
 
 permissions:
+  actions: read
   contents: write
   packages: write
 
@@ -34,7 +35,6 @@ jobs:
     uses: ./.github/workflows/build-site.yml
     with:
       site_name: Wiki
-      site_emoji: "📖"
       content_dir: wiki/docs/
       project_dir: wiki
       env_file_path: wiki/.env
