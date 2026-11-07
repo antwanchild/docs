@@ -76,7 +76,7 @@ jobs:
           globs: |
             ${{ matrix.site }}/docs/**/*.md
       - name: Build container
-        run: docker build -f Dockerfile.${{ matrix.site }} -t docs-${{ matrix.site }}:validation .
+        run: docker build --build-arg SOURCE_REVISION="$GITHUB_SHA" -f Dockerfile.${{ matrix.site }} -t docs-${{ matrix.site }}:validation .
       - name: Verify nginx serving and health check
         env:
           SITE: ${{ matrix.site }}
@@ -91,6 +91,8 @@ jobs:
             sleep 1
           done
           grep -q '<html' /tmp/site-home.html
+          curl -fsS http://localhost:8080/version.json | jq -e --arg sha "$GITHUB_SHA" '.revision == $sha'
+          curl -fsSI http://localhost:8080/version.json | grep -iq 'cache-control: no-store'
           docker exec docs-validation nginx -t
           docker exec docs-validation sh -c 'curl -f http://localhost/ >/dev/null'
           status=$(curl -sS -o /tmp/site-404.html -w '%{http_code}' http://localhost:8080/validation-missing-page)

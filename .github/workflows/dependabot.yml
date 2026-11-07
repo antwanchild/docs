@@ -137,44 +137,25 @@ jobs:
           [[ -n "${COMMITS_URL}" ]] && REFERENCE_LINKS+=("[Commits](${COMMITS_URL})")
 
           if [[ ${#REFERENCE_LINKS[@]} -gt 0 ]]; then
-            CHANGE_DETAILS="${CHANGE_SUMMARY}\\n${REFERENCE_LINKS[*]}"
+            CHANGE_DETAILS="${CHANGE_SUMMARY}"$'\n'"${REFERENCE_LINKS[*]}"
           else
             CHANGE_DETAILS="${CHANGE_SUMMARY}"
           fi
 
-          curl -H "Content-Type: application/json" \
-            -d '{
-              "embeds": [{
-                "title": "⚠️ Dependabot '"${PR_SCOPE}"' — Major Update Review Required",
-                "color": 16744272,
-                "fields": [
-                  {
-                    "name": "📦 Update",
-                    "value": "'"${CHANGE_DETAILS}"'",
-                    "inline": false
-                  },
-                  {
-                    "name": "🧭 Scope",
-                    "value": "'"${PR_SCOPE}"'",
-                    "inline": true
-                  },
-                  {
-                    "name": "🧪 Type",
-                    "value": "'"${UPDATE_TYPE#version-update:}"' / '"${DEPENDENCY_TYPE}"'",
-                    "inline": true
-                  },
-                  {
-                    "name": "🔀 PR",
-                    "value": "[#'"${PR_NUMBER}"']('"${PR_URL}"')",
-                    "inline": true
-                  }
-                ],
-                "footer": {
-                  "text": "Dependabot '"${PR_SCOPE}"' • github.com/'"${REPOSITORY}"' • '"${FORMATTED_DATE}"'"
-                }
-              }]
-            }' \
-            "$DISCORD_WEBHOOK_URL"
+          jq -n \
+            --arg title "⚠️ Dependabot ${PR_SCOPE} — Major Update Review Required" \
+            --argjson color "16744272" \
+            --arg details "$CHANGE_DETAILS" --arg scope "$PR_SCOPE" \
+            --arg type "${UPDATE_TYPE#version-update:} / ${DEPENDENCY_TYPE}" \
+            --arg pr "[#${PR_NUMBER}](${PR_URL})" \
+            --arg footer "Dependabot ${PR_SCOPE} • github.com/${REPOSITORY} • ${FORMATTED_DATE}" \
+            '{embeds: [{title: $title, color: $color, fields: [
+              {name: "📦 Update", value: $details[0:1024], inline: false},
+              {name: "🧭 Scope", value: $scope, inline: true},
+              {name: "🧪 Type", value: $type, inline: true},
+              {name: "🔀 PR", value: $pr, inline: true}
+            ], footer: {text: $footer}}]}' \
+            | curl --fail-with-body -sS -H 'Content-Type: application/json' --data-binary @- "$DISCORD_WEBHOOK_URL"
 
   # ---------------------------------------------------------------
   # Notify Discord when a Dependabot PR is merged into main.
@@ -234,6 +215,7 @@ jobs:
       - name: Notify Discord of merged Dependabot PR
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          PR_BASE: ${{ github.base_ref }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           PR_URL: ${{ github.event.pull_request.html_url }}
           PR_SCOPE: ${{ steps.pr_context.outputs.scope }}
@@ -260,46 +242,23 @@ jobs:
           [[ -n "${COMMITS_URL}" ]] && REFERENCE_LINKS+=("[Commits](${COMMITS_URL})")
 
           if [[ ${#REFERENCE_LINKS[@]} -gt 0 ]]; then
-            CHANGE_DETAILS="${CHANGE_SUMMARY}\\n${REFERENCE_LINKS[*]}"
+            CHANGE_DETAILS="${CHANGE_SUMMARY}"$'\n'"${REFERENCE_LINKS[*]}"
           else
             CHANGE_DETAILS="${CHANGE_SUMMARY}"
           fi
 
-          curl -H "Content-Type: application/json" \
-            -d '{
-              "embeds": [{
-                "title": "✅ Dependabot '"${PR_SCOPE}"' — PR Merged",
-                "color": 3066993,
-                "fields": [
-                  {
-                    "name": "📦 Update",
-                    "value": "'"${CHANGE_DETAILS}"'",
-                    "inline": false
-                  },
-                  {
-                    "name": "🧭 Scope",
-                    "value": "'"${PR_SCOPE}"'",
-                    "inline": true
-                  },
-                  {
-                    "name": "🧪 Type",
-                    "value": "'"${UPDATE_TYPE#version-update:}"' / '"${DEPENDENCY_TYPE}"'",
-                    "inline": true
-                  },
-                  {
-                    "name": "🔀 PR",
-                    "value": "[#'"${PR_NUMBER}"']('"${PR_URL}"')",
-                    "inline": true
-                  },
-                  {
-                    "name": "🎯 Merged to",
-                    "value": "'"${{ github.base_ref }}"'",
-                    "inline": true
-                  }
-                ],
-                "footer": {
-                  "text": "Dependabot '"${PR_SCOPE}"' • github.com/'"${REPOSITORY}"' • '"${FORMATTED_DATE}"'"
-                }
-              }]
-            }' \
-            "$DISCORD_WEBHOOK_URL"
+          jq -n \
+            --arg title "✅ Dependabot ${PR_SCOPE} — PR Merged" \
+            --argjson color "3066993" \
+            --arg details "$CHANGE_DETAILS" --arg scope "$PR_SCOPE" \
+            --arg type "${UPDATE_TYPE#version-update:} / ${DEPENDENCY_TYPE}" \
+            --arg pr "[#${PR_NUMBER}](${PR_URL})" --arg base "$PR_BASE" \
+            --arg footer "Dependabot ${PR_SCOPE} • github.com/${REPOSITORY} • ${FORMATTED_DATE}" \
+            '{embeds: [{title: $title, color: $color, fields: [
+              {name: "📦 Update", value: $details[0:1024], inline: false},
+              {name: "🧭 Scope", value: $scope, inline: true},
+              {name: "🧪 Type", value: $type, inline: true},
+              {name: "🔀 PR", value: $pr, inline: true},
+              {name: "🎯 Merged to", value: $base, inline: true}
+            ], footer: {text: $footer}}]}' \
+            | curl --fail-with-body -sS -H 'Content-Type: application/json' --data-binary @- "$DISCORD_WEBHOOK_URL"
