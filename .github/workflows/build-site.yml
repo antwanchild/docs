@@ -405,6 +405,10 @@ jobs:
         uses: actions/setup-python@v7
         with:
           python-version: '3.12'
+          cache: pip
+          cache-dependency-path: |
+            ${{ inputs.requirements_file }}
+            requirements.shared.txt
 
       - name: Install Python dependencies
         run: pip install -r ${{ inputs.requirements_file }}
