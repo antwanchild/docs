@@ -31,6 +31,23 @@ Each site is built independently:
 
 Pushing to `main` triggers the workflow for whichever site was changed (`wiki/**` or `blog/**`). Changes to shared dependencies, helpers, or the reusable build workflow trigger both pipelines. The two pipelines are independent.
 
+## Deploying published images
+
+Build workflows publish images to GHCR. After a successful build, update the
+containers on the server from the directory containing the Compose file:
+
+```bash
+docker compose pull
+docker compose up -d
+```
+
+Then open **Actions → Verify Published Sites → Run workflow** in GitHub.
+Choose `both`, `wiki`, or `blog`. Leave `expected_sha` blank to verify the selected
+branch or tag revision, or enter the full commit SHA of the image you deployed.
+The workflow waits for the live sites to report that revision. Verification runs
+separately, so manual deployment does not delay or fail image publication.
+An Anubis redirect is reported as blocked verification in the run summary.
+
 ## Running locally
 
 **Prerequisites:** Python 3, pip, Docker (optional)

@@ -1,0 +1,68 @@
+name: Verify Published Sites
+
+on:
+  workflow_dispatch:
+    inputs:
+      site:
+        description: 'Site to verify after pulling the published image'
+        type: choice
+        options:
+          - both
+          - wiki
+          - blog
+        default: both
+      expected_sha:
+        description: 'Full deployed commit SHA (blank uses the selected branch or tag revision)'
+        type: string
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  verify-live:
+    name: Verify ${{ matrix.site }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    strategy:
+      fail-fast: false
+      matrix:
+        site: ${{ inputs.site == 'both' && fromJSON('["wiki","blog"]') || fromJSON(format('["{0}"]', inputs.site)) }}
+    steps:
+      - name: Wait for the public site to serve this revision
+        id: revision
+        env:
+          BASE_URL: https://${{ matrix.site }}.anthonychild.com
+          EXPECTED_SHA: ${{ inputs.expected_sha || github.sha }}
+        run: |
+          url="${BASE_URL}/version.json?revision=${EXPECTED_SHA}"
+          body=$(mktemp)
+          trap 'rm -f "$body"' EXIT
+          for attempt in {1..20}; do
+            if response=$(curl --silent --show-error --max-time 5 \
+              -H 'Cache-Control: no-cache' --output "$body" \
+              --write-out '%{http_code} %{redirect_url}' "$url"); then
+              read -r status redirect <<< "$response"
+              case "$status $redirect" in
+                '307 https://anubis.anthonychild.com/.within.website/'*)
+                  message="Anubis blocked the public revision check for ${BASE_URL}. The image was published, but the live revision could not be verified."
+                  echo "::warning::$message"
+                  echo "$message" >> "$GITHUB_STEP_SUMMARY"
+                  echo "status=blocked by Anubis" >> "$GITHUB_OUTPUT"
+                  exit 0
+                  ;;
+              esac
+              if [[ "$status" == '200' ]] && jq -e --arg sha "$EXPECTED_SHA" \
+                '.revision == $sha' "$body" >/dev/null 2>&1; then
+                echo "Verified ${BASE_URL} at ${EXPECTED_SHA}" >> "$GITHUB_STEP_SUMMARY"
+                echo "status=verified" >> "$GITHUB_OUTPUT"
+                exit 0
+              fi
+              echo "Waiting for deployment (${attempt}/20, HTTP ${status})"
+            fi
+            if [[ "$attempt" != '20' ]]; then
+              sleep 25
+            fi
+          done
+          echo "::error::Image published, but ${BASE_URL} did not report revision ${EXPECTED_SHA} before verification timed out."
+          exit 1
