@@ -82,6 +82,14 @@ def test_wiki_service_links_and_external_link_behavior(page, site_urls):
 
 def test_wiki_diagrams_math_and_example_block_styles(page, site_urls):
     """Wiki diagrams math and example block styles."""
+    mathjax_requests = []
+    page.on("request", lambda request: mathjax_requests.append(request.url)
+            if "tex-mml-chtml" in request.url.lower() else None)
+
+    visit(page, site_urls["wiki"], "/homelab/overview/")
+    page.wait_for_timeout(500)
+    assert not mathjax_requests
+
     visit(page, site_urls["wiki"], "/fun/examples/")
     # Zensical renders SVGs inside closed shadow roots. Nonempty replacement
     # divs distinguish rendered diagrams from their source <pre> elements.
@@ -91,6 +99,7 @@ def test_wiki_diagrams_math_and_example_block_styles(page, site_urls):
         timeout=30000,
     )
     expect(page.locator("mjx-container").first).to_be_visible(timeout=30000)
+    assert any("tex-mml-chtml" in url.lower() for url in mathjax_requests)
     seen = set()
     for _ in range(3):
         scheme = page.locator("body").get_attribute("data-md-color-scheme")
