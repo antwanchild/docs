@@ -20,6 +20,8 @@ jobs:
     name: Auto-Merge
     runs-on: ubuntu-latest
     if: github.event.pull_request.user.login == 'dependabot[bot]' && github.event.action != 'closed'
+    env:
+      MERGE_APP_CONFIGURED: ${{ secrets.DEPENDABOT_MERGE_APP_CLIENT_ID != '' && secrets.DEPENDABOT_MERGE_APP_PRIVATE_KEY != '' }}
     steps:
       - name: Fetch Dependabot PR metadata
         id: metadata
@@ -36,14 +38,32 @@ jobs:
           PR_URL: ${{ github.event.pull_request.html_url }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Create merge token for minor and patch updates
+        id: merge-token
+        if: >
+          env.MERGE_APP_CONFIGURED == 'true' &&
+          (steps.metadata.outputs.update-type == 'version-update:semver-minor' ||
+          steps.metadata.outputs.update-type == 'version-update:semver-patch')
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ secrets.DEPENDABOT_MERGE_APP_CLIENT_ID }}
+          private-key: ${{ secrets.DEPENDABOT_MERGE_APP_PRIVATE_KEY }}
+          permission-contents: write
+          permission-pull-requests: write
+
       - name: Enable auto-merge for minor and patch updates
         if: >
           steps.metadata.outputs.update-type == 'version-update:semver-minor' ||
           steps.metadata.outputs.update-type == 'version-update:semver-patch'
-        run: gh pr merge --squash --auto "$PR_URL"
+        run: |
+          if [[ "$USING_MERGE_APP" != 'true' ]]; then
+            echo '::warning::Configure the Dependabot merge app secrets to enable workflow runs after automatic merges.'
+          fi
+          gh pr merge --squash --auto "$PR_URL"
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          USING_MERGE_APP: ${{ steps.merge-token.outcome == 'success' }}
+          GH_TOKEN: ${{ steps.merge-token.outputs.token || secrets.GITHUB_TOKEN }}
 
       - name: Comment on major updates requiring manual review
         if: steps.metadata.outputs.update-type == 'version-update:semver-major'
