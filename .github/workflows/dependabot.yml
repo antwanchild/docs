@@ -20,6 +20,8 @@ jobs:
     name: Auto-Merge
     runs-on: ubuntu-latest
     if: github.event.pull_request.user.login == 'dependabot[bot]' && github.event.action != 'closed'
+    env:
+      MERGE_APP_CONFIGURED: ${{ secrets.DEPENDABOT_MERGE_APP_CLIENT_ID != '' && secrets.DEPENDABOT_MERGE_APP_PRIVATE_KEY != '' }}
     steps:
       - name: Fetch Dependabot PR metadata
         id: metadata
@@ -36,14 +38,31 @@ jobs:
           PR_URL: ${{ github.event.pull_request.html_url }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Create GitHub App merge token
+        id: merge-token
+        if: >
+          env.MERGE_APP_CONFIGURED == 'true' &&
+          (steps.metadata.outputs.update-type == 'version-update:semver-minor' || steps.metadata.outputs.update-type == 'version-update:semver-patch')
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ secrets.DEPENDABOT_MERGE_APP_CLIENT_ID }}
+          private-key: ${{ secrets.DEPENDABOT_MERGE_APP_PRIVATE_KEY }}
+          permission-contents: write
+          permission-pull-requests: write
+
       - name: Enable auto-merge for minor and patch updates
         if: >
           steps.metadata.outputs.update-type == 'version-update:semver-minor' ||
           steps.metadata.outputs.update-type == 'version-update:semver-patch'
-        run: gh pr merge --squash --auto "$PR_URL"
+        run: |
+          if [[ "$USING_MERGE_APP" != 'true' ]]; then
+            echo '::warning::Configure the Dependabot merge app secrets to enable Discord alerts after auto-merges.'
+          fi
+          gh pr merge --squash --auto "$PR_URL"
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ steps.merge-token.outputs.token || secrets.GITHUB_TOKEN }}
+          USING_MERGE_APP: ${{ steps.merge-token.outcome == 'success' }}
 
       - name: Comment on major updates requiring manual review
         if: steps.metadata.outputs.update-type == 'version-update:semver-major'
@@ -158,8 +177,8 @@ jobs:
             | curl --fail-with-body -sS -H 'Content-Type: application/json' --data-binary @- "$DISCORD_WEBHOOK_URL"
 
   # ---------------------------------------------------------------
-  # Notify Discord when a Dependabot PR is merged outside auto-merge.
-  # The scheduled alerts workflow handles github-actions[bot] merges.
+  # Notify Discord when a Dependabot PR is merged into main.
+  # Fires on PR close events where the PR was actually merged.
   # ---------------------------------------------------------------
   notify-merged:
     name: Notify Merged
@@ -167,8 +186,7 @@ jobs:
     if: >
       github.event.pull_request.user.login == 'dependabot[bot]' &&
       github.event.action == 'closed' &&
-      github.event.pull_request.merged == true &&
-      github.event.pull_request.merged_by.login != 'github-actions[bot]'
+      github.event.pull_request.merged == true
     steps:
       - name: Collect PR context
         id: pr_context
@@ -216,6 +234,7 @@ jobs:
       - name: Notify Discord of merged Dependabot PR
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          ALERT_TITLE: ${{ github.event.pull_request.merged_by.type == 'Bot' && '✅ Dependabot PR Auto-Merged' || '✅ Dependabot PR Merged' }}
           PR_BASE: ${{ github.base_ref }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           PR_URL: ${{ github.event.pull_request.html_url }}
@@ -249,7 +268,7 @@ jobs:
           fi
 
           jq -n \
-            --arg title "✅ Dependabot ${PR_SCOPE} — PR Merged" \
+            --arg title "$ALERT_TITLE" \
             --argjson color "3066993" \
             --arg details "$CHANGE_DETAILS" --arg scope "$PR_SCOPE" \
             --arg type "${UPDATE_TYPE#version-update:} / ${DEPENDENCY_TYPE}" \
