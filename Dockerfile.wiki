@@ -20,7 +20,7 @@ COPY wiki/main.py main.py
 RUN zensical build --strict
 
 # Stage 2 — Serve with nginx
-FROM nginx:1.31-alpine
+FROM nginx:1.31-alpine AS runtime
 
 # Pull patched Alpine packages into the runtime image.
 RUN apk upgrade --no-cache && \
