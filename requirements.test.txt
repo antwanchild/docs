@@ -1,4 +1,4 @@
 -r requirements.shared.txt
 pytest>=9.2.0,<10
-playwright==1.65.0
+playwright==1.65.1
 pylint==4.1.3
