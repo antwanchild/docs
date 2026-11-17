@@ -1,9 +1,6 @@
 name: Action Lint
 
 on:
-  pull_request:
-    paths:
-      - '.github/workflows/**'
   push:
     branches:
       - main
