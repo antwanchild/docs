@@ -68,7 +68,10 @@ runs:
         failed_jobs=''
         if [[ "$RESULT" == 'failure' ]]; then
           if ! failed_jobs=$(gh api --paginate "repos/$GITHUB_REPOSITORY/actions/runs/$RUN_ID/attempts/$RUN_ATTEMPT/jobs?per_page=100" \
-            --jq '.jobs[] | select(.conclusion == "failure") | "- " + .name'); then
+            --jq '.jobs[] | select(.conclusion == "failure") | . as $job
+              | ([.steps[]? | select(.conclusion == "failure")] | .[0]) as $step
+              | if $step then "- " + $job.name + " → [" + $step.name + "](" + $job.html_url + "#step:" + ($step.number | tostring) + ":1)"
+                else "- [" + $job.name + "](" + $job.html_url + ")" end'); then
             failed_jobs='See the workflow run for job details.'
           fi
         fi
@@ -96,7 +99,7 @@ runs:
               field("Commit"; ("[" + $sha[0:7] + "](" + $commit_url + ")"); true)
             ] + (if $version != "" then [field("Version"; $version; true)] else [] end)
               + (if $duration != "" then [field("Duration"; $duration; true)] else [] end)
-              + (if $failed != "" then [field("Failed jobs"; $failed; false)] else [] end)
+              + (if $failed != "" then [field("Failure location"; $failed; false)] else [] end)
               + (if $details != "" then [field("Details"; $details; false)] else [] end)
               + (if $release != "" then [field("Release"; ("[View release](" + $release + ")"); true)] else [] end)
               + [field("Actions"; ("[View run](" + $run + ")"); true)])
