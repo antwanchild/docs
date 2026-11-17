@@ -544,7 +544,7 @@ jobs:
               echo 'Checks passed: strict Zensical build, link check, Trivy scan, and image smoke test.'
               printf 'Published image: [%s:latest](%s/%s/pkgs/container/%s)\n' "$IMAGE" "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY_OWNER" "$PACKAGE"
               if [[ -n "$DIGEST" ]]; then
-                printf 'Image digest: `%s@%s`\n' "$IMAGE" "$DIGEST"
+                printf "Image digest: \`%s@%s\`\n" "$IMAGE" "$DIGEST"
               fi
               echo 'Live site: pull the image on the server, then run Verify Published Sites.'
             else
