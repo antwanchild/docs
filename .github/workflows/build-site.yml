@@ -558,7 +558,7 @@ jobs:
             if [[ "$DOCKER_RESULT" == 'success' ]]; then
               echo 'Checks passed: strict Zensical build, link check, Trivy scan, and image smoke test.'
               printf 'Published image: [%s:latest](%s/%s/pkgs/container/%s)\n' "$IMAGE" "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY_OWNER" "$PACKAGE"
-              echo 'Live site: pull the image on the server, then run Verify Published Sites.'
+              printf 'Live site: pull the image on the server, then run [Verify Published Sites](%s/%s/actions/workflows/verify-published-sites.yml).\n' "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY"
             else
               printf 'Image publication: %s\n' "$DOCKER_RESULT"
             fi
