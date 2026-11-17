@@ -151,7 +151,6 @@ jobs:
       packages: write
     outputs:
       version: ${{ steps.version.outputs.version }}
-      digest: ${{ steps.publish.outputs.digest }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -265,20 +264,12 @@ jobs:
           curl -fsS http://localhost:8080/version.json | jq -e --arg sha "$EXPECTED_SHA" '.revision == $sha'
 
       - name: Publish the scanned image
-        id: publish
-        shell: bash
         env:
           IMAGE_TAGS: ${{ steps.meta.outputs.tags }}
         run: |
           while IFS= read -r tag; do
             [ -z "$tag" ] && continue
-            push_output="$(docker push "$tag" | tee /dev/stderr)"
-            if [[ "$tag" == *:latest ]]; then
-              digest="$(awk '/^latest: digest: sha256:[a-f0-9]+ / {print $3}' <<< "$push_output")"
-              if [[ "$digest" =~ ^sha256:[a-f0-9]{64}$ ]]; then
-                echo "digest=$digest" >> "$GITHUB_OUTPUT"
-              fi
-            fi
+            docker push "$tag"
           done <<< "$IMAGE_TAGS"
 
   # ---------------------------------------------------------------
@@ -523,29 +514,50 @@ jobs:
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
+          fetch-depth: 0
       - name: Summarize build results
         id: summary
         shell: bash
         env:
           DOCKER_RESULT: ${{ needs.docker.result }}
-          DIGEST: ${{ needs.docker.outputs.digest }}
           IMAGE: ghcr.io/${{ github.repository_owner }}/${{ inputs.image_name }}
           PACKAGE: ${{ inputs.image_name }}
           RELEASE_RESULT: ${{ needs.version.result }}
           RELEASE_TAG: ${{ needs.version.outputs.should_release == 'true' && needs.version.outputs.tag || '' }}
+          RELEASE_NOTES: ${{ needs.version.outputs.release_notes }}
+          PUSH_BEFORE: ${{ github.event.before }}
+          PROJECT_DIR: ${{ inputs.project_dir }}
+          DOCKERFILE: ${{ inputs.dockerfile }}
+          REQUIREMENTS_FILE: ${{ inputs.requirements_file }}
           MARKDOWN_OUTCOME: ${{ needs.markdownlint.outputs.outcome }}
           SPELLCHECK_OUTCOME: ${{ needs.spellcheck.outputs.outcome }}
           BUILD_ERROR: ${{ needs.link-check.outputs.build_error }}
           LINKS_OUTCOME: ${{ needs.link-check.outputs.links_outcome }}
         run: |
+          changes=''
+          if [[ "$DOCKER_RESULT" == 'success' ]]; then
+            if [[ "$RELEASE_RESULT" == 'success' && -n "$RELEASE_TAG" && -n "$RELEASE_NOTES" ]]; then
+              changes="$RELEASE_NOTES"
+            elif [[ "$GITHUB_EVENT_NAME" == 'workflow_dispatch' ]]; then
+              changes='Manual rebuild of the selected revision.'
+            elif [[ -n "$PUSH_BEFORE" ]] && git cat-file -e "${PUSH_BEFORE}^{commit}" 2>/dev/null; then
+              changes="$(git log --no-merges -3 --format='- %s' "$PUSH_BEFORE..$GITHUB_SHA" -- \
+                "$PROJECT_DIR/" "$DOCKERFILE" "$REQUIREMENTS_FILE" "nginx-${PROJECT_DIR}.conf" \
+                ".github/workflows/${PROJECT_DIR}.yml" .github/workflows/build-site.yml \
+                .dockerignore requirements.shared.txt mkdocs_env.py)"
+            fi
+            # Use the built revision when the push base or a scoped subject is unavailable.
+            if [[ -z "$changes" ]]; then
+              changes="$(git show -s --format='%s' "$GITHUB_SHA")"
+            fi
+          fi
+
+          delimiter="$(cat /proc/sys/kernel/random/uuid)"
           {
-            echo 'details<<EOF'
+            printf 'details<<%s\n' "$delimiter"
             if [[ "$DOCKER_RESULT" == 'success' ]]; then
               echo 'Checks passed: strict Zensical build, link check, Trivy scan, and image smoke test.'
               printf 'Published image: [%s:latest](%s/%s/pkgs/container/%s)\n' "$IMAGE" "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY_OWNER" "$PACKAGE"
-              if [[ -n "$DIGEST" ]]; then
-                printf "Image digest: \`%s@%s\`\n" "$IMAGE" "$DIGEST"
-              fi
               echo 'Live site: pull the image on the server, then run Verify Published Sites.'
             else
               printf 'Image publication: %s\n' "$DOCKER_RESULT"
@@ -571,7 +583,11 @@ jobs:
             if [[ "$SPELLCHECK_OUTCOME" == 'failure' ]]; then
               echo 'Warning: spellcheck reported issues. See its results artifact or job log.'
             fi
-            echo 'EOF'
+            if [[ -n "$changes" ]]; then
+              # Leave room for the build status and warnings in Discord's Details field.
+              printf '\n**What changed**\n%s\n' "${changes:0:420}"
+            fi
+            printf '%s\n' "$delimiter"
           } >> "$GITHUB_OUTPUT"
       - name: Send Discord result
         uses: ./.github/actions/discord-result
