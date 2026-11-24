@@ -25,11 +25,45 @@ Each site is built independently:
 
 1. **Lint & spellcheck** — markdownlint and pyspelling run against the content directory
 2. **Docker build** — Zensical builds the static site, nginx serves it; the image is pushed to GHCR
-3. **Release** — a versioned Git tag (`wiki-YYYY.MM` / `blog-YYYY.MM`) is created when new content is detected; release notes are generated with [git-cliff](https://git-cliff.org/)
+3. **Release** — a versioned Git tag (`wiki-YYYY.MM` / `blog-YYYY.MM`) is created when the site changelog contains an eligible dated release section; that section supplies the release notes
 4. **Link check** — lychee scans all outbound links
 5. **Notify** — a Discord notification is sent on completion
 
 Pushing to `main` triggers the workflow for whichever site was changed (`wiki/**` or `blog/**`). Changes to shared dependencies, helpers, or the reusable build workflow trigger both pipelines. The two pipelines are independent.
+
+## Changelogs and releases
+
+The [wiki changelog](wiki/CHANGELOG.md) and [blog changelog](blog/CHANGELOG.md)
+contain curated, reader-facing descriptions of notable changes. Update the
+appropriate `Unreleased` section alongside each meaningful change. Use `Added`,
+`Changed`, `Fixed`, `Removed`, `Deprecated`, or `Security` as needed; omit empty
+categories and minor typo corrections. Record shared changes in both changelogs
+when they affect both sites.
+
+For a wiki release, open **Actions → Release Wiki → Run workflow** on `main`.
+The workflow chooses the next available version (`wiki-2026.11`, then
+`wiki-2026.11.1`, `.2`, and so on) and opens a PR moving `Unreleased` entries into
+a dated section. Review the PR, approve workflow runs if GitHub requests it,
+and merge manually. The successful wiki build on `main` publishes that section
+as the GitHub release notes and creates the version and rolling yearly tags.
+Delete the `release/wiki` branch after merging or closing the PR. Rerunning the
+workflow while its PR is open links to that PR instead of creating another.
+An empty `Unreleased` section cannot produce a release.
+
+The repository's Actions settings must allow GitHub Actions to create pull
+requests. Preparation does not publish a release. Wiki publication selects the
+newest dated section without an existing tag, including when a PR crosses a
+month boundary. Once tagged, later content changes publish images without
+another GitHub release until you prepare the next one.
+
+The blog retains one release per month. Move pending entries into a heading such
+as `## [blog-2026.11] - 2026-11-24`, leaving an empty `Unreleased` section above it.
+A successful blog build publishes that month's section if its tag does not
+already exist. The blog's manual `force_release` input requires nonempty curated
+notes; it cannot bypass an existing tag. Posts still publish with ordinary builds.
+
+The changelogs summarize monthly releases from Git history and GitHub release
+records. Earlier daily and test releases remain in GitHub Releases.
 
 ## Deploying published images
 

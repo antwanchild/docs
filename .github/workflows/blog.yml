@@ -17,7 +17,7 @@ on:
   workflow_dispatch:
     inputs:
       force_release:
-        description: 'Force a release even if no new posts were added'
+        description: 'Require curated notes for the current monthly release'
         type: boolean
         default: false
 
