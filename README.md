@@ -40,21 +40,19 @@ appropriate `Unreleased` section alongside each meaningful change. Use `Added`,
 categories and minor typo corrections. Record shared changes in both changelogs
 when they affect both sites.
 
-For a wiki release, open **Actions → Release Wiki → Run workflow** on `main`.
-The workflow chooses the next available version (`wiki-2026.11`, then
-`wiki-2026.11.1`, `.2`, and so on) and opens a PR moving `Unreleased` entries into
-a dated section. Review the PR, approve workflow runs if GitHub requests it,
-and merge manually. The successful wiki build on `main` publishes that section
-as the GitHub release notes and creates the version and rolling yearly tags.
-Delete the `release/wiki` branch after merging or closing the PR. Rerunning the
-workflow while its PR is open links to that PR instead of creating another.
-An empty `Unreleased` section cannot produce a release.
+Wiki releases are automatic. Merge notable changes with entries under
+`wiki/CHANGELOG.md` → `Unreleased`. After the wiki image build and checks succeed
+on the latest `main` revision, CI chooses the next version (`wiki-2026.11`, then
+`wiki-2026.11.1`, `.2`, and so on), archives those entries in a dated changelog
+section, and publishes the tag and GitHub release notes. No release PR or manual
+approval is needed. An empty `Unreleased` section produces no new release.
 
-The repository's Actions settings must allow GitHub Actions to create pull
-requests. Preparation does not publish a release. Wiki publication selects the
-newest dated section without an existing tag, including when a PR crosses a
-month boundary. Once tagged, later content changes publish images without
-another GitHub release until you prepare the next one.
+CI commits only the changelog archive to `main`; repository rules must allow
+`github-actions[bot]` to push that commit. The push uses `GITHUB_TOKEN`, so the
+archive commit does not trigger another push build. A concurrent update to main
+is never overwritten: the newer revision's build handles the pending release.
+The version tag points at the revision whose image passed the build checks.
+**Actions → Release Wiki** remains available to retry the build manually.
 
 The blog retains one release per month. Move pending entries into a heading such
 as `## [blog-2026.11] - 2026-11-24`, leaving an empty `Unreleased` section above it.
