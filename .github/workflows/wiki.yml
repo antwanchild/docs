@@ -14,12 +14,8 @@ on:
       - 'nginx-wiki.conf'
       - '.github/workflows/build-site.yml'
       - '.github/workflows/wiki.yml'
+      - '.github/scripts/wiki_release.py'
   workflow_dispatch:
-    inputs:
-      force_release:
-        description: 'Force a release even if no new pages were added'
-        type: boolean
-        default: false
 
 concurrency:
   group: publish-wiki
@@ -44,7 +40,6 @@ jobs:
       docker_description: Personal wiki built with Zensical
       tag_prefix: wiki-
       base_url: https://wiki.anthonychild.com
-      force_release: ${{ inputs.force_release || false }}
     secrets:
       ENV_FILE: ${{ secrets.ENV_FILE }}
       DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
