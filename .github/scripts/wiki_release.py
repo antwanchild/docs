@@ -70,10 +70,24 @@ def release_notes(text, tags):
     return tag, body
 
 
+def automatic_release(text, tags, today):
+    """Retry a prepared release or archive pending entries for a new release."""
+    result = release_notes(text, tags)
+    if result is not None:
+        return text, result
+    pending = [item for item in sections(text) if item[0] == '[Unreleased]']
+    if len(pending) != 1:
+        raise ValueError('Expected exactly one Unreleased section')
+    if not has_entries(pending[0][1]):
+        return text, None
+    _, updated = prepare(text, tags, today)
+    return updated, release_notes(updated, tags)
+
+
 def main():
     """Run from the repository root."""
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command', choices=('prepare', 'notes'))
+    parser.add_argument('command', choices=('prepare', 'notes', 'auto'))
     args = parser.parse_args()
     path = Path('wiki/CHANGELOG.md')
     text = path.read_text(encoding='utf-8')
@@ -83,7 +97,12 @@ def main():
         path.write_text(updated, encoding='utf-8')
         print(tag)
     else:
-        result = release_notes(text, tags)
+        if args.command == 'auto':
+            updated, result = automatic_release(text, tags, date.today())
+            if updated != text:
+                path.write_text(updated, encoding='utf-8')
+        else:
+            result = release_notes(text, tags)
         if result:
             tag, body = result
             Path('release-notes.md').write_text(body + '\n', encoding='utf-8')

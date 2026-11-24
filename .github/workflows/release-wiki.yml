@@ -1,53 +1,33 @@
 name: Release Wiki
 
+# Optional retry/rebuild entry point; normal wiki pushes release automatically.
 on:
   workflow_dispatch:
 
 permissions:
+  actions: read
   contents: write
-  pull-requests: write
+  packages: write
 
 concurrency:
-  group: prepare-wiki-release
+  group: publish-wiki
   cancel-in-progress: false
 
-env:
-  TZ: America/Denver
-
 jobs:
-  prepare:
-    name: Prepare release PR
+  release:
     if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          ref: main
-          fetch-depth: 0
-      - name: Prepare changelog and open pull request
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          EXISTING=$(gh pr list --base main --head release/wiki --state open --json url --jq '.[0].url // empty')
-          if [ -n "$EXISTING" ]; then
-            echo "An existing wiki release PR needs review: $EXISTING" >> "$GITHUB_STEP_SUMMARY"
-            exit 0
-          fi
-          if git ls-remote --exit-code --heads origin release/wiki >/dev/null 2>&1; then
-            echo 'The release/wiki branch already exists. Delete it after merging or closing its PR before preparing another release.' >&2
-            exit 1
-          fi
-          git fetch --tags --force
-          TAG=$(python3 .github/scripts/wiki_release.py prepare)
-          git switch -c release/wiki
-          git config user.name 'github-actions[bot]'
-          git config user.email 'github-actions[bot]@users.noreply.github.com'
-          git add wiki/CHANGELOG.md
-          git commit -m "docs: prepare $TAG"
-          git push origin HEAD:refs/heads/release/wiki
-          cat > /tmp/wiki-release-body.md <<'BODY'
-          Moves the wiki's pending changelog entries into a dated release section.
-
-          Review the notes and approve workflow runs if GitHub requests it, then merge this PR manually. After the wiki build succeeds on main, CI publishes this version's tag and curated release notes. Delete the release/wiki branch after merging.
-          BODY
-          gh pr create --base main --head release/wiki --title "Release $TAG" --body-file /tmp/wiki-release-body.md >> "$GITHUB_STEP_SUMMARY"
+    uses: ./.github/workflows/build-site.yml
+    with:
+      site_name: Wiki
+      content_dir: wiki/docs/
+      project_dir: wiki
+      env_file_path: wiki/.env
+      requirements_file: requirements.wiki.txt
+      image_name: wiki
+      dockerfile: Dockerfile.wiki
+      docker_description: Personal wiki built with Zensical
+      tag_prefix: wiki-
+      base_url: https://wiki.anthonychild.com
+    secrets:
+      ENV_FILE: ${{ secrets.ENV_FILE }}
+      DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}

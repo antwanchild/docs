@@ -22,8 +22,8 @@ available in published Docker images.
 
 ### Changed
 
-- Prepare wiki releases through a manual workflow that opens a changelog PR and
-  automatically chooses the next available monthly version.
+- Automatically release notable wiki changes after successful builds, choosing
+  the next available monthly version and archiving pending changelog entries.
 
 - Migrate from MkDocs to Zensical with the modern theme and native TOML configuration.
 - Refresh homelab networking, Compose stacks, service inventory, and overview pages.

@@ -273,9 +273,9 @@ jobs:
           done <<< "$IMAGE_TAGS"
 
   # ---------------------------------------------------------------
-  # Publish curated notes: the newest dated wiki section or current blog month.
+  # Automatically prepare wiki notes; publish the current dated blog month.
   # Uses monthly tags (PREFIX-YYYY.MM) and a rolling yearly tag (PREFIX-YYYY).
-  # Unreleased entries remain pending until moved to a dated section.
+  # Wiki Unreleased entries are archived after a successful image build.
   # Wiki supports multiple releases per month; existing tags are skipped.
   # ---------------------------------------------------------------
   version:
@@ -303,7 +303,13 @@ jobs:
         run: |
           git fetch --tags --force
           if [ "$PROJECT_DIR" = "wiki" ]; then
-            python3 .github/scripts/wiki_release.py notes >> "$GITHUB_OUTPUT"
+            # A newer main revision has its own queued build; let it release instead.
+            MAIN_SHA=$(git ls-remote origin refs/heads/main | cut -f1)
+            if [ "$GITHUB_REF" != "refs/heads/main" ] || [ "$MAIN_SHA" != "$GITHUB_SHA" ]; then
+              echo "should_release=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            python3 .github/scripts/wiki_release.py auto >> "$GITHUB_OUTPUT"
             exit 0
           fi
           RELEASE_TAG="${TAG_PREFIX}$(date +%Y.%m)"
@@ -362,7 +368,19 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          git tag "$RELEASE_TAG"
+          if [ "${{ inputs.project_dir }}" = "wiki" ] && ! git diff --quiet -- wiki/CHANGELOG.md; then
+            git add wiki/CHANGELOG.md
+            git commit -m "docs: archive ${RELEASE_TAG} changelog"
+            # Fast-forward only: never overwrite a concurrent change to main.
+            # If main advanced, its queued build will prepare the release instead.
+            if ! git push origin HEAD:refs/heads/main; then
+              echo 'Main advanced or disallows bot commits; release was not published.' >&2
+              exit 1
+            fi
+          fi
+
+          # The release describes the revision whose image passed all build checks.
+          git tag "$RELEASE_TAG" "$GITHUB_SHA"
           git push origin "$RELEASE_TAG"
 
           git tag -f "$YEARLY_TAG"

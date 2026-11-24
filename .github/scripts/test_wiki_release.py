@@ -3,7 +3,7 @@
 from datetime import date
 import unittest
 
-from wiki_release import next_tag, prepare, release_notes
+from wiki_release import automatic_release, next_tag, prepare, release_notes
 
 
 class WikiReleaseTests(unittest.TestCase):
@@ -50,6 +50,23 @@ class WikiReleaseTests(unittest.TestCase):
         text = '## [Unreleased]\n\n## [wiki-2026.10.2] - 2026-10-31\n\n- Fix.\n'
         self.assertEqual(release_notes(text, [])[0], 'wiki-2026.10.2')
         self.assertIsNone(release_notes(text, ['wiki-2026.10.2']))
+
+    def test_automatic_release_and_repeat(self):
+        """Archive pending notes once, retry before tagging, and skip after tagging."""
+        updated, result = automatic_release(self.pending, [], self.today)
+        self.assertEqual(result, ('wiki-2026.11', '### Fixed\n\n- Correct links.'))
+        self.assertEqual(automatic_release(updated, [], self.today), (updated, result))
+        self.assertEqual(automatic_release(updated, [result[0]], self.today),
+                         (updated, None))
+        more = updated.replace('## [Unreleased]', '## [Unreleased]\n\n- Another fix.')
+        newer, result = automatic_release(more, ['wiki-2026.11'], self.today)
+        self.assertEqual(result, ('wiki-2026.11.1', '- Another fix.'))
+        self.assertIn('## [wiki-2026.11] - 2026-11-24', newer)
+
+    def test_empty_automatic_release(self):
+        """Routine builds with no pending entries do not create releases."""
+        text = '# Changelog\n\n## [Unreleased]\n'
+        self.assertEqual(automatic_release(text, [], self.today), (text, None))
 
     def test_invalid_release(self):
         """Reject malformed dates and empty dated releases."""
