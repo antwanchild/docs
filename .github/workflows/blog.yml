@@ -13,6 +13,7 @@ on:
       - 'mkdocs_env.py'
       - 'nginx-blog.conf'
       - '.github/workflows/build-site.yml'
+      - '.github/actions/discord-result/**'
       - '.github/workflows/blog.yml'
   workflow_dispatch:
     inputs:
