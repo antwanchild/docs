@@ -1,0 +1,94 @@
+name: Clean Up Site Images
+
+on:
+  schedule:
+    - cron: '23 10 * * 0'
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: 'Delete eligible image versions instead of reporting them'
+        type: boolean
+        default: false
+
+permissions:
+  packages: write
+
+concurrency:
+  group: cleanup-site-images
+  cancel-in-progress: false
+
+jobs:
+  cleanup:
+    name: Review ${{ matrix.package }} image versions
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package: [blog, wiki]
+    steps:
+      - name: Apply image retention policy
+        uses: actions/github-script@373c709c69115d41ff229c7e5df9f8788daa9553 # v9
+        env:
+          PACKAGE_NAME: ${{ matrix.package }}
+          APPLY: ${{ (github.event_name == 'workflow_dispatch' && inputs.apply) || (github.event_name == 'schedule' && vars.DOCS_IMAGE_CLEANUP_ENABLED == 'true') }}
+        with:
+          script: |
+            const packageName = process.env.PACKAGE_NAME;
+            const apply = process.env.APPLY === 'true';
+            const packageParams = {
+              username: context.repo.owner,
+              package_type: 'container',
+              package_name: packageName,
+            };
+            const versionsRoute = '/users/{username}/packages/{package_type}/{package_name}/versions';
+            const versionRoute = versionsRoute + '/{package_version_id}';
+            const cutoff = Date.now() - 30 * 24 * 60 * 60 * 1000;
+            const minimumRoutineVersions = 10;
+
+            // Any release, rolling alias, or unfamiliar tag protects the whole version.
+            // Leave untagged versions alone because a manifest may still reference them.
+            const tagsFor = (version) => version.metadata?.container?.tags ?? [];
+            const routine = (version) => {
+              const tags = tagsFor(version);
+              return tags.length > 0 && tags.every(tag =>
+                /^sha-[0-9a-f]{7}$/.test(tag) || /^\d{4}\.\d{2}\.\d{2}$/.test(tag));
+            };
+            const oldEnough = (version) => Date.parse(version.created_at) < cutoff;
+
+            const versions = await github.paginate('GET ' + versionsRoute, {
+              ...packageParams,
+              state: 'active',
+              per_page: 100,
+            });
+            const routineVersions = versions.filter(version =>
+              routine(version) && Number.isFinite(Date.parse(version.created_at)));
+            routineVersions.sort((a, b) =>
+              Date.parse(b.created_at) - Date.parse(a.created_at) || b.id - a.id);
+            const candidates = routineVersions.slice(minimumRoutineVersions).filter(oldEnough);
+
+            await core.summary
+              .addHeading(`${packageName} image retention`)
+              .addRaw(`${apply ? 'Deletion enabled' : 'Dry run'}. Found ${candidates.length} eligible image version(s) out of ${versions.length}.\n`)
+              .write();
+
+            for (const candidate of candidates) {
+              const params = { ...packageParams, package_version_id: candidate.id };
+              if (!apply) {
+                core.info(`Would delete ${candidate.id} (${candidate.created_at}): ${tagsFor(candidate).join(', ')}`);
+                continue;
+              }
+
+              try {
+                const { data: current } = await github.request('GET ' + versionRoute, params);
+                if (!routine(current) || !oldEnough(current)) {
+                  core.info(`Skipping ${candidate.id}. Its tags or age no longer qualify.`);
+                  continue;
+                }
+                await github.request('DELETE ' + versionRoute, params);
+                core.info(`Deleted ${candidate.id}: ${tagsFor(current).join(', ')}`);
+              } catch (error) {
+                if (error.status !== 404) throw error;
+                core.info(`Version ${candidate.id} is no longer available.`);
+              }
+            }
