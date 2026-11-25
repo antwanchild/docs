@@ -128,7 +128,7 @@ jobs:
             find blog/site -type f -path '*/assets/images/social/*' -print -quit | grep -q .
           fi
       - name: Lint Markdown
-        uses: DavidAnson/markdownlint-cli2-action@v25.0.0
+        uses: DavidAnson/markdownlint-cli2-action@v25.1.0
         continue-on-error: true
         with:
           globs: |
