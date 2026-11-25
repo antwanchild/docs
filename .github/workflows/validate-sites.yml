@@ -110,7 +110,9 @@ jobs:
             requirements.${{ matrix.site }}.txt
             requirements.shared.txt
       - name: Install dependencies
-        run: uv pip install -r requirements.${{ matrix.site }}.txt
+        env:
+          REQUIREMENTS_FILE: requirements.${{ matrix.site }}.txt
+        run: uv pip install -r "$REQUIREMENTS_FILE"
       - name: Build site
         run: zensical build --strict -f ${{ matrix.site }}/zensical.toml
       - name: Verify generated features
