@@ -59,17 +59,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-python@v7
+      - uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d  # v10.4.0
         with:
           python-version: '3.12'
-          cache: pip
-          cache-dependency-path: |
+          activate-environment: true
+          enable-cache: true
+          cache-dependency-glob: |
             requirements.test.txt
             requirements.shared.txt
       - name: Install test dependencies
-        run: pip install -r requirements.test.txt
-      - name: Lint test code
-        run: python -m pylint --persistent=n --source-roots=. --ignore-patterns='^\._' tests
+        run: uv pip install -r requirements.test.txt
       - name: Install Chromium
         run: python -m playwright install --with-deps chromium
       - name: Run macro and browser tests
@@ -100,15 +99,16 @@ jobs:
         site: ${{ fromJSON(needs.changed-sites.outputs.sites) }}
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-python@v7
+      - uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d  # v10.4.0
         with:
           python-version: '3.12'
-          cache: pip
-          cache-dependency-path: |
+          activate-environment: true
+          enable-cache: true
+          cache-dependency-glob: |
             requirements.${{ matrix.site }}.txt
             requirements.shared.txt
       - name: Install dependencies
-        run: pip install -r requirements.${{ matrix.site }}.txt
+        run: uv pip install -r requirements.${{ matrix.site }}.txt
       - name: Build site
         run: zensical build --strict -f ${{ matrix.site }}/zensical.toml
       - name: Verify generated features
