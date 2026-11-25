@@ -36,7 +36,7 @@ jobs:
           enable-cache: true
           cache-dependency-glob: requirements*.txt
       - name: Install lint dependencies
-        run: uv pip install -r requirements.test.txt -r requirements.lint.txt
+        run: uv pip install -r requirements.test.txt
       - name: Lint Python
         run: |
           python -m pylint --persistent=n --source-roots=. --ignore-patterns='^\._' tests
