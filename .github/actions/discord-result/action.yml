@@ -90,6 +90,8 @@ runs:
           --arg details "$DETAILS" --arg failed "$failed_jobs" --arg release "$RELEASE_URL" \
           --arg duration "$duration" \
           'def field($name; $value; $inline): {name: $name, value: $value[0:1024], inline: $inline};
+          def discord_details:
+            split("\n") | map(sub("^###[ \t]+(?<heading>\\S.*?)\\s*$"; "**\(.heading)**")) | join("\n");
           {embeds: [{
             title: $title, url: $run, color: $color, timestamp: (now | todateiso8601),
             fields: ([
@@ -100,7 +102,7 @@ runs:
             ] + (if $version != "" then [field("Version"; $version; true)] else [] end)
               + (if $duration != "" then [field("Duration"; $duration; true)] else [] end)
               + (if $failed != "" then [field("Failure location"; $failed; false)] else [] end)
-              + (if $details != "" then [field("Details"; $details; false)] else [] end)
+              + (if $details != "" then [field("Details"; ($details | discord_details); false)] else [] end)
               + (if $release != "" then [field("Release"; ("[View release](" + $release + ")"); true)] else [] end)
               + [field("Actions"; ("[View run](" + $run + ")"); true)])
           }]}' \
