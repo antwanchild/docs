@@ -65,6 +65,7 @@ jobs:
                   `.github/workflows/${workflow_id}`,
                 ]);
                 const matches = path => path?.startsWith(`${site}/`) ||
+                  path?.startsWith('.github/actions/discord-result/') ||
                   sharedPaths.has(path) || sitePaths.has(path);
                 if (['ahead', 'identical'].includes(comparison?.status) && comparison.files &&
                     files.length < 300 &&
