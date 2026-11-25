@@ -13,6 +13,11 @@ available in published Docker images.
 
 ## [Unreleased]
 
+### Changed
+
+- Use cached uv installs in CI, replace Super-Linter with focused lint commands,
+  and report GitHub Actions security findings with zizmor.
+
 ## [wiki-2026.11] - 2026-11-24
 
 ### Added
@@ -23,9 +28,6 @@ available in published Docker images.
   the Plex token generator.
 
 ### Changed
-
-- Use cached uv installs in CI, replace Super-Linter with focused lint commands,
-  and report GitHub Actions security findings with zizmor.
 
 - Automatically release notable wiki changes after successful builds, choosing
   the next available monthly version and archiving pending changelog entries.

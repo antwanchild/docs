@@ -18,7 +18,6 @@ and test releases remain in [GitHub Releases](https://github.com/antwanchild/doc
 
 - Use cached uv installs in CI, replace Super-Linter with focused lint commands,
   and report GitHub Actions security findings with zizmor.
-
 - Complete and publish "Long Time No See...", with reading time displayed.
 - Add deployment revision reporting and a separate manual workflow to verify
   published sites, including reporting when Anubis blocks verification.

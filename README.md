@@ -161,7 +161,7 @@ actionlint
 zizmor --offline .github
 ```
 
-Install yamllint from `requirements.lint.txt`; actionlint, ShellCheck, and zizmor
+Install yamllint from `requirements.test.txt`; actionlint, ShellCheck, and zizmor
 are separate command-line tools. On macOS-mounted filesystems, exclude untracked
 `._*` metadata files when scanning directories locally.
 
