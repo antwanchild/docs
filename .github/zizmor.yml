@@ -1,0 +1,7 @@
+rules:
+  unpinned-uses:
+    config:
+      policies:
+        # Keep setup-uv on release tags as requested; uv itself has an exact version.
+        astral-sh/setup-uv: ref-pin
+        '*': hash-pin

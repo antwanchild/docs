@@ -144,11 +144,13 @@ remain supported. Dependabot continues to manage dependency updates.
 
 Code Lint runs Pylint, yamllint, and ShellCheck directly. Actionlint checks workflow
 syntax and embedded shell scripts. Workflow Security runs zizmor and uploads
-findings to GitHub's Security → Code scanning view. Findings are reported for
-review rather than blocking merges; scanner or upload errors still fail the job.
+findings to GitHub's Security → Code scanning view. GitHub can mark its separate
+code-scanning check as failed when changed lines introduce findings, even when
+the scanner job succeeds. New findings should be resolved before merging.
 The first scan includes existing workflow findings, including action pinning and
 permission scope. These tools run on GitHub Actions without an additional hosted
-service subscription.
+service subscription. The pinning policy permits release tags for setup-uv,
+with an exact uv tool version; other actions retain the SHA-pinning policy.
 
 Run the focused checks locally with:
 
