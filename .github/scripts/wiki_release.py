@@ -48,7 +48,8 @@ def prepare(text, tags, today):
             tail = text[start + links.start():]
     replacement = f"## [Unreleased]\n\n## [{tag}] - {today.isoformat()}\n\n{body}\n\n"
     updated = text[:start] + replacement + tail
-    updated = updated.rstrip() + f"\n\n[{tag}]: https://github.com/antwanchild/docs/releases/tag/{tag}\n"
+    release_url = f"https://github.com/antwanchild/docs/releases/tag/{tag}"
+    updated = updated.rstrip() + f"\n\n[{tag}]: {release_url}\n"
     return tag, updated
 
 
@@ -58,7 +59,8 @@ def release_notes(text, tags):
     if not releases:
         return None
     heading, body, _, _ = releases[0]
-    match = re.fullmatch(r"\[(wiki-\d{4}\.\d{2}(?:\.[1-9]\d*)?)\] - (\d{4}-\d{2}-\d{2})", heading)
+    pattern = r"\[(wiki-\d{4}\.\d{2}(?:\.[1-9]\d*)?)\] - (\d{4}-\d{2}-\d{2})"
+    match = re.fullmatch(pattern, heading)
     if not match:
         raise ValueError('Invalid wiki release heading')
     tag, released = match.groups()

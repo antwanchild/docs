@@ -1,41 +1,50 @@
-name: Super Linter
+name: Code Lint
 
 on:
-  push:
-    branches:
-      - main
+  pull_request:
     paths:
-      # Only run when code files change — not on content pushes
       - '**/*.py'
       - '**/*.sh'
       - '**/*.yaml'
       - '**/*.yml'
-      - '.github/workflows/**'
+      - 'requirements*.txt'
+  push:
+    branches: [main]
+    paths:
+      - '**/*.py'
+      - '**/*.sh'
+      - '**/*.yaml'
+      - '**/*.yml'
+      - 'requirements*.txt'
   workflow_dispatch:
 
-jobs:
-  superlinter:
-    name: Super Linter
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      statuses: write
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
+permissions:
+  contents: read
 
-      - name: Run Super Linter
-        uses: super-linter/super-linter@v9
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VALIDATE_ALL_CODEBASE: false
-          DEFAULT_BRANCH: main
-          GITHUB_BEFORE_SHA: ${{ github.event.before }}
-          GITHUB_SHA: ${{ github.sha }}
-          SAVE_SUPER_LINTER_SUMMARY: true
-          VALIDATE_PYTHON_PYLINT: true
-          VALIDATE_BASH: true
-          VALIDATE_YAML: true
-          FILTER_REGEX_EXCLUDE: .*\.git.*
+jobs:
+  lint:
+    name: Python and YAML
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d  # v10.4.0
+        with:
+          python-version: '3.12'
+          activate-environment: true
+          enable-cache: true
+          cache-dependency-glob: requirements*.txt
+      - name: Install lint dependencies
+        run: uv pip install -r requirements.test.txt -r requirements.lint.txt
+      - name: Lint Python
+        run: |
+          python -m pylint --persistent=n --source-roots=. --ignore-patterns='^\._' tests
+          python -m pylint --persistent=n --disable=duplicate-code mkdocs_env.py wiki/main.py blog/main.py
+          PYTHONPATH=.github/scripts python -m pylint --persistent=n .github/scripts/*.py
+      - name: Lint YAML
+        run: git ls-files -z '*.yml' '*.yaml' | xargs -0 yamllint -c .yamllint.yml
+      - name: Lint standalone shell scripts
+        run: |
+          # actionlint also checks shell embedded in GitHub workflows.
+          git ls-files -z '*.sh' | xargs -0 -r shellcheck

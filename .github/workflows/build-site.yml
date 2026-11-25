@@ -417,16 +417,17 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Set up Python
-        uses: actions/setup-python@v7
+        uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d  # v10.4.0
         with:
           python-version: '3.12'
-          cache: pip
-          cache-dependency-path: |
+          activate-environment: true
+          enable-cache: true
+          cache-dependency-glob: |
             ${{ inputs.requirements_file }}
             requirements.shared.txt
 
       - name: Install Python dependencies
-        run: pip install -r ${{ inputs.requirements_file }}
+        run: uv pip install -r ${{ inputs.requirements_file }}
 
       - name: Write .env file for site macros
         run: echo "${{ secrets.ENV_FILE }}" > ${{ inputs.env_file_path }}

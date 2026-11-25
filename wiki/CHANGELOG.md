@@ -24,6 +24,9 @@ available in published Docker images.
 
 ### Changed
 
+- Use cached uv installs in CI, replace Super-Linter with focused lint commands,
+  and report GitHub Actions security findings with zizmor.
+
 - Automatically release notable wiki changes after successful builds, choosing
   the next available monthly version and archiving pending changelog entries.
 

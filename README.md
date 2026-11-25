@@ -136,6 +136,35 @@ The generator's markup is in `wiki/docs/plex-token.html`, with styles in
 `wiki/docs/javascripts/plex-token.js`. nginx revalidates these custom assets
 so updates reach visitors without waiting for the general one-year asset cache.
 
+## CI tooling
+
+GitHub Actions uses uv with cached downloads and Python 3.12 environments to
+install the existing requirements files. Local pip instructions and Docker builds
+remain supported. Dependabot continues to manage dependency updates.
+
+Code Lint runs Pylint, yamllint, and ShellCheck directly. Actionlint checks workflow
+syntax and embedded shell scripts. Workflow Security runs zizmor and uploads
+findings to GitHub's Security → Code scanning view. Findings are reported for
+review rather than blocking merges; scanner or upload errors still fail the job.
+The first scan includes existing workflow findings, including action pinning and
+permission scope. These tools run on GitHub Actions without an additional hosted
+service subscription.
+
+Run the focused checks locally with:
+
+```bash
+python -m pylint --persistent=n --source-roots=. --ignore-patterns='^\._' tests
+python -m pylint --persistent=n --disable=duplicate-code mkdocs_env.py wiki/main.py blog/main.py
+PYTHONPATH=.github/scripts python -m pylint --persistent=n .github/scripts/*.py
+git ls-files -z '*.yml' '*.yaml' | xargs -0 yamllint -c .yamllint.yml
+actionlint
+zizmor --offline .github
+```
+
+Install yamllint from `requirements.lint.txt`; actionlint, ShellCheck, and zizmor
+are separate command-line tools. On macOS-mounted filesystems, exclude untracked
+`._*` metadata files when scanning directories locally.
+
 ## Contributing
 
 Open an [issue](https://github.com/antwanchild/docs/issues) to suggest content or report a bug.

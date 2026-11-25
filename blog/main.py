@@ -1,3 +1,5 @@
+"""Template macros for the blog."""
+
 import os
 import sys
 from datetime import datetime
@@ -10,11 +12,12 @@ for candidate in (HERE, HERE.parent):
             sys.path.insert(0, str(candidate))
         break
 
-from mkdocs_env import load_site_env
+from mkdocs_env import load_site_env  # pylint: disable=wrong-import-position
 
 load_site_env()
 
 def define_env(env):
+    """Register site variables and template macros."""
 
     domain = os.getenv("DOMAIN", "anthonychild.com")
     env.variables["domain"] = domain
