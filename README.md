@@ -25,11 +25,18 @@ Each site is built independently:
 
 1. **Lint & spellcheck** — markdownlint and pyspelling run against the content directory
 2. **Docker build** — Zensical builds the static site, nginx serves it; the image is pushed to GHCR
-3. **Release** — a versioned Git tag (`wiki-YYYY.MM` / `blog-YYYY.MM`) is created when the site changelog contains an eligible dated release section; that section supplies the release notes
+3. **Release** — eligible changelog entries produce a site-specific Git tag and GitHub release notes. The two sites follow the release rules below.
 4. **Link check** — lychee scans all outbound links
 5. **Notify** — a Discord notification is sent on completion
 
 Pushing to `main` triggers the workflow for whichever site was changed (`wiki/**` or `blog/**`). Changes to shared dependencies, helpers, or the reusable build workflow trigger both pipelines. The two pipelines are independent.
+
+## Publish a blog post
+
+1. Save the Markdown file under `blog/docs/posts/` and add any images it references.
+2. From the repository root, run `zensical serve -f blog/zensical.toml`. Check the post and its images at <http://localhost:8000>.
+3. In VS Code Source Control, stage the post and its images, then commit and push. If you worked on a branch, merge it into `main` to start the Blog build.
+4. Wait for the Blog success notification in Discord. Once the server is running the new image, open the post on [the public blog](https://blog.anthonychild.com) and check its images. See [Deploying published images](#deploying-published-images) for the manual container update and revision check.
 
 ## Changelogs and releases
 
@@ -62,6 +69,20 @@ notes; it cannot bypass an existing tag. Posts still publish with ordinary build
 
 The changelogs summarize monthly releases from Git history and GitHub release
 records. Earlier daily and test releases remain in GitHub Releases.
+
+## Where versions appear
+
+| Where | Routine build | Build that publishes a release |
+| --- | --- | --- |
+| Discord build alert | Date version, such as `2026.11.25` | Release tag, such as `wiki-2026.11.1` or `blog-2026.11` |
+| Dockwatch image version (OCI label) | Date version, such as `2026.11.25` | Planned release tag, such as `wiki-2026.11.1` or `blog-2026.11` |
+| GitHub Releases | No new release entry | Wiki starts at `wiki-YYYY.MM` and adds `.1`, `.2`, and so on for subsequent releases that month. Blog uses `blog-YYYY.MM` once per month. |
+
+The Dockwatch row describes the version stored in the image's
+`org.opencontainers.image.version` label. The running container gets the new
+label when it is recreated with the new image.
+The date version can be reused across builds. The `sha-<short-commit>` image tag
+identifies the source commit when you need to look up a specific build.
 
 ## Deploying published images
 
