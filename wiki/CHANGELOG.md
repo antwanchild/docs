@@ -13,6 +13,8 @@ available in published Docker images.
 
 ## [Unreleased]
 
+## [wiki-2026.11.1] - 2026-11-24
+
 ### Changed
 
 - Use cached uv installs in CI, replace Super-Linter with focused lint commands,
@@ -98,3 +100,5 @@ available in published Docker images.
 [wiki-2026.03]: https://github.com/antwanchild/docs/releases/tag/wiki-2026.03
 
 [wiki-2026.11]: https://github.com/antwanchild/docs/releases/tag/wiki-2026.11
+
+[wiki-2026.11.1]: https://github.com/antwanchild/docs/releases/tag/wiki-2026.11.1
