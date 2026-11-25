@@ -19,7 +19,6 @@ jobs:
     uses: ./.github/workflows/build-site.yml
     with:
       site_name: Wiki
-      content_dir: wiki/docs/
       project_dir: wiki
       env_file_path: wiki/.env
       requirements_file: requirements.wiki.txt

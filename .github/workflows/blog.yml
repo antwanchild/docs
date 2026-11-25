@@ -36,7 +36,6 @@ jobs:
     uses: ./.github/workflows/build-site.yml
     with:
       site_name: Blog
-      content_dir: blog/docs/posts/
       project_dir: blog
       env_file_path: blog/.env
       requirements_file: requirements.blog.txt
