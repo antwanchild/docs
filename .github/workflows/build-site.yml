@@ -250,7 +250,8 @@ jobs:
       contents: read
       packages: write
     outputs:
-      version: ${{ steps.version.outputs.build_tag }}
+      version: ${{ steps.version.outputs.version }}
+      build_tag: ${{ steps.version.outputs.build_tag }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -425,7 +426,7 @@ jobs:
         if: needs.plan-release.outputs.should_release == 'true'
         env:
           IMAGE: ghcr.io/${{ github.repository_owner }}/${{ inputs.image_name }}
-          BUILD_TAG: ${{ needs.docker.outputs.version }}
+          BUILD_TAG: ${{ needs.docker.outputs.build_tag }}
           RELEASE_TAG: ${{ needs.plan-release.outputs.tag }}
           PROJECT_DIR: ${{ inputs.project_dir }}
         run: |
